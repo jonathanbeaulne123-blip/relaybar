@@ -1,0 +1,2 @@
+# Context Stack 0.5 baseline
+These are the original feature receipts and historical design documents. The Context Stack engine remains in the merged 0.6 source, but old extension installation advice is superseded. See ../../START_HERE.md and ../PinnedChats/VALIDATION.md for the current update. BrowserNativeHost.swift was intentionally retired by the Native Sheets merge; other listed preserved foundation files remain unchanged.

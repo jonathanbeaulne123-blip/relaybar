@@ -1,0 +1,7 @@
+Swift version 6.2.1 (swift-6.2.1-RELEASE)
+Target: x86_64-unknown-linux-gnu
+
+PASS: all Core/Mac Swift sources parse in Swift 5 mode; not macOS typechecking.
+PASS: portable Core sources typecheck.
+PASS: all command/build/helper shell scripts parse.
+PASS: version 0.2.1 / build 4, identity local.relaybar, macOS minimum 12.0

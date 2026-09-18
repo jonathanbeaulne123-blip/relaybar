@@ -1,0 +1,41 @@
+=== PINS_CONTROLLER ===
+/tmp/tmpjvv4bsa4/Controller.swift:29:44: warning: reference to captured var 'self' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 27 |         sleepObserver = NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.willSleepNotification,
+ 28 |             object: nil, queue: .main) { [weak self] _ in
+ 29 |                 DispatchQueue.main.async { self?.invalidate("Pins cleared for sleep. Return to the assistant to refresh.") }
+    |                                            `- warning: reference to captured var 'self' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]
+ 30 |             }
+ 31 |     }
+
+[#SendableClosureCaptures]: <https://docs.swift.org/compiler/documentation/diagnostics/sendable-closure-captures>
+{
+  "boundary" : "Exact controller with explicit Cocoa and AX reader doubles; not Mac or live sidebar execution.",
+  "checks" : [
+    "initialization does not read the app",
+    "inactive update does not read",
+    "discovery never navigates",
+    "seven actual entries have three pages",
+    "selected chat marker carried into the real slots",
+    "Pins widths remain within compact budget",
+    "next page exposes fourth chat",
+    "previous page returns first chat",
+    "pending dispatch disables chat buttons",
+    "success says request, not loaded chat",
+    "dispatch retires the inventory",
+    "old-generation button cannot open another chat",
+    "fresh unpin rejects navigation",
+    "foreground change rejects stale tap",
+    "provider switch replaces the inventory",
+    "provider button explicitly asks to open other assistant",
+    "switch clears old provider targets immediately",
+    "stop cancels queued navigation before action",
+    "late callback does not repopulate stopped page",
+    "uncertain action is never automatically retried",
+    "unavailable source produces status not invented pins",
+    "termination discards in-memory pins",
+    "real controller notifies native view refresh"
+  ],
+  "failed" : 0,
+  "passed" : 23
+}
+

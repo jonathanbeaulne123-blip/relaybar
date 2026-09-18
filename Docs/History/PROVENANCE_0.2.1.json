@@ -1,0 +1,106 @@
+{
+  "release": "0.2.1",
+  "build": "4",
+  "prepared": "2026-09-17",
+  "foundation_filename": "RelayBar_v0.2_Screenshot_Shelf.zip",
+  "foundation_sha256": "b1ccfdc11cb531948272029a71774128fddd91b6c6e1736afbe09a7905e76d4e",
+  "changed_existing_files": [
+    {
+      "path": "Install.command",
+      "before": "50e93575164ec31981473b1ba1fdebff5d87596d1f7a30caa39566e5ac9aabfa",
+      "after": "72e365e2553724a287d85dce436f7394a99bf1d2dfde559b8dc210a75fc1a71b"
+    },
+    {
+      "path": "Resources/Info.plist",
+      "before": "55eb5363ba9be20f2563a982bf2ffcaa6797a38558a9eb4c441249948dc8519a",
+      "after": "fe938b18fb563c348d2f0ed38884f711d2a0337038aa6799f5e4ad6301d05b96"
+    },
+    {
+      "path": "START_HERE.md",
+      "before": "378a30e62bcc7015882ebab00b9523313bb69913ee4383f448f59f65b1c7302c",
+      "after": "95df9672fcecc50ba6cf5f101fde93851de811a1457f716e8de68fb27d62e2f0"
+    },
+    {
+      "path": "Sources/Mac/AppMain.swift",
+      "before": "b4c7edfae58158e577bed4e65394d4cc635ae80564048fc82272aab7fe4d784f",
+      "after": "ad9a11361a9b877a280f0e8e652b8d7c0ef383a30dcf07adf4ac4aa3d2dca989"
+    },
+    {
+      "path": "Sources/Mac/Components.swift",
+      "before": "8c2fa01ac8d339949c7dec7dee962fcb104c7fde9803125023e875cf3868c104",
+      "after": "23f6b636f1b4f98d33653a3443abb29eb841120ce190e858828a214ae14d471d"
+    },
+    {
+      "path": "Sources/Mac/ScreenshotNativeChecks.swift",
+      "before": "1bb5032d2faad424dba557ef01942dde72868fd91c0f32d1061317b6ab4c0829",
+      "after": "3af558686d389f8cdd35efd6832e5e8044bdddc6d4bd85f59e2352acbe0ff0b7"
+    }
+  ],
+  "added_files": [
+    "Docs/BUILD_REPAIR_TEST_RESULTS_0.2.1.txt",
+    "Docs/CORE_TEST_RESULTS_0.2.1.txt",
+    "Docs/INTEGRATION_CONTRACT_RESULTS_0.2.1.txt",
+    "Docs/SOURCES_0.2.1.md",
+    "Docs/START_HERE_0.2_HISTORICAL.md",
+    "Docs/SYNTAX_RESULTS_0.2.1.txt",
+    "Docs/VALIDATION_0.2.1.md",
+    "Sources/Core/ScreenshotPresentation.swift",
+    "Tests/AutoOpen/test_integration_contract.py",
+    "Tests/RelayCoreTests/ScreenshotPresentationTests.swift"
+  ],
+  "removed_files": [],
+  "protected_byte_identical": [
+    {
+      "path": "Sources/Bridge/NativeBridge.h",
+      "sha256": "4808436e6e1133e0dcd541ddbdd257852eaba5e0ffcc30f084202aa933c6c00f"
+    },
+    {
+      "path": "Sources/Bridge/NativeBridge.m",
+      "sha256": "f6247ceffd0f846928dad7458b3876581796b3a71d04cc83f6fa8fa5cc776ca8"
+    },
+    {
+      "path": "Scripts/toolchain.sh",
+      "sha256": "b91541971c6a04d84133ab8b9778ace9e8a085809246e42b6b792bc252686dda"
+    },
+    {
+      "path": "Scripts/build.sh",
+      "sha256": "72955d51ed710d453be17a533d107488f6ec6a9836a52ffedb736f7397ae293a"
+    },
+    {
+      "path": "Sources/Mac/ScreenshotShelfMac.swift",
+      "sha256": "54333f51dbe8da0104110f32c8532b77d85277dbc45e9051ae0d0f7c3d4d1702"
+    },
+    {
+      "path": "Sources/Core/ScreenshotShelf.swift",
+      "sha256": "a4d01354268eeb9d85938c22f22ab687a81b0c4b43005a78afdf50a374666095"
+    },
+    {
+      "path": "Sources/Core/LocalStore.swift",
+      "sha256": "f1e8e292af5a8617ec3b00163102ee0b3e7357c6084121dcc4714cfdd751856a"
+    },
+    {
+      "path": "Sources/Core/Models.swift",
+      "sha256": "3493c6266de27a68e487dcbc003e6599e00999cfec6d760cf425e63f46417fa3"
+    },
+    {
+      "path": "Sources/Core/PromptEngine.swift",
+      "sha256": "1e9f4ce82d15f5d12caec34bc685264bae7b6e6214132d22283d99ee2c2082f4"
+    }
+  ],
+  "checks": {
+    "portable_swift_tests": 101,
+    "new_portable_tests": 24,
+    "compiler_repair_tests": 16,
+    "static_integration_contract_tests": 14
+  },
+  "not_verified": [
+    "macOS SDK compilation",
+    "local signing",
+    "installation on user Mac",
+    "native self-test execution",
+    "physical Touch Bar auto-open",
+    "focus preservation on hardware",
+    "pasting full image into user apps"
+  ],
+  "scope": "Touch Bar Screenshot Shelf only; no auto-opening Preview or activating any desktop window; no change to clipboard collection or original source screenshots."
+}

@@ -1,0 +1,64 @@
+{
+  "environment": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+  "boundary": "Parser and shell syntax only. No macOS SDK or installer execution.",
+  "swiftSourceCount": 14,
+  "shellCount": 8,
+  "plistVersion": "0.5.0 (7)",
+  "checks": [
+    {
+      "command": "swiftc -frontend -parse -swift-version 5 Sources/Core/AppContext.swift Sources/Core/BrowserMailbox.swift Sources/Core/LocalStore.swift Sources/Core/Models.swift Sources/Core/NativeMenus.swift Sources/Core/PromptEngine.swift Sources/Core/ScreenshotPresentation.swift Sources/Core/ScreenshotShelf.swift Sources/Mac/AppMain.swift Sources/Mac/Components.swift Sources/Mac/NativeAXSource.swift Sources/Mac/NativeMenuController.swift Sources/Mac/ScreenshotNativeChecks.swift Sources/Mac/ScreenshotShelfMac.swift",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Diagnostics/Doctor.command",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Diagnostics/Screenshot_Test.command",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Diagnostics/Test.command",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Diagnostics/Toolchain_Check.command",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Install.command",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Scripts/build.sh",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Scripts/toolchain.sh",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "bash -n Uninstall.command",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

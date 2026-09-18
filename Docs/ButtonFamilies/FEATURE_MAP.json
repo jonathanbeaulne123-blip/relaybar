@@ -1,0 +1,672 @@
+{
+  "pages": [
+    {
+      "breadcrumb": "Home",
+      "id": "home",
+      "items": [
+        {
+          "help": "Open Home › Prompting",
+          "id": "prompting",
+          "kind": "group",
+          "title": "Prompting"
+        },
+        {
+          "help": "Open Home › Context",
+          "id": "context",
+          "kind": "group",
+          "title": "Context"
+        },
+        {
+          "help": "Open Home › Chats",
+          "id": "chats",
+          "kind": "group",
+          "title": "Chats"
+        },
+        {
+          "help": "Open Home › Workspace",
+          "id": "workspace",
+          "kind": "group",
+          "title": "Workspace"
+        },
+        {
+          "help": "Open Home › Settings",
+          "id": "settings",
+          "kind": "group",
+          "title": "Settings"
+        }
+      ],
+      "parent": "",
+      "title": "Home"
+    },
+    {
+      "breadcrumb": "Home › Prompting",
+      "id": "prompting",
+      "items": [
+        {
+          "help": "Compose Next slice from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-nextSlice",
+          "kind": "action",
+          "title": "Next slice"
+        },
+        {
+          "help": "Compose Challenge from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-challenge",
+          "kind": "action",
+          "title": "Challenge"
+        },
+        {
+          "help": "Compose Handoff from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-handoff",
+          "kind": "action",
+          "title": "Handoff"
+        },
+        {
+          "help": "Open Home › Prompting › More prompts",
+          "id": "promptLibrary",
+          "kind": "group",
+          "title": "More prompts"
+        },
+        {
+          "help": "Open Home › Prompting › Draft",
+          "id": "draft",
+          "kind": "group",
+          "title": "Draft"
+        }
+      ],
+      "parent": "home",
+      "title": "Prompting"
+    },
+    {
+      "breadcrumb": "Home › Prompting › More prompts",
+      "id": "promptLibrary",
+      "items": [
+        {
+          "help": "Open Home › Prompting › More prompts › Build & review",
+          "id": "buildPrompts",
+          "kind": "group",
+          "title": "Build & review"
+        },
+        {
+          "help": "Open Home › Prompting › More prompts › Write & refine",
+          "id": "writePrompts",
+          "kind": "group",
+          "title": "Write & refine"
+        }
+      ],
+      "parent": "prompting",
+      "title": "More prompts"
+    },
+    {
+      "breadcrumb": "Home › Prompting › More prompts › Build & review",
+      "id": "buildPrompts",
+      "items": [
+        {
+          "help": "Compose Explain from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-explain",
+          "kind": "action",
+          "title": "Explain"
+        },
+        {
+          "help": "Compose Diagnose from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-diagnose",
+          "kind": "action",
+          "title": "Diagnose"
+        },
+        {
+          "help": "Compose Add tests from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-tests",
+          "kind": "action",
+          "title": "Add tests"
+        },
+        {
+          "help": "Compose UI review from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-reviewUI",
+          "kind": "action",
+          "title": "UI review"
+        }
+      ],
+      "parent": "promptLibrary",
+      "title": "Build & review"
+    },
+    {
+      "breadcrumb": "Home › Prompting › More prompts › Write & refine",
+      "id": "writePrompts",
+      "items": [
+        {
+          "help": "Compose Tighten from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-tighten",
+          "kind": "action",
+          "title": "Tighten"
+        },
+        {
+          "help": "Compose Expand from your explicit reference. Review first; nothing is sent.",
+          "id": "prompt-expand",
+          "kind": "action",
+          "title": "Expand"
+        }
+      ],
+      "parent": "promptLibrary",
+      "title": "Write & refine"
+    },
+    {
+      "breadcrumb": "Home › Prompting › Draft",
+      "id": "draft",
+      "items": [
+        {
+          "help": "Review draft",
+          "id": "reviewDraft",
+          "kind": "action",
+          "title": "Review draft"
+        },
+        {
+          "help": "Use the reviewed draft. No paste or send action is issued.",
+          "id": "copyDraft",
+          "kind": "action",
+          "title": "Copy draft"
+        },
+        {
+          "help": "Use the reviewed draft. No paste or send action is issued.",
+          "id": "copyAndOpen",
+          "kind": "action",
+          "title": "Copy + Open"
+        },
+        {
+          "help": "Confirm before passing a draft to Claude's new-chat URL handler; no send action.",
+          "id": "prefillClaude",
+          "kind": "action",
+          "title": "Prefill Claude…"
+        },
+        {
+          "help": "Save…",
+          "id": "saveCheckpoint",
+          "kind": "action",
+          "title": "Save…"
+        }
+      ],
+      "parent": "prompting",
+      "title": "Draft"
+    },
+    {
+      "breadcrumb": "Home › Context",
+      "id": "context",
+      "items": [
+        {
+          "help": "Open Home › Context › Capture",
+          "id": "capture",
+          "kind": "group",
+          "title": "Capture"
+        },
+        {
+          "help": "Open Home › Context › Context Stack",
+          "id": "stack",
+          "kind": "group",
+          "title": "Context Stack"
+        },
+        {
+          "help": "Open Home › Context › Screenshots",
+          "id": "screenshots",
+          "kind": "group",
+          "title": "Screenshots"
+        }
+      ],
+      "parent": "home",
+      "title": "Context"
+    },
+    {
+      "breadcrumb": "Home › Context › Capture",
+      "id": "capture",
+      "items": [
+        {
+          "help": "Selection",
+          "id": "captureSelection",
+          "kind": "action",
+          "title": "Selection"
+        },
+        {
+          "help": "Clipboard text",
+          "id": "captureClipboard",
+          "kind": "action",
+          "title": "Clipboard text"
+        },
+        {
+          "help": "Edit reference",
+          "id": "editReference",
+          "kind": "action",
+          "title": "Edit reference"
+        },
+        {
+          "help": "Confirm before clearing the in-memory reference, task and draft. Checkpoints and clipboard are untouched.",
+          "id": "clearSession",
+          "kind": "action",
+          "title": "Clear session…"
+        }
+      ],
+      "parent": "context",
+      "title": "Capture"
+    },
+    {
+      "breadcrumb": "Home › Context › Context Stack",
+      "id": "stack",
+      "items": [
+        {
+          "help": "Explicitly start or pause future clipboard-text collection. No collection is started by opening a group.",
+          "id": "collectStack",
+          "kind": "action",
+          "title": "Collect"
+        },
+        {
+          "help": "Open Home › Context › Context Stack › Recent clips",
+          "id": "stackClips",
+          "kind": "group",
+          "title": "Recent clips"
+        },
+        {
+          "help": "Review stack",
+          "id": "reviewStack",
+          "kind": "action",
+          "title": "Review stack"
+        },
+        {
+          "help": "Open Home › Context › Context Stack › Stack options",
+          "id": "stackOptions",
+          "kind": "group",
+          "title": "Stack options"
+        }
+      ],
+      "parent": "context",
+      "title": "Context Stack"
+    },
+    {
+      "breadcrumb": "Home › Context › Context Stack › Recent clips",
+      "id": "stackClips",
+      "items": [],
+      "parent": "stack",
+      "title": "Recent clips"
+    },
+    {
+      "breadcrumb": "Home › Context › Context Stack › Stack options",
+      "id": "stackOptions",
+      "items": [
+        {
+          "help": "Paste clip",
+          "id": "pasteStack",
+          "kind": "action",
+          "title": "Paste clip"
+        },
+        {
+          "help": "Review stack",
+          "id": "reviewStack",
+          "kind": "action",
+          "title": "Review stack"
+        },
+        {
+          "help": "Clear stack…",
+          "id": "clearStack",
+          "kind": "action",
+          "title": "Clear stack…"
+        }
+      ],
+      "parent": "stack",
+      "title": "Stack options"
+    },
+    {
+      "breadcrumb": "Home › Context › Screenshots",
+      "id": "screenshots",
+      "items": [
+        {
+          "help": "Open Home › Context › Screenshots › Screenshot options",
+          "id": "screenshotOptions",
+          "kind": "group",
+          "title": "Screenshot options"
+        }
+      ],
+      "parent": "context",
+      "title": "Screenshots"
+    },
+    {
+      "breadcrumb": "Home › Context › Screenshots › Screenshot options",
+      "id": "screenshotOptions",
+      "items": [
+        {
+          "help": "Save folder…",
+          "id": "chooseScreenshotFolder",
+          "kind": "action",
+          "title": "Save folder…"
+        },
+        {
+          "help": "Collect images",
+          "id": "watchScreenshots",
+          "kind": "action",
+          "title": "Collect images"
+        },
+        {
+          "help": "Auto-open",
+          "id": "autoScreenshots",
+          "kind": "action",
+          "title": "Auto-open"
+        },
+        {
+          "help": "Clipboard image",
+          "id": "addClipboardImage",
+          "kind": "action",
+          "title": "Clipboard image"
+        },
+        {
+          "help": "Clear shelf…",
+          "id": "clearScreenshots",
+          "kind": "action",
+          "title": "Clear shelf…"
+        }
+      ],
+      "parent": "screenshots",
+      "title": "Screenshot options"
+    },
+    {
+      "breadcrumb": "Home › Chats",
+      "id": "chats",
+      "items": [
+        {
+          "help": "Open Home › Chats › Pinned chats",
+          "id": "pins",
+          "kind": "group",
+          "title": "Pinned chats"
+        },
+        {
+          "help": "Open Home › Chats › Destination",
+          "id": "destinations",
+          "kind": "group",
+          "title": "Destination"
+        },
+        {
+          "help": "Open the configured desktop assistant. Does not copy, type or send. The Follow assistant setting may update the prompt destination on activation.",
+          "id": "openGPT",
+          "kind": "action",
+          "title": "Open GPT"
+        },
+        {
+          "help": "Open the configured desktop assistant. Does not copy, type or send. The Follow assistant setting may update the prompt destination on activation.",
+          "id": "openClaude",
+          "kind": "action",
+          "title": "Open Claude"
+        },
+        {
+          "help": "Pins status",
+          "id": "pinsStatus",
+          "kind": "action",
+          "title": "Pins status"
+        }
+      ],
+      "parent": "home",
+      "title": "Chats"
+    },
+    {
+      "breadcrumb": "Home › Chats › Pinned chats",
+      "id": "pins",
+      "items": [],
+      "parent": "chats",
+      "title": "Pinned chats"
+    },
+    {
+      "breadcrumb": "Home › Chats › Destination",
+      "id": "destinations",
+      "items": [
+        {
+          "help": "Change the prompt destination, not the open chat. Changing destination invalidates the current draft.",
+          "id": "selectGPT",
+          "kind": "action",
+          "title": "ChatGPT"
+        },
+        {
+          "help": "Change the prompt destination, not the open chat. Changing destination invalidates the current draft.",
+          "id": "selectClaude",
+          "kind": "action",
+          "title": "Claude"
+        }
+      ],
+      "parent": "chats",
+      "title": "Destination"
+    },
+    {
+      "breadcrumb": "Home › Workspace",
+      "id": "workspace",
+      "items": [
+        {
+          "help": "Open Home › Workspace › Projects",
+          "id": "projects",
+          "kind": "group",
+          "title": "Projects"
+        },
+        {
+          "help": "Open Home › Workspace › Workflow mode",
+          "id": "modes",
+          "kind": "group",
+          "title": "Workflow mode"
+        },
+        {
+          "help": "Open Home › Workspace › Checkpoints",
+          "id": "checkpoints",
+          "kind": "group",
+          "title": "Checkpoints"
+        },
+        {
+          "help": "Open Home › Workspace › App controls",
+          "id": "appControls",
+          "kind": "group",
+          "title": "App controls"
+        }
+      ],
+      "parent": "home",
+      "title": "Workspace"
+    },
+    {
+      "breadcrumb": "Home › Workspace › Projects",
+      "id": "projects",
+      "items": [
+        {
+          "help": "Open Home › Workspace › Projects › Project options",
+          "id": "projectOptions",
+          "kind": "group",
+          "title": "Project options"
+        }
+      ],
+      "parent": "workspace",
+      "title": "Projects"
+    },
+    {
+      "breadcrumb": "Home › Workspace › Projects › Project options",
+      "id": "projectOptions",
+      "items": [
+        {
+          "help": "Edit brief…",
+          "id": "editProject",
+          "kind": "action",
+          "title": "Edit brief…"
+        },
+        {
+          "help": "New project…",
+          "id": "newProject",
+          "kind": "action",
+          "title": "New project…"
+        }
+      ],
+      "parent": "projects",
+      "title": "Project options"
+    },
+    {
+      "breadcrumb": "Home › Workspace › Workflow mode",
+      "id": "modes",
+      "items": [],
+      "parent": "workspace",
+      "title": "Workflow mode"
+    },
+    {
+      "breadcrumb": "Home › Workspace › Checkpoints",
+      "id": "checkpoints",
+      "items": [
+        {
+          "help": "Save…",
+          "id": "saveCheckpoint",
+          "kind": "action",
+          "title": "Save…"
+        },
+        {
+          "help": "Load…",
+          "id": "loadCheckpoint",
+          "kind": "action",
+          "title": "Load…"
+        },
+        {
+          "help": "Local data",
+          "id": "revealData",
+          "kind": "action",
+          "title": "Local data"
+        }
+      ],
+      "parent": "workspace",
+      "title": "Checkpoints"
+    },
+    {
+      "breadcrumb": "Home › Workspace › App controls",
+      "id": "appControls",
+      "items": [],
+      "parent": "workspace",
+      "title": "App controls"
+    },
+    {
+      "breadcrumb": "Home › Settings",
+      "id": "settings",
+      "items": [
+        {
+          "help": "Open Home › Settings › Layout & bar",
+          "id": "layout",
+          "kind": "group",
+          "title": "Layout & bar"
+        },
+        {
+          "help": "Open Home › Settings › Native controls",
+          "id": "connections",
+          "kind": "group",
+          "title": "Native controls"
+        },
+        {
+          "help": "Open Home › Settings › Assistant settings",
+          "id": "assistantSettings",
+          "kind": "group",
+          "title": "Assistant settings"
+        },
+        {
+          "help": "Local data",
+          "id": "revealData",
+          "kind": "action",
+          "title": "Local data"
+        },
+        {
+          "help": "About / privacy",
+          "id": "about",
+          "kind": "action",
+          "title": "About / privacy"
+        }
+      ],
+      "parent": "home",
+      "title": "Settings"
+    },
+    {
+      "breadcrumb": "Home › Settings › Layout & bar",
+      "id": "layout",
+      "items": [
+        {
+          "help": "App-aware",
+          "id": "appAware",
+          "kind": "action",
+          "title": "App-aware"
+        },
+        {
+          "help": "Cross-app bar…",
+          "id": "overlay",
+          "kind": "action",
+          "title": "Cross-app bar…"
+        },
+        {
+          "help": "Hide bar",
+          "id": "disableOverlay",
+          "kind": "action",
+          "title": "Hide bar"
+        }
+      ],
+      "parent": "settings",
+      "title": "Layout & bar"
+    },
+    {
+      "breadcrumb": "Home › Settings › Native controls",
+      "id": "connections",
+      "items": [
+        {
+          "help": "Enable native…",
+          "id": "enableNative",
+          "kind": "action",
+          "title": "Enable native…"
+        },
+        {
+          "help": "Sheets detection",
+          "id": "nativeDetection",
+          "kind": "action",
+          "title": "Sheets detection"
+        },
+        {
+          "help": "Change the global action-confirmation setting. Turning it off requires acknowledgement.",
+          "id": "nativeConfirmation",
+          "kind": "action",
+          "title": "Ask before run"
+        },
+        {
+          "help": "Connection report",
+          "id": "nativeReport",
+          "kind": "action",
+          "title": "Connection report"
+        },
+        {
+          "help": "Permission…",
+          "id": "accessibility",
+          "kind": "action",
+          "title": "Permission…"
+        }
+      ],
+      "parent": "settings",
+      "title": "Native controls"
+    },
+    {
+      "breadcrumb": "Home › Settings › Assistant settings",
+      "id": "assistantSettings",
+      "items": [
+        {
+          "help": "Follow assistant",
+          "id": "followAssistant",
+          "kind": "action",
+          "title": "Follow assistant"
+        },
+        {
+          "help": "Prefer desktop",
+          "id": "preferDesktop",
+          "kind": "action",
+          "title": "Prefer desktop"
+        },
+        {
+          "help": "GPT app…",
+          "id": "chooseGPTApp",
+          "kind": "action",
+          "title": "GPT app…"
+        },
+        {
+          "help": "Claude app…",
+          "id": "chooseClaudeApp",
+          "kind": "action",
+          "title": "Claude app…"
+        }
+      ],
+      "parent": "settings",
+      "title": "Assistant settings"
+    }
+  ],
+  "release": "RelayBar 0.8.2 · Unified · Verified Click",
+  "source": "Sources/Core/ButtonHierarchy.swift"
+}

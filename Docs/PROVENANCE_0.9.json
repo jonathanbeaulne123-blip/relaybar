@@ -1,0 +1,41 @@
+{
+  "release": "RelayBar 0.9 Persistent Shell",
+  "version": "0.9.0",
+  "build": "16",
+  "bundle_id": "local.relaybar",
+  "prepared": "2026-09-17",
+  "foundation": {
+    "filename": "RelayBar_v0.8.2_Verified_Click.zip",
+    "sha256": "91b5d097ae01bd596fef6d860d230689d8d6e02b9f655502efe7517e833577ee"
+  },
+  "new_runtime_files": [
+    "Sources/Core/PersistentShell.swift",
+    "Sources/Mac/PersistentShellMac.swift"
+  ],
+  "modified_runtime_files": [
+    "Sources/Mac/AppMain.swift",
+    "Sources/Mac/Components.swift",
+    "Sources/Core/ButtonHierarchy.swift",
+    "Sources/Mac/NativeMenuController.swift",
+    "Resources/Info.plist"
+  ],
+  "installer_changes": [
+    "persistent default shell",
+    "user LaunchAgent at login",
+    "0.9 version gate",
+    "permission-recovery version update"
+  ],
+  "preserved_features": [
+    "0.8.2 Verified Click",
+    "Menu Cascade",
+    "Lean Scan + Adaptive Bounds",
+    "Screenshot Shelf + auto-open",
+    "Button Families",
+    "Context Stack",
+    "Pinned Chats",
+    "prompt/project/checkpoint tools"
+  ],
+  "browser_extension_required": false,
+  "per_spreadsheet_setup_required": false,
+  "hardware_validation": "not run in build environment"
+}

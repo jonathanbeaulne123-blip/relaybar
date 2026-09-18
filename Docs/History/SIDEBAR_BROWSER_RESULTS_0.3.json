@@ -1,0 +1,26 @@
+{
+  "environment": "Chromium DOM, Google/Chrome API doubles, offline",
+  "passed": 20,
+  "checks": [
+    "Starts disconnected",
+    "No Google call before consent",
+    "No manifest published before consent",
+    "All fixture buttons rendered",
+    "One-tap action is explicitly labelled",
+    "Connecting does not run a script",
+    "Actual content-script receiver accepts current action",
+    "Default action asks for confirmation",
+    "No execution before confirmation",
+    "Cancel dismisses request",
+    "Cancellation never runs script",
+    "Confirmed tap runs once",
+    "Content script blocks duplicate request",
+    "Reviewed one-tap action skips confirmation",
+    "Different sidebar token rejected",
+    "Different workbook rejected",
+    "Disconnected sidebar rejects taps",
+    "Disconnect revokes server session",
+    "Disconnect removes published buttons",
+    "No network requests during offline test"
+  ]
+}

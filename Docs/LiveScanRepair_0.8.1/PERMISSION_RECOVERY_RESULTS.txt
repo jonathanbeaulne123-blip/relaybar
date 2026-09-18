@@ -1,0 +1,29 @@
+test_app_changed_after_approval_blocks_launch (__main__.RecoveryTests.test_app_changed_after_approval_blocks_launch) ... ok
+test_app_started_during_consent_refused (__main__.RecoveryTests.test_app_started_during_consent_refused) ... ok
+test_app_symlink_refused (__main__.RecoveryTests.test_app_symlink_refused) ... ok
+test_arguments_refused (__main__.RecoveryTests.test_arguments_refused) ... ok
+test_cancel_after_reset_does_not_launch (__main__.RecoveryTests.test_cancel_after_reset_does_not_launch) ... ok
+test_cancel_does_not_reset_or_launch (__main__.RecoveryTests.test_cancel_does_not_reset_or_launch) ... ok
+test_delivered_script_no_signing_build_or_privilege_bypass (__main__.RecoveryTests.test_delivered_script_no_signing_build_or_privilege_bypass) ... ok
+test_eof_before_consent_is_cancel (__main__.RecoveryTests.test_eof_before_consent_is_cancel) ... ok
+test_executable_symlink_refused (__main__.RecoveryTests.test_executable_symlink_refused) ... ok
+test_invalid_signature_refused (__main__.RecoveryTests.test_invalid_signature_refused) ... ok
+test_linux_refused_before_mac_calls (__main__.RecoveryTests.test_linux_refused_before_mac_calls) ... ok
+test_new_process_after_approval_no_reset_or_launch_retry (__main__.RecoveryTests.test_new_process_after_approval_no_reset_or_launch_retry) ... ok
+test_open_error_no_retry (__main__.RecoveryTests.test_open_error_no_retry) ... ok
+test_process_query_failure_refused (__main__.RecoveryTests.test_process_query_failure_refused) ... ok
+test_reset_failure_no_retry_or_open (__main__.RecoveryTests.test_reset_failure_no_retry_or_open) ... ok
+test_reset_word_is_explicit (__main__.RecoveryTests.test_reset_word_is_explicit) ... ok
+test_root_refused (__main__.RecoveryTests.test_root_refused) ... ok
+test_running_app_refused_without_termination (__main__.RecoveryTests.test_running_app_refused_without_termination) ... ok
+test_settings_must_be_closed_before_reset (__main__.RecoveryTests.test_settings_must_be_closed_before_reset) ... ok
+test_success_sequence_exact_reset_and_exact_launch_no_success_claim (__main__.RecoveryTests.test_success_sequence_exact_reset_and_exact_launch_no_success_claim) ... ok
+test_unexpected_executable_refused (__main__.RecoveryTests.test_unexpected_executable_refused) ... ok
+test_unrelated_bundle_refused (__main__.RecoveryTests.test_unrelated_bundle_refused) ... ok
+test_wrong_build_refused (__main__.RecoveryTests.test_wrong_build_refused) ... ok
+test_wrong_version_refused (__main__.RecoveryTests.test_wrong_version_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 7.447s
+
+OK

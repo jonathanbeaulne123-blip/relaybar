@@ -1,0 +1,46 @@
+test_ambiguous_webroots_fail_closed (__main__.PinsWiringTests.test_ambiguous_webroots_fail_closed) ... ok
+test_app_switch_is_explicit_not_discovery (__main__.PinsWiringTests.test_app_switch_is_explicit_not_discovery) ... ok
+test_back_to_home_stops_reading (__main__.PinsWiringTests.test_back_to_home_stops_reading) ... ok
+test_body_and_secure_fields_pruned (__main__.PinsWiringTests.test_body_and_secure_fields_pruned) ... ok
+test_browser_entry_without_extension (__main__.PinsWiringTests.test_browser_entry_without_extension) ... ok
+test_browsers_have_explicit_allowlist (__main__.PinsWiringTests.test_browsers_have_explicit_allowlist) ... ok
+test_budget_and_message_timeouts (__main__.PinsWiringTests.test_budget_and_message_timeouts) ... ok
+test_build_includes_new_sources_unchanged (__main__.PinsWiringTests.test_build_includes_new_sources_unchanged) ... ok
+test_exactly_one_press_no_retry (__main__.PinsWiringTests.test_exactly_one_press_no_retry) ... ok
+test_fresh_rescan_precedes_press (__main__.PinsWiringTests.test_fresh_rescan_precedes_press) ... ok
+test_heading_label_from_child_is_preserved (__main__.PinsWiringTests.test_heading_label_from_child_is_preserved) ... ok
+test_hide_stops_pins (__main__.PinsWiringTests.test_hide_stops_pins) ... ok
+test_limited_results_disabled (__main__.PinsWiringTests.test_limited_results_disabled) ... ok
+test_main_landmark_not_read_for_description (__main__.PinsWiringTests.test_main_landmark_not_read_for_description) ... ok
+test_merged_routes_do_not_restore_extension (__main__.PinsWiringTests.test_merged_routes_do_not_restore_extension) ... ok
+test_metadata (__main__.PinsWiringTests.test_metadata) ... ok
+test_native_pointer_and_focus_check (__main__.PinsWiringTests.test_native_pointer_and_focus_check) ... ok
+test_no_actions_during_discovery (__main__.PinsWiringTests.test_no_actions_during_discovery) ... ok
+test_no_dispatch_from_timer (__main__.PinsWiringTests.test_no_dispatch_from_timer) ... ok
+test_no_eager_scan_in_init (__main__.PinsWiringTests.test_no_eager_scan_in_init) ... ok
+test_no_network_extension_credentials_clipboard (__main__.PinsWiringTests.test_no_network_extension_credentials_clipboard) ... ok
+test_no_title_based_identity (__main__.PinsWiringTests.test_no_title_based_identity) ... ok
+test_only_explicit_runtime_accessibility_preparation (__main__.PinsWiringTests.test_only_explicit_runtime_accessibility_preparation) ... ok
+test_permission_checked_for_scan_and_press (__main__.PinsWiringTests.test_permission_checked_for_scan_and_press) ... ok
+test_pins_cancel_native_actions_before_reading (__main__.PinsWiringTests.test_pins_cancel_native_actions_before_reading) ... ok
+test_pins_page_uses_real_slots (__main__.PinsWiringTests.test_pins_page_uses_real_slots) ... ok
+test_primary_chats_family (__main__.PinsWiringTests.test_primary_chats_family) ... ok
+test_quit_clears (__main__.PinsWiringTests.test_quit_clears) ... ok
+test_reads_only_when_active (__main__.PinsWiringTests.test_reads_only_when_active) ... ok
+test_real_controller_instantiated (__main__.PinsWiringTests.test_real_controller_instantiated) ... ok
+test_screenshot_still_preempts (__main__.PinsWiringTests.test_screenshot_still_preempts) ... ok
+test_selfcheck_does_not_read_assistants (__main__.PinsWiringTests.test_selfcheck_does_not_read_assistants) ... ok
+test_single_sidebar_required (__main__.PinsWiringTests.test_single_sidebar_required) ... ok
+test_source_follows_live_foreground (__main__.PinsWiringTests.test_source_follows_live_foreground) ... ok
+test_stable_generation_keys (__main__.PinsWiringTests.test_stable_generation_keys) ... ok
+test_stack_methods_survive_three_way_merge (__main__.PinsWiringTests.test_stack_methods_survive_three_way_merge) ... ok
+test_stack_stops_pins_not_clips (__main__.PinsWiringTests.test_stack_stops_pins_not_clips) ... ok
+test_static_value_only_in_sidebar (__main__.PinsWiringTests.test_static_value_only_in_sidebar) ... ok
+test_status_never_claims_loaded (__main__.PinsWiringTests.test_status_never_claims_loaded) ... ok
+test_worker_checks_foreground_before_and_after_scan (__main__.PinsWiringTests.test_worker_checks_foreground_before_and_after_scan) ... ok
+test_worker_serial_and_publication_cancelled (__main__.PinsWiringTests.test_worker_serial_and_publication_cancelled) ... ok
+
+----------------------------------------------------------------------
+Ran 41 tests in 0.007s
+
+OK

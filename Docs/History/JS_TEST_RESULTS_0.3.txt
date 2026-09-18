@@ -1,0 +1,448 @@
+TAP version 13
+# Subtest: discovery deduplicates drawings and includes images
+ok 1 - discovery deduplicates drawings and includes images
+  ---
+  duration_ms: 3.213845
+  type: 'test'
+  ...
+# Subtest: no automatic execution on discovery
+ok 2 - no automatic execution on discovery
+  ---
+  duration_ms: 0.709228
+  type: 'test'
+  ...
+# Subtest: registered menu action with explicit one tap
+ok 3 - registered menu action with explicit one tap
+  ---
+  duration_ms: 1.055158
+  type: 'test'
+  ...
+# Subtest: runs original assigned function once
+ok 4 - runs original assigned function once
+  ---
+  duration_ms: 1.143008
+  type: 'test'
+  ...
+# Subtest: same tap rejected
+ok 5 - same tap rejected
+  ---
+  duration_ms: 1.22549
+  type: 'test'
+  ...
+# Subtest: removed assignment rejected
+ok 6 - removed assignment rejected
+  ---
+  duration_ms: 0.890655
+  type: 'test'
+  ...
+# Subtest: wrong worksheet rejected without switching
+ok 7 - wrong worksheet rejected without switching
+  ---
+  duration_ms: 1.637969
+  type: 'test'
+  ...
+# Subtest: wrong workbook rejected
+ok 8 - wrong workbook rejected
+  ---
+  duration_ms: 0.765
+  type: 'test'
+  ...
+# Subtest: unknown action rejected
+ok 9 - unknown action rejected
+  ---
+  duration_ms: 0.81911
+  type: 'test'
+  ...
+# Subtest: disconnected token rejected
+ok 10 - disconnected token rejected
+  ---
+  duration_ms: 0.936533
+  type: 'test'
+  ...
+# Subtest: cache eviction fails closed
+ok 11 - cache eviction fails closed
+  ---
+  duration_ms: 0.623861
+  type: 'test'
+  ...
+# Subtest: private helpers and implicit triggers not discovered
+ok 12 - private helpers and implicit triggers not discovered
+  ---
+  duration_ms: 0.526297
+  type: 'test'
+  ...
+# Subtest: invalid function strings never eval
+ok 13 - invalid function strings never eval
+  ---
+  duration_ms: 0.510464
+  type: 'test'
+  ...
+# Subtest: library methods keep their receiver
+ok 14 - library methods keep their receiver
+  ---
+  duration_ms: 0.605164
+  type: 'test'
+  ...
+# Subtest: changed confirmation setting requires relink
+ok 15 - changed confirmation setting requires relink
+  ---
+  duration_ms: 0.714214
+  type: 'test'
+  ...
+# Subtest: failure is not retried
+ok 16 - failure is not retried
+  ---
+  duration_ms: 0.664491
+  type: 'test'
+  ...
+# Subtest: bounded replay session fails closed
+ok 17 - bounded replay session fails closed
+  ---
+  duration_ms: 1.701071
+  type: 'test'
+  ...
+# Subtest: function results never leave the script
+ok 18 - function results never leave the script
+  ---
+  duration_ms: 0.702918
+  type: 'test'
+  ...
+# Subtest: labels sanitize controls
+ok 19 - labels sanitize controls
+  ---
+  duration_ms: 0.554389
+  type: 'test'
+  ...
+# Subtest: exact Sheets URL
+ok 20 - exact Sheets URL
+  ---
+  duration_ms: 1.09044
+  type: 'test'
+  ...
+# Subtest: multi-account Sheets URL
+ok 21 - multi-account Sheets URL
+  ---
+  duration_ms: 0.285001
+  type: 'test'
+  ...
+# Subtest: reject URL https://docs.google.com.evil.com/spreadsheets/d/sheet_123456789
+ok 22 - reject URL https://docs.google.com.evil.com/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.11502
+  type: 'test'
+  ...
+# Subtest: reject URL http://docs.google.com/spreadsheets/d/sheet_123456789
+ok 23 - reject URL http://docs.google.com/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.070464
+  type: 'test'
+  ...
+# Subtest: reject URL https://docs.google.com:444/spreadsheets/d/sheet_123456789
+ok 24 - reject URL https://docs.google.com:444/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.169951
+  type: 'test'
+  ...
+# Subtest: reject URL https://user@docs.google.com/spreadsheets/d/sheet_123456789
+ok 25 - reject URL https://user@docs.google.com/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.076723
+  type: 'test'
+  ...
+# Subtest: reject URL https://docs.google.com/document/d/sheet_123456789
+ok 26 - reject URL https://docs.google.com/document/d/sheet_123456789
+  ---
+  duration_ms: 0.120137
+  type: 'test'
+  ...
+# Subtest: reject URL javascript:alert(1)
+ok 27 - reject URL javascript:alert(1)
+  ---
+  duration_ms: 0.067289
+  type: 'test'
+  ...
+# Subtest: reject URL file:///spreadsheets/d/sheet_123456789
+ok 28 - reject URL file:///spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.267605
+  type: 'test'
+  ...
+# Subtest: valid sidebar https://script.google.com/macros/123
+ok 29 - valid sidebar https://script.google.com/macros/123
+  ---
+  duration_ms: 0.351599
+  type: 'test'
+  ...
+# Subtest: valid sidebar https://n-abc123-script.googleusercontent.com/userCodeAppPanel
+ok 30 - valid sidebar https://n-abc123-script.googleusercontent.com/userCodeAppPanel
+  ---
+  duration_ms: 0.158083
+  type: 'test'
+  ...
+# Subtest: valid sidebar https://script.googleusercontent.com/anything
+ok 31 - valid sidebar https://script.googleusercontent.com/anything
+  ---
+  duration_ms: 0.061921
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://googleusercontent.com/
+ok 32 - reject sidebar https://googleusercontent.com/
+  ---
+  duration_ms: 0.100228
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://evil.googleusercontent.com/
+ok 33 - reject sidebar https://evil.googleusercontent.com/
+  ---
+  duration_ms: 0.056093
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://script.google.com.evil/
+ok 34 - reject sidebar https://script.google.com.evil/
+  ---
+  duration_ms: 0.04713
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://evil-script.googleusercontent.com.bad/
+ok 35 - reject sidebar https://evil-script.googleusercontent.com.bad/
+  ---
+  duration_ms: 0.045126
+  type: 'test'
+  ...
+# Subtest: valid manifest strips extraneous fields
+ok 36 - valid manifest strips extraneous fields
+  ---
+  duration_ms: 1.857472
+  type: 'test'
+  ...
+# Subtest: wrong workbook manifest
+ok 37 - wrong workbook manifest
+  ---
+  duration_ms: 0.19611
+  type: 'test'
+  ...
+# Subtest: duplicate actions
+ok 38 - duplicate actions
+  ---
+  duration_ms: 0.265452
+  type: 'test'
+  ...
+# Subtest: more than 120 rejected
+ok 39 - more than 120 rejected
+  ---
+  duration_ms: 0.144764
+  type: 'test'
+  ...
+# Subtest: no function payload accepted as action
+ok 40 - no function payload accepted as action
+  ---
+  duration_ms: 0.090373
+  type: 'test'
+  ...
+# Subtest: confirmation must be boolean
+ok 41 - confirmation must be boolean
+  ---
+  duration_ms: 0.095501
+  type: 'test'
+  ...
+# Subtest: linked Sheet context
+ok 42 - linked Sheet context
+  ---
+  duration_ms: 0.156121
+  type: 'test'
+  ...
+# Subtest: wrong cached workbook not actionable
+ok 43 - wrong cached workbook not actionable
+  ---
+  duration_ms: 0.087109
+  type: 'test'
+  ...
+# Subtest: incognito produces no identity
+ok 44 - incognito produces no identity
+  ---
+  duration_ms: 0.064596
+  type: 'test'
+  ...
+# Subtest: unavailable URL stays browser
+ok 45 - unavailable URL stays browser
+  ---
+  duration_ms: 0.095871
+  type: 'test'
+  ...
+# Subtest: pending navigation removes script controls
+ok 46 - pending navigation removes script controls
+  ---
+  duration_ms: 0.118225
+  type: 'test'
+  ...
+# Subtest: ChatGPT website route
+ok 47 - ChatGPT website route
+  ---
+  duration_ms: 0.079247
+  type: 'test'
+  ...
+# Subtest: Claude website route
+ok 48 - Claude website route
+  ---
+  duration_ms: 0.060009
+  type: 'test'
+  ...
+# Subtest: lookalike AI domain not detected
+ok 49 - lookalike AI domain not detected
+  ---
+  duration_ms: 0.110643
+  type: 'test'
+  ...
+# Subtest: tap valid
+ok 50 - tap valid
+  ---
+  duration_ms: 0.279452
+  type: 'test'
+  ...
+# Subtest: reject stale tabID
+ok 51 - reject stale tabID
+  ---
+  duration_ms: 0.132546
+  type: 'test'
+  ...
+# Subtest: reject stale windowID
+ok 52 - reject stale windowID
+  ---
+  duration_ms: 0.064125
+  type: 'test'
+  ...
+# Subtest: reject stale sheetID
+ok 53 - reject stale sheetID
+  ---
+  duration_ms: 0.05403
+  type: 'test'
+  ...
+# Subtest: reject stale pageToken
+ok 54 - reject stale pageToken
+  ---
+  duration_ms: 0.08773
+  type: 'test'
+  ...
+# Subtest: reject stale actionID
+ok 55 - reject stale actionID
+  ---
+  duration_ms: 0.086497
+  type: 'test'
+  ...
+# Subtest: reject stale expiresAt
+ok 56 - reject stale expiresAt
+  ---
+  duration_ms: 0.114119
+  type: 'test'
+  ...
+# Subtest: reject stale expiresAt
+ok 57 - reject stale expiresAt
+  ---
+  duration_ms: 0.072016
+  type: 'test'
+  ...
+# Subtest: reject stale version
+ok 58 - reject stale version
+  ---
+  duration_ms: 0.048422
+  type: 'test'
+  ...
+# Subtest: background window cannot run
+ok 59 - background window cannot run
+  ---
+  duration_ms: 0.071726
+  type: 'test'
+  ...
+# Subtest: bounded navigation requires focus
+ok 60 - bounded navigation requires focus
+  ---
+  duration_ms: 0.069763
+  type: 'test'
+  ...
+# Subtest: worker accepts real authorized iframe manifest
+ok 61 - worker accepts real authorized iframe manifest
+  ---
+  duration_ms: 6.43485
+  type: 'test'
+  ...
+# Subtest: worker rejects unrelated iframe origin
+ok 62 - worker rejects unrelated iframe origin
+  ---
+  duration_ms: 1.355752
+  type: 'test'
+  ...
+# Subtest: worker rejects top-level page
+ok 63 - worker rejects top-level page
+  ---
+  duration_ms: 1.900547
+  type: 'test'
+  ...
+# Subtest: worker rejects other extension
+ok 64 - worker rejects other extension
+  ---
+  duration_ms: 1.200393
+  type: 'test'
+  ...
+# Subtest: webpage cannot enable the link
+ok 65 - webpage cannot enable the link
+  ---
+  duration_ms: 1.0432
+  type: 'test'
+  ...
+# Subtest: native tap goes only to exact linked iframe
+ok 66 - native tap goes only to exact linked iframe
+  ---
+  duration_ms: 1.745738
+  type: 'test'
+  ...
+# Subtest: duplicate native tap not replayed
+ok 67 - duplicate native tap not replayed
+  ---
+  duration_ms: 1.136088
+  type: 'test'
+  ...
+# Subtest: focus loss blocks native command
+ok 68 - focus loss blocks native command
+  ---
+  duration_ms: 1.281762
+  type: 'test'
+  ...
+# Subtest: tab navigation clears old manifest before tap
+ok 69 - tab navigation clears old manifest before tap
+  ---
+  duration_ms: 2.376999
+  type: 'test'
+  ...
+# Subtest: unlinked frame cannot keep script controls
+ok 70 - unlinked frame cannot keep script controls
+  ---
+  duration_ms: 1.33439
+  type: 'test'
+  ...
+# Subtest: two simultaneously linked frames fail closed
+ok 71 - two simultaneously linked frames fail closed
+  ---
+  duration_ms: 0.997622
+  type: 'test'
+  ...
+# Subtest: disabled extension rejects browser commands
+ok 72 - disabled extension rejects browser commands
+  ---
+  duration_ms: 0.984223
+  type: 'test'
+  ...
+# Subtest: competing sidebar heartbeats stay fail-closed until one disconnects
+ok 73 - competing sidebar heartbeats stay fail-closed until one disconnects
+  ---
+  duration_ms: 1.166943
+  type: 'test'
+  ...
+1..73
+# tests 73
+# suites 0
+# pass 73
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 83.133334

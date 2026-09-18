@@ -1,0 +1,10 @@
+User supplied; not captured remotely by the repair build.
+RelayBar 0.5.0 · Native Sheets
+Accessibility: granted
+Browser bundle: com.google.Chrome
+Page kind: sheets
+Top-level controls: 0
+Open-menu controls: 0
+Visited UI nodes: 796
+Status: Accessibility scan limit reached; actions disabled.
+No page URL, document title, cells, script source or screenshots are included in this report.

@@ -1,0 +1,141 @@
+{
+  "release": "RelayBar 0.5 Context Stack",
+  "native_version": "0.5.0",
+  "native_build": "7",
+  "browser_extension_version": "0.4.0",
+  "prepared_at_utc": "2026-09-17T16:21:11.906003+00:00",
+  "input_archives": [
+    {
+      "filename": "RelayBar_v0.3_App_Aware.zip",
+      "bytes": 281723,
+      "sha256": "2ce302430713bc30b68f6599cc3ca9a7c1c0b56bc268d554bbec72093bc1e458"
+    },
+    {
+      "filename": "RelayBar_v0.4_Automatic_Sheets.zip",
+      "bytes": 73506,
+      "sha256": "c3d4a6c8374292bd2e44a7a8a04b7de7e6c2b6b8adfd3b5bd84c80a1b243a735"
+    }
+  ],
+  "preserved_native_files": [
+    {
+      "path": "Sources/Bridge/NativeBridge.h",
+      "sha256": "4808436e6e1133e0dcd541ddbdd257852eaba5e0ffcc30f084202aa933c6c00f",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Sources/Bridge/NativeBridge.m",
+      "sha256": "f6247ceffd0f846928dad7458b3876581796b3a71d04cc83f6fa8fa5cc776ca8",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Scripts/build.sh",
+      "sha256": "72955d51ed710d453be17a533d107488f6ec6a9836a52ffedb736f7397ae293a",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Scripts/toolchain.sh",
+      "sha256": "b91541971c6a04d84133ab8b9778ace9e8a085809246e42b6b792bc252686dda",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Sources/Mac/Components.swift",
+      "sha256": "23f6b636f1b4f98d33653a3443abb29eb841120ce190e858828a214ae14d471d",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Sources/Mac/ScreenshotShelfMac.swift",
+      "sha256": "54333f51dbe8da0104110f32c8532b77d85277dbc45e9051ae0d0f7c3d4d1702",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Sources/Core/ScreenshotShelf.swift",
+      "sha256": "a4d01354268eeb9d85938c22f22ab687a81b0c4b43005a78afdf50a374666095",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Sources/Core/ScreenshotPresentation.swift",
+      "sha256": "0c7506e20273d2f2f8ea99685dc66722ac33e76eddd5a32905305caf0786500b",
+      "baseline": "native_0.3"
+    },
+    {
+      "path": "Sources/Mac/BrowserNativeHost.swift",
+      "sha256": "e17a687be343c1692facec492df5a889e4067d63b8d9a239b26cb1879c1e9869",
+      "baseline": "native_0.3"
+    }
+  ],
+  "preserved_extension_files": [
+    {
+      "path": "BrowserExtension/background.js",
+      "sha256": "4f49b12b894989342384cf67e85bf7dc9be5aae85f4d2b4f1af0b84f04087319",
+      "baseline": "automatic_sheets_0.4"
+    },
+    {
+      "path": "BrowserExtension/manifest.json",
+      "sha256": "1906262ac73d14a625b261c9bca5d46f3132ed5670023c081e3b3ca33968f1b0",
+      "baseline": "automatic_sheets_0.4"
+    },
+    {
+      "path": "BrowserExtension/popup.html",
+      "sha256": "7a4161198844c86e3baf900509a33528d6a0541f3ab64ec5069843e978c48d62",
+      "baseline": "automatic_sheets_0.4"
+    },
+    {
+      "path": "BrowserExtension/popup.js",
+      "sha256": "93952aae26f9629414b58ade6ab09ba58b6a4a2c9c66ed3199c5566b92ff8870",
+      "baseline": "automatic_sheets_0.4"
+    },
+    {
+      "path": "BrowserExtension/protocol.js",
+      "sha256": "04bcc738e99e7be96637f6f8383d682be026c29c04baabc6db19e8802cb4c46d",
+      "baseline": "automatic_sheets_0.4"
+    },
+    {
+      "path": "BrowserExtension/sheet-ui.js",
+      "sha256": "b65ba780beabce8d6bfb059c28c9132e3814431ff60a7f210c7b8614fa8afe26",
+      "baseline": "automatic_sheets_0.4"
+    }
+  ],
+  "changed_source_or_test_paths_vs_native_0_3": [
+    "BrowserExtension/background.js",
+    "BrowserExtension/manifest.json",
+    "BrowserExtension/popup.html",
+    "BrowserExtension/popup.js",
+    "Install.command",
+    "Resources/Info.plist",
+    "Set_Up_Sheets.command",
+    "Sources/Mac/AppMain.swift",
+    "Tests/AppAware/check_syntax.py",
+    "Tests/AppAware/worker.test.cjs",
+    "Tests/AutoOpen/test_integration_contract.py"
+  ],
+  "added_source_or_test_paths_vs_native_0_3": [
+    "BrowserExtension/sheet-ui.js",
+    "Context_Stack_Test.command",
+    "Sources/Core/ContextStack.swift",
+    "Sources/Mac/ContextStackMac.swift",
+    "Sources/Mac/ContextStackNativeChecks.swift",
+    "Tests/AppAware/automatic_browser_test.py",
+    "Tests/ContextStack/test_integration.py",
+    "Tests/RelayCoreTests/ContextStackTests.swift"
+  ],
+  "removed_paths_with_historical_copies": [
+    "BrowserExtension/sidebar.js",
+    "Tests/AppAware/sidebar_browser_test.py"
+  ],
+  "notes": [
+    "Original input archives were not modified.",
+    "Automatic_Sheets_0.4 is an additive recovered package; updater native version guard and its fixture test are intentionally extended for 0.5.",
+    "Removed old sidebar tests and original worker/protocol files are preserved under Docs/Historical_0.3_Tests.",
+    "Byte identity does not prove native runtime behavior."
+  ],
+  "environment": {
+    "os": "Linux-6.18.44-x86_64-with-glibc2.41",
+    "swift": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu",
+    "node": "v22.16.0"
+  },
+  "macOS_SDK_typechecking": false,
+  "macOS_compilation": false,
+  "user_Mac_installation": false,
+  "physical_Touch_Bar_test": false,
+  "live_Sheets_test": false
+}

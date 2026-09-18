@@ -1,0 +1,19 @@
+test_context_stack_native_version_supported (__main__.UpdateTest.test_context_stack_native_version_supported) ... ok
+test_corrupt_manifest_refused (__main__.UpdateTest.test_corrupt_manifest_refused) ... ok
+test_failed_stage_move_rolls_back (__main__.UpdateTest.test_failed_stage_move_rolls_back) ... ok
+test_missing_managed_marker_refused (__main__.UpdateTest.test_missing_managed_marker_refused) ... ok
+test_missing_new_source_does_not_replace_old (__main__.UpdateTest.test_missing_new_source_does_not_replace_old) ... ok
+test_newer_app_refused (__main__.UpdateTest.test_newer_app_refused) ... ok
+test_public_key_preserved (__main__.UpdateTest.test_public_key_preserved) ... ok
+test_restore_original_and_keep_update (__main__.UpdateTest.test_restore_original_and_keep_update) ... ok
+test_restore_receipt_cannot_escape_base (__main__.UpdateTest.test_restore_receipt_cannot_escape_base) ... ok
+test_restore_requires_confirmation (__main__.UpdateTest.test_restore_requires_confirmation) ... ok
+test_symlink_manifest_refused (__main__.UpdateTest.test_symlink_manifest_refused) ... ok
+test_symlink_target_refused (__main__.UpdateTest.test_symlink_target_refused) ... ok
+test_unrelated_extension_refused (__main__.UpdateTest.test_unrelated_extension_refused) ... ok
+test_update_and_preserve_data (__main__.UpdateTest.test_update_and_preserve_data) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.057s
+
+OK

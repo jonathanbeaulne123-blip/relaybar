@@ -1,0 +1,24 @@
+test_already_updated_tree_can_be_copied_without_reapplying_edits (__main__.MergeTests.test_already_updated_tree_can_be_copied_without_reapplying_edits) ... ok
+test_clean_ancestor_creates_copy_only (__main__.MergeTests.test_clean_ancestor_creates_copy_only) ... ok
+test_conflicting_appmain_edit_refuses_output (__main__.MergeTests.test_conflicting_appmain_edit_refuses_output) ... ok
+test_corrupt_release_manifest_payload_refused (__main__.MergeTests.test_corrupt_release_manifest_payload_refused) ... ok
+test_existing_output_is_not_overwritten (__main__.MergeTests.test_existing_output_is_not_overwritten) ... ok
+test_extra_local_plist_metadata_preserved (__main__.MergeTests.test_extra_local_plist_metadata_preserved) ... ok
+test_generated_and_repository_directories_excluded (__main__.MergeTests.test_generated_and_repository_directories_excluded) ... ok
+test_incomplete_native_only_branch_is_refused (__main__.MergeTests.test_incomplete_native_only_branch_is_refused) ... ok
+test_known_lean_scan_engine_is_not_reverted (__main__.MergeTests.test_known_lean_scan_engine_is_not_reverted) ... ok
+test_new_family_file_collision_refuses_output (__main__.MergeTests.test_new_family_file_collision_refuses_output) ... ok
+test_newer_release_is_not_downgraded (__main__.MergeTests.test_newer_release_is_not_downgraded) ... ok
+test_nonoverlapping_appmain_edit_three_way_merges (__main__.MergeTests.test_nonoverlapping_appmain_edit_three_way_merges) ... ok
+test_output_cannot_be_inside_source (__main__.MergeTests.test_output_cannot_be_inside_source) ... ok
+test_output_inventory_verifies_every_regular_file (__main__.MergeTests.test_output_inventory_verifies_every_regular_file) ... ok
+test_removed_baseline_file_is_not_resurrected (__main__.MergeTests.test_removed_baseline_file_is_not_resurrected) ... ok
+test_source_never_modified_by_dry_run (__main__.MergeTests.test_source_never_modified_by_dry_run) ... ok
+test_symlinked_source_file_is_refused (__main__.MergeTests.test_symlinked_source_file_is_refused) ... ok
+test_symlinked_source_root_is_refused (__main__.MergeTests.test_symlinked_source_root_is_refused) ... ok
+test_unrelated_engine_edit_and_extra_file_retained (__main__.MergeTests.test_unrelated_engine_edit_and_extra_file_retained) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.824s
+
+OK

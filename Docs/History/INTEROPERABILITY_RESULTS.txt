@@ -1,0 +1,2 @@
+PASS: the native Swift core decoder loads a checkpoint exported by the browser workbench.
+This verifies data interoperability, not macOS UI behavior.

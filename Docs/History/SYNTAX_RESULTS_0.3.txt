@@ -1,0 +1,5 @@
+PASS: All Swift Core/Mac sources parsed in Swift 5 mode; this is NOT macOS SDK compilation.
+PASS: 9 shell files passed bash -n; Mac installers not executed.
+PASS: 7 JavaScript source/test files passed node --check.
+PASS: Actual .gs source and inline sidebar JavaScript parsed; this is NOT Google V8 execution.
+PASS: Native plist and MV3 JSON versions, limited permissions and referenced assets checked.

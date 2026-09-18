@@ -1,0 +1,35 @@
+[0/1] Planning build
+Building for debugging...
+[0/5] Write sources
+[1/5] Write swift-version--1BA0962812E73E12.txt
+[3/7] Compiling RelayCoreTests NativeMenuTests.swift
+[4/7] Emitting module RelayCoreTests
+[5/8] /mnt/data/relaybar08/RelayBar_0.8_Unified/.build/x86_64-unknown-linux-gnu/debug/RelayBarCorePackageDiscoveredTests.derived/all-discovered-tests.swift
+[6/9] Write sources
+[8/12] Emitting module RelayBarCorePackageDiscoveredTests
+[9/12] Compiling RelayBarCorePackageDiscoveredTests RelayCoreTests.swift
+[10/12] Compiling RelayBarCorePackageDiscoveredTests all-discovered-tests.swift
+[11/13] Wrapping AST for RelayBarCorePackageDiscoveredTests for debugging
+[12/17] /mnt/data/relaybar08/RelayBar_0.8_Unified/.build/x86_64-unknown-linux-gnu/debug/RelayBarCorePackageTests.derived/runner.swift
+[13/18] Write sources
+[14/18] Wrapping AST for RelayCoreTests for debugging
+[16/20] Emitting module RelayBarCorePackageTests
+[17/20] Compiling RelayBarCorePackageTests runner.swift
+[18/20] Write Objects.LinkFileList
+[19/20] Linking RelayBarCorePackageTests.xctest
+Build complete! (3.13s)
+Test Suite 'Selected tests' started at 2026-09-17 18:38:11.857
+Test Suite 'NativeMenuTests' started at 2026-09-17 18:38:11.859
+Test Case 'NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound' started at 2026-09-17 18:38:11.859
+/mnt/data/relaybar08/RelayBar_0.8_Unified/Tests/RelayCoreTests/NativeMenuTests.swift:181: error: NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound : XCTAssertTrue failed - 
+/mnt/data/relaybar08/RelayBar_0.8_Unified/Tests/RelayCoreTests/NativeMenuTests.swift:182: error: NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound : XCTAssertEqual failed: ("nodes") is not equal to ("none") - 
+/mnt/data/relaybar08/RelayBar_0.8_Unified/Tests/RelayCoreTests/NativeMenuTests.swift:183: error: NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound : XCTAssertEqual failed: ("[]") is not equal to ("["Hearth tool one", "Hearth tool two"]") - 
+Test Case 'NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound' failed (0.007 seconds)
+Test Suite 'NativeMenuTests' failed at 2026-09-17 18:38:11.865
+	 Executed 1 test, with 3 failures (0 unexpected) in 0.007 (0.007) seconds
+Test Suite 'Selected tests' failed at 2026-09-17 18:38:11.866
+	 Executed 1 test, with 3 failures (0 unexpected) in 0.007 (0.007) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

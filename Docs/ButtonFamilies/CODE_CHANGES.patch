@@ -1,0 +1,2449 @@
+--- a/Install.command
++++ b/Install.command
+@@ -10,8 +10,9 @@
+   if [[ -t 0 ]]; then printf '\nPress Return to close this window. '; read -r _ || true; fi
+ }
+ trap finish EXIT
+-printf 'RELAYBAR 0.6 — PINNED CHATS / NATIVE SHEETS / CONTEXT STACK\n\n'
++printf 'RELAYBAR 0.7 — BUTTON FAMILIES / PINNED CHATS / NATIVE SHEETS / CONTEXT STACK\n\n'
+ printf 'This script compiles the included source and installs only into ~/Applications.\n'
++printf 'Have local source edits? Use Merge_Into_Source_Copy.command before installing; this installer is not a source merger.\n'
+ printf 'It does not install paid tools, disable Gatekeeper, request an API key, or modify ChatGPT/Claude.\n\n'
+ if [[ "$(uname -s)" != "Darwin" ]]; then echo 'Run this installer on your Mac.'; exit 2; fi
+ if ! xcode-select -p >/dev/null 2>&1 || ! xcrun --find swiftc >/dev/null 2>&1; then
+@@ -42,6 +43,17 @@
+ if [[ -e "$APP" ]]; then
+   IDENTIFIER=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist" 2>/dev/null || true)
+   if [[ "$IDENTIFIER" != "local.relaybar" ]]; then echo "Refusing to replace an unrelated app at $APP"; exit 2; fi
++  CURRENT=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Contents/Info.plist" 2>/dev/null || true)
++  CURRENT_BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP/Contents/Info.plist" 2>/dev/null || true)
++  TARGET_BUILD=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$ROOT/Resources/Info.plist")
++  case "$CURRENT:$CURRENT_BUILD" in
++    0.1.0:1|0.1.1:2|0.2.0:3|0.2.1:4|0.3.0:5|0.5.0:7|0.5.1:10|0.6.0:9) ;;
++    0.7.0:*)
++      if [[ ! "$CURRENT_BUILD" =~ ^[0-9]+$ ]] || [[ ! "$TARGET_BUILD" =~ ^[0-9]+$ ]] || (( 10#$CURRENT_BUILD > 10#$TARGET_BUILD )); then
++        echo "Refusing to replace a newer or unrecognized build ($CURRENT build $CURRENT_BUILD)."; exit 2
++      fi ;;
++    *) echo "Unrecognized or newer RelayBar ($CURRENT build $CURRENT_BUILD). Preserve your current source and reconcile it before installing."; exit 2 ;;
++  esac
+ fi
+ STAGE="$(mktemp -d "$DEST/.RelayBar-stage.XXXXXX")"
+ /usr/bin/ditto "$ROOT/build/RelayBar.app" "$STAGE/RelayBar.app"
+@@ -61,7 +73,7 @@
+ if [[ -n "$BACKUP" ]]; then printf 'Previous version preserved: %s\n' "$BACKUP"; fi
+ printf '\nOpen the RB menu or press Control + Option + Command + Space.\n'
+ printf 'The cross-app Touch Bar is experimental and OFF until you explicitly enable it.\n'
+-printf 'Choose your screenshot save folder in RB → Screenshot Shelf. No Screen Recording permission is needed.\n'
+-printf 'Choose Enable native app controls in RelayBar, then grant Accessibility to RelayBar if asked. Pins uses this same permission.\n'
++printf 'Choose your screenshot save folder in RB → Context → Screenshots → Screenshot options. No Screen Recording permission is needed.\n'
++printf 'Choose RB → Settings → Native controls → Enable native…, then grant Accessibility to RelayBar if asked. Pins uses this same permission.\n'
+ printf 'No browser extension, script code, sidebar or per-spreadsheet setup is required.\n'
+ /usr/bin/open "$APP"
+--- a/Resources/Info.plist
++++ b/Resources/Info.plist
+@@ -15,9 +15,9 @@
+ 	<key>CFBundlePackageType</key>
+ 	<string>APPL</string>
+ 	<key>CFBundleShortVersionString</key>
+-	<string>0.6.0</string>
++	<string>0.7.0</string>
+ 	<key>CFBundleVersion</key>
+-	<string>9</string>
++	<string>11</string>
+ 	<key>CFBundleIconFile</key>
+ 	<string>AppIcon</string>
+ 	<key>LSMinimumSystemVersion</key>
+--- /dev/null
++++ b/Scripts/build_family_map.py
+@@ -0,0 +1,15 @@
++#!/usr/bin/env python3
++"""Build a no-network interactive GUIDE from the actual Swift catalog.
++This is not RelayBar's native UI and deliberately executes no app actions.
++"""
++from pathlib import Path
++import json, subprocess, tempfile
++R=Path(__file__).resolve().parents[1]
++with tempfile.TemporaryDirectory() as tmp:
++ exe=Path(tmp)/'catalog'
++ subprocess.run(['swiftc','-swift-version','5','-parse-as-library',*map(str,sorted((R/'Sources/Core').glob('*.swift'))),str(R/'Scripts/export_button_families.swift'),'-o',str(exe)],check=True)
++ catalog=json.loads(subprocess.check_output([str(exe)],text=True))
++(R/'Docs/ButtonFamilies/FEATURE_MAP.json').write_text(json.dumps(catalog,ensure_ascii=False,indent=2)+'\n')
++template=(R/'Scripts/FamilyMap.template.html').read_text()
++(R/'Button_Families_Map.html').write_text(template.replace('__CATALOG__',json.dumps(catalog,ensure_ascii=False).replace('</','<\\/')))
++print('Built Button_Families_Map.html from',catalog['source'])
+--- /dev/null
++++ b/Scripts/export_button_families.swift
+@@ -0,0 +1,21 @@
++import Foundation
++
++/// Export the SAME catalog used by AppMain's Touch Bar and RB menu.
++/// Run via Scripts/build_family_map.py; no app or assistant is opened.
++@main
++struct ExportButtonFamilies {
++    static func main() throws {
++        let pages: [[String: Any]] = RelayPage.allCases.map { page in
++            let items: [[String: String]] = RelayHierarchy.items(on: page).map { item in
++                switch item {
++                case .page(let child): return ["kind": "group", "id": child.rawValue, "title": child.title, "help": "Open " + child.breadcrumb]
++                case .command(let action): return ["kind": "action", "id": action.id, "title": action.title, "help": action.help]
++                }
++            }
++            return ["id": page.rawValue, "title": page.title, "parent": page.parent?.rawValue ?? "", "breadcrumb": page.breadcrumb, "items": items]
++        }
++        let result: [String: Any] = ["release": "RelayBar 0.7.0 · Button Families", "source": "Sources/Core/ButtonHierarchy.swift", "pages": pages]
++        let data = try JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted, .sortedKeys])
++        FileHandle.standardOutput.write(data)
++    }
++}
+--- /dev/null
++++ b/Scripts/merge_button_families.py
+@@ -0,0 +1,225 @@
++#!/usr/bin/env python3
++"""Merge this release into a NEW copy of a compatible RelayBar source tree.
++
++Never modifies the input tree, installs an app, runs copied code, or resolves a
++conflict by dropping a local change. Text merge uses system diff3, not git state.
++Unrelated feature engine edits remain byte-identical in the copy. A clean merge
++is not an SDK build or semantic compatibility proof; review and test the result.
++"""
++from __future__ import annotations
++import argparse
++import hashlib
++import json
++import os
++from pathlib import Path
++import plistlib
++import re
++import shutil
++import subprocess
++import sys
++import tempfile
++from typing import Dict, Tuple
++
++PACKAGE = Path(__file__).resolve().parents[1]
++EXCLUDED = {'.git', '.build', 'build', 'BuildLogs', '__pycache__', '.DS_Store'}
++REQUIRED = ['Sources/Mac/AppMain.swift', 'Sources/Core/PinnedChats.swift',
++            'Sources/Mac/PinnedChatsMac.swift', 'Sources/Mac/PinnedChatsAX.swift',
++            'Sources/Core/ContextStack.swift', 'Sources/Mac/ContextStackMac.swift',
++            'Sources/Core/NativeMenus.swift', 'Sources/Mac/NativeMenuController.swift',
++            'Sources/Mac/NativeAXSource.swift', 'Sources/Mac/Components.swift',
++            'Sources/Core/Models.swift', 'Package.swift', 'Resources/Info.plist', 'Scripts/build.sh']
++
++class MergeError(Exception):
++    pass
++
++def sha(data: bytes) -> str:
++    return hashlib.sha256(data).hexdigest()
++
++def version(value: str) -> Tuple[int, int, int]:
++    if not re.fullmatch(r'\d+\.\d+\.\d+', value):
++        raise MergeError('Unrecognized version; refusing an automatic merge: ' + value)
++    return tuple(map(int, value.split('.')))  # type: ignore[return-value]
++
++def safe_relative(value: str) -> Path:
++    p = Path(value)
++    if p.is_absolute() or '..' in p.parts or not p.parts:
++        raise MergeError('Unsafe path in release manifest: ' + value)
++    return p
++
++def plain_root(path: Path, must_exist: bool = True) -> Path:
++    absolute = Path(os.path.abspath(path.expanduser()))
++    for part in [absolute, *absolute.parents]:
++        if part.is_symlink():
++            raise MergeError('Symlinked source/destination roots are not supported: ' + str(part))
++    if must_exist and not absolute.is_dir():
++        raise MergeError('Choose an extracted SOURCE folder, not a ZIP or installed .app: ' + str(absolute))
++    return absolute
++
++def inventory(root: Path) -> Dict[str, dict]:
++    result: Dict[str, dict] = {}
++    for directory, dirs, files in os.walk(root, followlinks=False):
++        here = Path(directory)
++        dirs[:] = sorted(d for d in dirs if d not in EXCLUDED)
++        for d in dirs:
++            if (here/d).is_symlink():
++                raise MergeError('Symlinked source directories are not supported: ' + str(here/d))
++        for name in sorted(files):
++            if name in EXCLUDED:
++                continue
++            p = here/name
++            if p.is_symlink() or not p.is_file():
++                raise MergeError('Only regular source files can be copied: ' + str(p))
++            if p.stat().st_size > 100_000_000 or len(result) >= 10000:
++                raise MergeError('Unexpectedly large source tree; review it manually.')
++            data = p.read_bytes()
++            result[str(p.relative_to(root))] = {'sha256': sha(data), 'mode': p.stat().st_mode & 0o777}
++    return result
++
++def three_way(local: bytes, base: bytes, proposed: bytes, name: str) -> bytes:
++    if local == proposed:
++        return local
++    if local == base:
++        return proposed
++    if proposed == base:
++        return local
++    if any(b'\0' in b for b in (local, base, proposed)):
++        raise MergeError('Binary merge conflict: ' + name)
++    tool = shutil.which('diff3')
++    if not tool:
++        raise MergeError('System diff3 is required to preserve edited files. No merge was performed.')
++    with tempfile.TemporaryDirectory(prefix='relaybar-merge-') as tmp:
++        paths = [Path(tmp)/part for part in ('current', 'base', 'families')]
++        for p, b in zip(paths, (local, base, proposed)):
++            p.write_bytes(b)
++        run = subprocess.run([tool, '-m', *map(str, paths)], capture_output=True, timeout=30)
++        if run.returncode != 0:
++            raise MergeError('Overlapping edits in ' + name + '. No output copy was created; original files are unchanged. Reconcile this file manually.')
++        return run.stdout
++
++def merge(source: Path, destination: Path, dry_run: bool = False) -> dict:
++    source, destination = plain_root(source), plain_root(destination, False)
++    if source.suffix == '.app':
++        raise MergeError('This tool needs editable source, not the installed RelayBar.app.')
++    if destination.exists():
++        raise MergeError('Destination already exists. Choose a NEW folder: ' + str(destination))
++    if source == destination or source in destination.parents or destination in source.parents:
++        raise MergeError('The output must be a separate sibling folder, not inside or above your source.')
++    if not destination.parent.is_dir():
++        raise MergeError('The output parent folder must already exist.')
++    before = inventory(source)
++    missing = [name for name in REQUIRED if name not in before]
++    if missing:
++        raise MergeError('This is not the complete 0.6+ combined source (Pins + Stack + Native Sheets). Missing: ' + ', '.join(missing))
++    info = plistlib.loads((source/'Resources/Info.plist').read_bytes())
++    if info.get('CFBundleIdentifier') != 'local.relaybar':
++        raise MergeError('Refusing a source tree that does not identify as local.relaybar.')
++    v = version(str(info.get('CFBundleShortVersionString', '')))
++    if v < (0, 6, 0) or v > (0, 7, 0):
++        raise MergeError('This patch accepts 0.6.x or 0.7.0 combined source only; refusing a downgrade or unrelated branch.')
++    manifest = json.loads((PACKAGE/'MergeSupport/manifest.json').read_text())
++    replacements: Dict[str, bytes] = {}
++    modes: Dict[str, int] = {}
++    decisions = []
++    for item in manifest['files']:
++        name = item['path']; relative = safe_relative(name)
++        proposal_path = PACKAGE/relative
++        proposed = proposal_path.read_bytes()
++        if sha(proposed) != item['proposed_sha256']:
++            raise MergeError('Release payload changed after its manifest was made: ' + name)
++        old = source/relative
++        local = old.read_bytes() if name in before else None
++        if old.exists() and not old.is_file():
++            raise MergeError('A folder occupies an output file path: ' + name)
++        if name == 'Resources/Info.plist':
++            # Preserve ALL extra local metadata; change only release identity.
++            patched = dict(info)
++            proposed_info = plistlib.loads(proposed)
++            patched['CFBundleShortVersionString'] = proposed_info['CFBundleShortVersionString']
++            try:
++                current_build = int(info['CFBundleVersion'])
++                proposed_build = int(proposed_info['CFBundleVersion'])
++            except (KeyError, ValueError, TypeError):
++                raise MergeError('Non-numeric build number; refusing to guess a replacement.')
++            patched['CFBundleVersion'] = str(max(current_build + (v < (0, 7, 0)), proposed_build))
++            result = local if patched == info else plistlib.dumps(patched, sort_keys=False)
++        elif item.get('base_sha256') is not None:
++            if local is None:
++                raise MergeError('A locally removed file would be reintroduced: ' + name)
++            base = (PACKAGE/'MergeSupport/base'/relative).read_bytes()
++            if sha(base) != item['base_sha256']:
++                raise MergeError('The supplied merge ancestor has changed: ' + name)
++            if sha(local) == item.get('accepted_upstream_sha256'):
++                result = proposed
++            else:
++                result = three_way(local, base, proposed, name)
++        else:
++            if local is not None and local != proposed:
++                raise MergeError('A local file conflicts with a NEW hierarchy file: ' + name)
++            result = proposed
++        assert result is not None
++        replacements[name] = result
++        modes[name] = before.get(name, {}).get('mode', item['mode']) | (item['mode'] & 0o111)
++        decisions.append({'path': name, 'status': 'unchanged' if result == local else ('added' if local is None else 'merged'), 'sha256': sha(result)})
++    if inventory(source) != before:
++        raise MergeError('Source changed during merge planning. Retry after saving/stopping edits.')
++    report = {'mode': 'dry-run' if dry_run else 'new-copy', 'source': str(source), 'destination': str(destination),
++              'ancestor': manifest['ancestor'], 'files': decisions,
++              'preserved_source_files': len(set(before) - set(replacements) - {'SHA256SUMS.txt'}),
++              'excluded': sorted(EXCLUDED), 'regenerated': ['SHA256SUMS.txt'],
++              'installed': False, 'mac_sdk_tested': False,
++              'note': 'Clean text merge only. Inspect changes, run Test.command and Button_Families_Test.command, then Install.command from the COPY.'}
++    if dry_run:
++        return report
++    temp = Path(tempfile.mkdtemp(prefix='.relaybar-families-', dir=destination.parent))
++    try:
++        for name, meta in before.items():
++            target = temp/safe_relative(name)
++            target.parent.mkdir(parents=True, exist_ok=True)
++            shutil.copy2(source/name, target)
++        for name, data in replacements.items():
++            target = temp/safe_relative(name)
++            target.parent.mkdir(parents=True, exist_ok=True)
++            target.write_bytes(data); target.chmod(modes[name])
++        # Every unrelated file is explicitly checked, not merely assumed preserved.
++        for name, meta in before.items():
++            if name not in replacements and sha((temp/name).read_bytes()) != meta['sha256']:
++                raise MergeError('Source changed while copying: ' + name)
++        if inventory(source) != before:
++            raise MergeError('Source changed while copying. No output was published; retry after edits stop.')
++        # Generate a NEW receipt and inventory only in the output copy.
++        report_name = 'BUTTON_FAMILIES_MERGE_REPORT.json'
++        if (temp/report_name).exists():
++            report_name = 'BUTTON_FAMILIES_MERGE_REPORT_0.7.json'
++        if (temp/report_name).exists():
++            raise MergeError('Existing merge receipts would be overwritten. Choose an unmerged source copy.')
++        (temp/report_name).write_text(json.dumps(report, indent=2) + '\n')
++        sums = []
++        for name, meta in inventory(temp).items():
++            if name != 'SHA256SUMS.txt':
++                sums.append(meta['sha256'] + '  ' + name)
++        (temp/'SHA256SUMS.txt').write_text('\n'.join(sorted(sums)) + '\n')
++        if destination.exists():
++            raise MergeError('Output appeared while working. Refusing to replace it.')
++        temp.rename(destination)
++    finally:
++        if temp.exists():
++            shutil.rmtree(temp)
++    return report
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__)
++    parser.add_argument('source', type=Path, help='Extracted, complete RelayBar 0.6.x source folder with your edits')
++    parser.add_argument('--output', type=Path, help='New sibling folder; must not exist')
++    parser.add_argument('--dry-run', action='store_true', help='Check compatibility and merges without creating an output copy')
++    args = parser.parse_args()
++    output = args.output or args.source.expanduser().absolute().with_name(args.source.name + '_Button_Families_Copy')
++    try:
++        result = merge(args.source, output, args.dry_run)
++        print(json.dumps(result, indent=2))
++        return 0
++    except (MergeError, OSError, ValueError, subprocess.SubprocessError) as error:
++        print('MERGE STOPPED: ' + str(error), file=sys.stderr)
++        return 2
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+--- /dev/null
++++ b/Sources/Core/ButtonHierarchy.swift
+@@ -0,0 +1,236 @@
++import Foundation
++
++/// Presentation-only taxonomy. Feature engines own their data, permissions and effects.
++/// A group button changes a page; it must never execute a child action implicitly.
++public enum RelayPage: String, CaseIterable, Codable {
++    case home, prompting, promptLibrary, buildPrompts, writePrompts, draft
++    case context, capture, stack, stackClips, stackOptions, screenshots, screenshotOptions
++    case chats, pins, destinations
++    case workspace, projects, projectOptions, modes, checkpoints, appControls
++    case settings, layout, connections, assistantSettings
++
++    public var title: String {
++        switch self {
++        case .home: return "Home"
++        case .prompting: return "Prompting"
++        case .promptLibrary: return "More prompts"
++        case .buildPrompts: return "Build & review"
++        case .writePrompts: return "Write & refine"
++        case .draft: return "Draft"
++        case .context: return "Context"
++        case .capture: return "Capture"
++        case .stack: return "Context Stack"
++        case .stackClips: return "Recent clips"
++        case .stackOptions: return "Stack options"
++        case .screenshots: return "Screenshots"
++        case .screenshotOptions: return "Screenshot options"
++        case .chats: return "Chats"
++        case .pins: return "Pinned chats"
++        case .destinations: return "Destination"
++        case .workspace: return "Workspace"
++        case .projects: return "Projects"
++        case .projectOptions: return "Project options"
++        case .modes: return "Workflow mode"
++        case .checkpoints: return "Checkpoints"
++        case .appControls: return "App controls"
++        case .settings: return "Settings"
++        case .layout: return "Layout & bar"
++        case .connections: return "Native controls"
++        case .assistantSettings: return "Assistant settings"
++        }
++    }
++    public var parent: RelayPage? {
++        switch self {
++        case .home: return nil
++        case .prompting, .context, .chats, .workspace, .settings: return .home
++        case .promptLibrary, .draft: return .prompting
++        case .buildPrompts, .writePrompts: return .promptLibrary
++        case .capture, .stack, .screenshots: return .context
++        case .stackClips, .stackOptions: return .stack
++        case .screenshotOptions: return .screenshots
++        case .pins, .destinations: return .chats
++        case .projects, .modes, .checkpoints, .appControls: return .workspace
++        case .projectOptions: return .projects
++        case .layout, .connections, .assistantSettings: return .settings
++        }
++    }
++    public var path: [RelayPage] { (parent?.path ?? []) + [self] }
++    public var breadcrumb: String { path.map(\.title).joined(separator: " › ") }
++}
++
++public enum RelayCommand: Equatable, Hashable {
++    case prompt(PromptAction)
++    case captureSelection, captureClipboard, editReference, clearSession
++    case collectStack, pasteStack, reviewStack, clearStack
++    case chooseScreenshotFolder, watchScreenshots, autoScreenshots, addClipboardImage, clearScreenshots
++    case selectGPT, selectClaude, openGPT, openClaude, pinsStatus
++    case reviewDraft, copyDraft, copyAndOpen, prefillClaude, saveCheckpoint, loadCheckpoint
++    case editProject, newProject, revealData
++    case appAware, overlay, disableOverlay, enableNative, nativeDetection, nativeConfirmation, nativeReport, accessibility
++    case followAssistant, preferDesktop, chooseGPTApp, chooseClaudeApp, about
++
++    public var id: String {
++        if case .prompt(let action) = self { return "prompt-" + action.rawValue }
++        return String(describing: self)
++    }
++    public var title: String {
++        switch self {
++        case .prompt(let action): return action.title
++        case .captureSelection: return "Selection"
++        case .captureClipboard: return "Clipboard text"
++        case .editReference: return "Edit reference"
++        case .clearSession: return "Clear session…"
++        case .collectStack: return "Collect"
++        case .pasteStack: return "Paste clip"
++        case .reviewStack: return "Review stack"
++        case .clearStack: return "Clear stack…"
++        case .chooseScreenshotFolder: return "Save folder…"
++        case .watchScreenshots: return "Collect images"
++        case .autoScreenshots: return "Auto-open"
++        case .addClipboardImage: return "Clipboard image"
++        case .clearScreenshots: return "Clear shelf…"
++        case .selectGPT: return "ChatGPT"
++        case .selectClaude: return "Claude"
++        case .openGPT: return "Open GPT"
++        case .openClaude: return "Open Claude"
++        case .pinsStatus: return "Pins status"
++        case .reviewDraft: return "Review draft"
++        case .copyDraft: return "Copy draft"
++        case .copyAndOpen: return "Copy + Open"
++        case .prefillClaude: return "Prefill Claude…"
++        case .saveCheckpoint: return "Save…"
++        case .loadCheckpoint: return "Load…"
++        case .editProject: return "Edit brief…"
++        case .newProject: return "New project…"
++        case .revealData: return "Local data"
++        case .appAware: return "App-aware"
++        case .overlay: return "Cross-app bar…"
++        case .disableOverlay: return "Hide bar"
++        case .enableNative: return "Enable native…"
++        case .nativeDetection: return "Sheets detection"
++        case .nativeConfirmation: return "Ask before run"
++        case .nativeReport: return "Connection report"
++        case .accessibility: return "Permission…"
++        case .followAssistant: return "Follow assistant"
++        case .preferDesktop: return "Prefer desktop"
++        case .chooseGPTApp: return "GPT app…"
++        case .chooseClaudeApp: return "Claude app…"
++        case .about: return "About / privacy"
++        }
++    }
++    public var help: String {
++        switch self {
++        case .prompt(let action): return "Compose \(action.title) from your explicit reference. Review first; nothing is sent."
++        case .clearSession: return "Confirm before clearing the in-memory reference, task and draft. Checkpoints and clipboard are untouched."
++        case .selectGPT, .selectClaude: return "Change the prompt destination, not the open chat. Changing destination invalidates the current draft."
++        case .openGPT, .openClaude: return "Open the configured desktop assistant. Does not copy, type or send. The Follow assistant setting may update the prompt destination on activation."
++        case .copyDraft, .copyAndOpen: return "Use the reviewed draft. No paste or send action is issued."
++        case .prefillClaude: return "Confirm before passing a draft to Claude's new-chat URL handler; no send action."
++        case .collectStack: return "Explicitly start or pause future clipboard-text collection. No collection is started by opening a group."
++        case .nativeConfirmation: return "Change the global action-confirmation setting. Turning it off requires acknowledgement."
++        default: return title
++        }
++    }
++}
++
++public enum RelayHierarchyItem: Equatable {
++    case page(RelayPage)
++    case command(RelayCommand)
++    public var id: String {
++        switch self { case .page(let p): return "group-" + p.rawValue; case .command(let c): return c.id }
++    }
++    public var title: String {
++        switch self { case .page(let p): return p.title + " ›"; case .command(let c): return c.title }
++    }
++}
++
++public enum RelayHierarchy {
++    public static func items(on page: RelayPage) -> [RelayHierarchyItem] {
++        switch page {
++        case .home: return [.page(.prompting), .page(.context), .page(.chats), .page(.workspace), .page(.settings)]
++        case .prompting: return [.command(.prompt(.nextSlice)), .command(.prompt(.challenge)), .command(.prompt(.handoff)), .page(.promptLibrary), .page(.draft)]
++        case .promptLibrary: return [.page(.buildPrompts), .page(.writePrompts)]
++        case .buildPrompts: return [.command(.prompt(.explain)), .command(.prompt(.diagnose)), .command(.prompt(.tests)), .command(.prompt(.reviewUI))]
++        case .writePrompts: return [.command(.prompt(.tighten)), .command(.prompt(.expand))]
++        case .draft: return [.command(.reviewDraft), .command(.copyDraft), .command(.copyAndOpen), .command(.prefillClaude), .command(.saveCheckpoint)]
++        case .context: return [.page(.capture), .page(.stack), .page(.screenshots)]
++        case .capture: return [.command(.captureSelection), .command(.captureClipboard), .command(.editReference), .command(.clearSession)]
++        // Pack and recent excerpt buttons come from the existing stack controller.
++        case .stack: return [.command(.collectStack), .page(.stackClips), .command(.reviewStack), .page(.stackOptions)]
++        case .stackClips: return []
++        case .stackOptions: return [.command(.pasteStack), .command(.reviewStack), .command(.clearStack)]
++        // Five full-image copy buttons come from the existing screenshot shelf.
++        case .screenshots: return [.page(.screenshotOptions)]
++        case .screenshotOptions: return [.command(.chooseScreenshotFolder), .command(.watchScreenshots), .command(.autoScreenshots), .command(.addClipboardImage), .command(.clearScreenshots)]
++        case .chats: return [.page(.pins), .page(.destinations), .command(.openGPT), .command(.openClaude), .command(.pinsStatus)]
++        case .pins: return []
++        case .destinations: return [.command(.selectGPT), .command(.selectClaude)]
++        case .workspace: return [.page(.projects), .page(.modes), .page(.checkpoints), .page(.appControls)]
++        case .projects: return [.page(.projectOptions)]
++        case .projectOptions: return [.command(.editProject), .command(.newProject)]
++        case .modes: return []
++        case .checkpoints: return [.command(.saveCheckpoint), .command(.loadCheckpoint), .command(.revealData)]
++        case .appControls: return []
++        case .settings: return [.page(.layout), .page(.connections), .page(.assistantSettings), .command(.revealData), .command(.about)]
++        case .layout: return [.command(.appAware), .command(.overlay), .command(.disableOverlay)]
++        case .connections: return [.command(.enableNative), .command(.nativeDetection), .command(.nativeConfirmation), .command(.nativeReport), .command(.accessibility)]
++        case .assistantSettings: return [.command(.followAssistant), .command(.preferDesktop), .command(.chooseGPTApp), .command(.chooseClaudeApp)]
++        }
++    }
++    public enum NativeBack: Equatable { case cancelConfirmation, menuRoots, parent }
++    public static func nativeBack(pending: Bool, showingOpenMenu: Bool) -> NativeBack {
++        if pending { return .cancelConfirmation }
++        return showingOpenMenu ? .menuRoots : .parent
++    }
++    public static let projectPageSize = 4
++    public static func projectPageCount(_ count: Int) -> Int { max(1, (max(0, count) + projectPageSize - 1) / projectPageSize) }
++    public static func projectRange(count: Int, page: Int) -> Range<Int> {
++        let count = max(0, count), p = min(max(0, page), projectPageCount(count) - 1)
++        let first = min(count, p * projectPageSize)
++        return first..<min(count, first + projectPageSize)
++    }
++}
++
++/// Only navigation state. No clipboard, app activation, pin read, storage or timer.
++public struct RelayNavigation {
++    public private(set) var page: RelayPage = .home
++    public private(set) var generation = UUID()
++    public private(set) var screenshotReturn: RelayPage?
++    public private(set) var projectPage = 0
++    public init() {}
++    public var backDestination: RelayPage? {
++        page == .screenshots ? (screenshotReturn ?? page.parent) : page.parent
++    }
++    public var isStackPage: Bool { [.stack, .stackClips, .stackOptions].contains(page) }
++    public func accepts(_ ticket: UUID) -> Bool { ticket == generation }
++    public mutating func open(_ destination: RelayPage) {
++        // Every explicit navigation invalidates queued controls, even an identical page.
++        // Options opened inside an interrupted viewer retain its return path.
++        if destination != .screenshots && destination != .screenshotOptions { screenshotReturn = nil }
++        page = destination; generation = UUID()
++    }
++    public mutating func home() { open(.home) }
++    public mutating func back() {
++        let destination = backDestination ?? .home
++        open(destination)
++    }
++    public mutating func screenshotArrived(autoOpen: Bool) {
++        guard autoOpen else { return }
++        if page != .screenshots && page != .screenshotOptions { screenshotReturn = page }
++        page = .screenshots; generation = UUID()
++    }
++    /// A real external-app/document change dismisses a viewer, not ordinary refreshes.
++    /// The existing pin controller remains responsible for validating its target.
++    public mutating func externalContextChanged(appAware: Bool) {
++        guard appAware, page == .screenshots || page == .screenshotOptions else { return }
++        open(screenshotReturn ?? .context)
++    }
++    public mutating func leaveUnavailablePins() {
++        if page == .pins { open(.chats) }
++        if screenshotReturn == .pins { screenshotReturn = .chats }
++    }
++    public mutating func setProjectPage(_ proposed: Int, count: Int) {
++        projectPage = min(max(0, proposed), RelayHierarchy.projectPageCount(count)-1)
++        generation = UUID()
++    }
++}
+--- a/Sources/Core/NativeMenus.swift
++++ b/Sources/Core/NativeMenus.swift
+@@ -21,11 +21,72 @@
+             y < other.y + other.height && other.y < y + height
+     }
+ }
++/// Shape only: deliberately excludes names, values, descriptions and URLs.
++public struct NativeNodeHeader {
++    public var role: String?
++    public var subrole: String?
++    public var hidden: Bool?
++    public init(role: String?, subrole: String? = nil, hidden: Bool? = nil) {
++        self.role = role; self.subrole = subrole; self.hidden = hidden
++    }
++}
++public enum NativeScanFailure: String {
++    case none, deadline, queries, children, depth, nodes, readFailed, cancelled
++    public var explanation: String {
++        switch self {
++        case .none: return "none"
++        case .deadline: return "time budget reached"
++        case .queries: return "AX query budget reached"
++        case .children: return "child-list safety bound reached"
++        case .depth: return "tree depth bound reached"
++        case .nodes: return "node bound reached"
++        case .readFailed: return "required UI metadata unavailable or changed"
++        case .cancelled: return "scan cancelled"
++        }
++    }
++}
++public struct NativeReadMetrics {
++    public var queries = 0
++    public var milliseconds = 0
++    public var headerBatches = 0
++    public var headerFallbacks = 0
++    public var childPages = 0
++    public var widestBranch = 0
++    public var failure: NativeScanFailure = .none
++    public init() {}
++}
++/// Shared with the real adapter and portable regression tests. These remain
++/// hard bounds, not a setting the user has to tune for each workbook.
++public struct NativeReadBudget {
++    public static let seconds: Double = 0.85
++    public static let maximumQueries = 3500
++    public static let maximumChildren = 4096
++    public static let childPageSize = 64
++    public private(set) var start: Double
++    public private(set) var queries = 0
++    public private(set) var failure: NativeScanFailure = .none
++    public init(now: Double) { start = now }
++    public func currentFailure(now: Double, cancelled: Bool) -> NativeScanFailure {
++        if cancelled { return .cancelled }
++        if failure != .none { return failure }
++        if !now.isFinite || !start.isFinite || now < start || now - start > Self.seconds { return .deadline }
++        return .none
++    }
++    public mutating func take(now: Double, cancelled: Bool) -> Bool {
++        let current = currentFailure(now: now, cancelled: cancelled)
++        guard current == .none else { fail(current); return false }
++        guard queries < Self.maximumQueries else { fail(.queries); return false }
++        queries += 1; return true
++    }
++    public mutating func fail(_ reason: NativeScanFailure) { if failure == .none { failure = reason } }
++}
+ public protocol NativeMenuSource: AnyObject {
+     associatedtype Node: Hashable
+     var trusted: Bool { get }
+     var limited: Bool { get }
+     var now: Double { get } // monotonic clock
++    var metrics: NativeReadMetrics { get }
++    func header(_ node: Node) -> NativeNodeHeader
+     func beginRead()
+     func frontmostPID() -> Int32
+     func application(_ pid: Int32) -> Node
+@@ -39,6 +100,16 @@
+     func hitTest(_ app: Node, x: Double, y: Double) -> Node?
+     func perform(_ node: Node, action: String) -> Bool
+ }
++public extension NativeMenuSource {
++    // Defaults keep existing service doubles explicit; the Mac implementation
++    // overrides header with one batched AX request and read-local caching.
++    var metrics: NativeReadMetrics {
++        var result = NativeReadMetrics(); if limited { result.failure = .readFailed }; return result
++    }
++    func header(_ node: Node) -> NativeNodeHeader {
++        NativeNodeHeader(role: string(node, .role), subrole: string(node, .subrole), hidden: flag(node, .hidden))
++    }
++}
+ public enum NativeSite: String { case sheets, chatgpt, claude, other }
+ public enum NativeMenuPolicy {
+     public static let browserBundles: Set<String> = ["com.google.Chrome", "com.microsoft.edgemac",
+@@ -51,6 +122,12 @@
+     public static let contentRoles: Set<String> = ["AXTable", "AXGrid", "AXRow", "AXCell",
+         "AXColumn", "AXTextArea", "AXTextField", "AXStaticText", "AXOutline", "AXList",
+         "AXImage", "AXCanvas", "AXScrollBar"]
++    // Formatting toolbars and tab selectors are not custom-menu inventories.
++    // Apply ONLY inside the document, never to the browser-window identity scan
++    // or to descendants of an actual menu container.
++    public static let chromeRoles: Set<String> = ["AXToolbar", "AXTabGroup", "AXRadioGroup"]
++    public static let leafRoles: Set<String> = ["AXLink", "AXCheckBox", "AXRadioButton", "AXSlider",
++        "AXProgressIndicator", "AXBusyIndicator", "AXSplitter", "AXColorWell", "AXIncrementor"]
+     public static let itemRoles: Set<String> = ["AXMenuItem", "AXMenuBarItem", "AXPopUpButton", "AXButton"]
+     public static let standardMenus: Set<String> = ["file", "edit", "view", "insert", "format", "data",
+         "tools", "extensions", "help", "accessibility"]
+@@ -112,6 +189,14 @@
+     public var status = "Waiting for a supported browser."
+     public var sampledAt: Double
+     public var nodesVisited = 0
++    public var readMetrics = NativeReadMetrics()
++    public var scanPhase = "browser identity"
++    public var failure: NativeScanFailure = .none
++    public var deepestLevel = 0
++    public var prunedContentNodes = 0
++    public var prunedChromeNodes = 0
++    public var menuContainersSeen = 0
++    public var candidatesSeen = 0
+     public var ready: Bool { route?.site == .sheets && (!roots.isEmpty || !openItems.isEmpty) }
+     public func sameContent(as other: Self) -> Bool {
+         route == other.route && focus == other.focus && roots == other.roots &&
+@@ -131,6 +216,19 @@
+ 
+     public func scan(pid: Int32, bundle: String) -> NativeMenuSnapshot<N> {
+         source.beginRead()
++        var result = scanBody(pid: pid, bundle: bundle)
++        result.readMetrics = source.metrics
++        if result.readMetrics.failure != .none { result.failure = result.readMetrics.failure }
++        if result.failure != .none {
++            // Never publish partially scanned or expired actions, even if some
++            // candidate labels were found before a budget or API failure.
++            result.roots = []; result.openItems = []
++            result.status = "\(result.scanPhase): \(result.failure.explanation); actions disabled."
++        }
++        return result
++    }
++
++    private func scanBody(pid: Int32, bundle: String) -> NativeMenuSnapshot<N> {
+         var result = NativeMenuSnapshot<N>(sampledAt: source.now)
+         guard source.trusted else { result.status = "Accessibility permission needed."; return result }
+         guard NativeMenuPolicy.browserBundles.contains(bundle) else {
+@@ -148,12 +246,16 @@
+         while cursor < queue.count {
+             let (node, depth) = queue[cursor]; cursor += 1
+             guard seen.insert(node).inserted else { continue }
++            result.deepestLevel = max(result.deepestLevel, depth)
+             if seen.count > NativeMenuPolicy.maximumNodes || depth > NativeMenuPolicy.maximumDepth || source.limited {
++                result.failure = source.limited ? source.metrics.failure :
++                    (depth > NativeMenuPolicy.maximumDepth ? .depth : .nodes)
+                 incomplete = true; break
+             }
+-            guard source.flag(node, .hidden) != true else { continue }
+-            guard let role = source.string(node, .role) else { incomplete = true; continue }
+-            if role == "AXSheet" || role == "AXDialog" || source.string(node, .subrole) == "AXDialog" {
++            let header = source.header(node)
++            guard header.hidden != true else { continue }
++            guard let role = header.role else { incomplete = true; result.failure = .readFailed; continue }
++            if role == "AXSheet" || role == "AXDialog" || header.subrole == "AXDialog" {
+                 modal = true; continue
+             }
+             if role == "AXWebArea" {
+@@ -161,11 +263,13 @@
+                 continue // Do not mistake an iframe for another browser tab.
+             }
+             if NativeMenuPolicy.contentRoles.contains(role) || role == "AXMenuBar" { continue }
+-            guard let children = source.children(node) else { incomplete = true; continue }
++            guard let children = source.children(node) else { incomplete = true; result.failure = .readFailed; continue }
+             queue.append(contentsOf: children.map { ($0, depth+1) })
+         }
+         result.nodesVisited = seen.count
+-        guard !incomplete, !source.limited else { result.status = "Accessibility scan incomplete; actions disabled."; return result }
++        guard !incomplete, !source.limited else {
++            if result.failure == .none { result.failure = .readFailed }; return result
++        }
+         guard !modal else { result.status = "Close the browser dialog to show Sheet menus."; return result }
+         guard areas.count == 1, let web = areas.first,
+               let url = source.string(web, .url), url.count <= 4096 else {
+@@ -175,28 +279,41 @@
+         let route = NativeRoute(pid: pid, bundle: bundle, window: window, webArea: web, url: url)
+         result.route = route
+         guard route.site == .sheets else { result.status = "Native browser context available."; return result }
+-        // Depth-first ordering reaches menu children before the spreadsheet grid.
++        result.scanPhase = "Sheet menu discovery"
++        // Menu traversal is still bounded and complete-or-disabled. Cheap shape
++        // headers prune content and formatting branches before child IPC.
+         var stack: [(N,Int,String,Bool,Bool)] = [(web,0,"",false,false)]
+         seen.removeAll(); var roots: [NativeControl<N>] = [], groups: [(Int,[NativeControl<N>])] = []
+         while let (node, depth, path, inBar, inMenu) = stack.popLast() {
+             guard seen.insert(node).inserted else { continue }
++            result.deepestLevel = max(result.deepestLevel, depth)
+             if seen.count > NativeMenuPolicy.maximumNodes || depth > NativeMenuPolicy.maximumDepth || source.limited {
++                result.failure = source.limited ? source.metrics.failure :
++                    (depth > NativeMenuPolicy.maximumDepth ? .depth : .nodes)
+                 incomplete = true; break
+             }
+-            guard source.flag(node, .hidden) != true else { continue }
+-            guard let role = source.string(node, .role) else { incomplete = true; continue }
++            let header = source.header(node)
++            guard header.hidden != true else { continue }
++            guard let role = header.role else { incomplete = true; result.failure = .readFailed; continue }
+             if node != web && role == "AXWebArea" { continue }
+-            if role == "AXSheet" || role == "AXDialog" || source.string(node, .subrole) == "AXDialog" { modal = true; continue }
+-            if NativeMenuPolicy.contentRoles.contains(role) { continue }
++            if role == "AXSheet" || role == "AXDialog" || header.subrole == "AXDialog" { modal = true; continue }
++            if NativeMenuPolicy.contentRoles.contains(role) || NativeMenuPolicy.leafRoles.contains(role) {
++                result.prunedContentNodes += 1; continue
++            }
++            if !inBar && !inMenu && NativeMenuPolicy.chromeRoles.contains(role) {
++                result.prunedChromeNodes += 1; continue
++            }
+             // The cell canvas is usually a scroll area; don't fetch its contents.
+-            if role == "AXScrollArea" { continue }
++            if role == "AXScrollArea" { result.prunedContentNodes += 1; continue }
+             let isBar = role == "AXMenuBar"
+             let isPopup = role == "AXMenu"
++            if isBar || isPopup { result.menuContainersSeen += 1 }
+             if (isBar || isPopup), !(source.rect(node)?.valid ?? false) { continue }
+-            guard let children = source.children(node) else { incomplete = true; continue }
++            guard let children = source.children(node) else { incomplete = true; result.failure = .readFailed; continue }
+             var nextPath = path
+             if NativeMenuPolicy.itemRoles.contains(role), (inBar || inMenu),
+                let control = control(node, role: role, path: path, root: inBar, children: children) {
++                result.candidatesSeen += 1
+                 if inBar { roots.append(control) }
+                 else { groups.append((depth, [control])) }
+                 if control.isMenu { nextPath = path.isEmpty ? control.label : path + " › " + control.label }
+@@ -209,8 +326,11 @@
+             }
+         }
+         result.nodesVisited += seen.count
+-        guard !incomplete, !source.limited else { result.status = "Accessibility scan limit reached; actions disabled."; return result }
++        guard !incomplete, !source.limited else {
++            if result.failure == .none { result.failure = .readFailed }; return result
++        }
+         guard !modal else { result.status = "A Sheet dialog is open; actions disabled."; return result }
++        result.scanPhase = "document revalidation"
+         guard source.frontmostPID() == pid, source.element(app, .focusedWindow) == window,
+               source.string(web, .url) == url, source.element(app, .focusedElement) == result.focus else {
+             result.route = nil; result.status = "Document changed during discovery."; return result
+--- a/Sources/Mac/AppMain.swift
++++ b/Sources/Mac/AppMain.swift
+@@ -6,13 +6,13 @@
+     static func main() {
+         // Extension/native-messaging entry points have been removed in 0.5.
+         if CommandLine.arguments.contains("--browser-native") || CommandLine.arguments.contains("--register-browser-host") {
+-            fputs("RelayBar 0.5 uses native Accessibility; no browser extension is required or served.\n", stderr)
++            fputs("RelayBar uses native Accessibility; no browser extension is required or served.\n", stderr)
+             exit(2)
+         }
+         let app = NSApplication.shared
+         if CommandLine.arguments.contains("--diagnostics") {
+             let result: [String: Any] = [
+-                "version": "0.6.0",
++                "version": "0.7.0",
+                 "macOS": ProcessInfo.processInfo.operatingSystemVersionString,
+                 "overlaySelectorsAvailable": RBBridge.overlayAvailable(),
+                 "accessibilityGranted": RBBridge.accessibilityTrusted(),
+@@ -23,6 +23,10 @@
+                 print(String(decoding: data, as: UTF8.self))
+             }
+             return
++        }
++        if CommandLine.arguments.contains("--button-families-self-test") {
++            app.setActivationPolicy(.prohibited)
++            exit(RelayAppDelegate().runButtonFamiliesSelfTest())
+         }
+         if CommandLine.arguments.contains("--pinned-chats-self-test") {
+             app.setActivationPolicy(.prohibited)
+@@ -114,6 +118,8 @@
+     private var scriptPage = 0
+     private var manualAITools = false
+     private var contextStack: ContextStackController?
++    private var navigation = RelayNavigation()
++    private var familyPathLabel = label("Home", size: 12, weight: .semibold)
+     private var showingContextStack = false
+     private var showingPinnedChats = false
+     private var pinnedChats: PinnedChatsController?
+@@ -131,6 +137,7 @@
+             startupError = "Local configuration could not be loaded: \(error.localizedDescription)\n\nThe original data is untouched. This session uses temporary starter settings. Fix or rename the configuration file before saving new settings."
+         }
+         screenshotPresentation.setAutoOpenEnabled(UserDefaults.standard.object(forKey: autoOpenKey) as? Bool ?? true)
++        screenshotPresentation.showTools() // First launch opens the five families, not an empty screenshot shelf.
+         lastExternalApp = NSWorkspace.shared.frontmostApplication
+         buildMenu()
+         buildPanel()
+@@ -152,7 +159,10 @@
+                 let ticket = didAdd ? self.screenshotPresentation.screenshotAdded() : nil
+                 // New screenshots keep their established presentation priority.
+                 // Stack text and collection state are retained, not discarded.
+-                if ticket != nil { self.showingContextStack = false; self.stopPinnedChats() }
++                if ticket != nil {
++                    self.navigation.screenshotArrived(autoOpen: true)
++                    self.showingContextStack = false; self.stopPinnedChats()
++                }
+                 self.refreshScreenshotUI()
+                 if let ticket = ticket { self.scheduleScreenshotRecovery(ticket: ticket) }
+             }
+@@ -212,74 +222,14 @@
+             item.target = self; menu.addItem(item); return item
+         }
+         _ = add("Open RelayBar   ⌃⌥⌘Space", #selector(showFromMenu))
+-        _ = add("Capture selected text", #selector(captureFromMenu))
++        menu.addItem(FamilyMenuItem("Home — all button families") { [weak self] in self?.navigate(to: .home) })
+         menu.addItem(.separator())
+-        appAwareMenuItem = add("Automatically change buttons with the active app", #selector(toggleAppAware))
+-        appAwareMenuItem?.state = appAwareEnabled ? .on : .off
++        for item in RelayHierarchy.items(on: .home) {
++            if case .page(let page) = item { menu.addItem(familyMenu(page)) }
++        }
++        menu.addItem(.separator())
+         appContextMenuItem = NSMenuItem(title: "Active app: waiting", action: nil, keyEquivalent: "")
+         if let item = appContextMenuItem { menu.addItem(item) }
+-        _ = add("Enable native app controls…", #selector(enableNativeControls))
+-        nativePauseMenuItem = add("Native Google Sheets menu detection", #selector(toggleNativeDetection))
+-        nativePauseMenuItem?.state = nativeMenusEnabled ? .on : .off
+-        nativeAskMenuItem = add("Ask before activating menu actions", #selector(toggleNativeConfirmation))
+-        nativeAskMenuItem?.state = nativeAskActions ? .on : .off
+-        _ = add("Native connection report…", #selector(showNativeReport))
+-        menu.addItem(.separator())
+-        let pinsRoot = NSMenuItem(title: "Pinned Chats", action: nil, keyEquivalent: "")
+-        let pinsMenu = NSMenu(title: "Pinned Chats")
+-        for (title, action) in [("Show pinned chats on Touch Bar", #selector(showPinnedChats)),
+-                                ("Refresh the active sidebar", #selector(refreshPinnedChats)),
+-                                ("Setup / detection status…", #selector(showPinnedStatus))] {
+-            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+-            item.target = self; pinsMenu.addItem(item)
+-        }
+-        pinsRoot.submenu = pinsMenu; menu.addItem(pinsRoot)
+-        menu.addItem(.separator())
+-        let stackRoot = NSMenuItem(title: "Context Stack", action: nil, keyEquivalent: "")
+-        let stackMenu = NSMenu(title: "Context Stack")
+-        func addStack(_ title: String, _ selector: Selector) -> NSMenuItem {
+-            let item = NSMenuItem(title: title, action: selector, keyEquivalent: "")
+-            item.target = self; stackMenu.addItem(item); return item
+-        }
+-        _ = addStack("Show Context Stack on Touch Bar", #selector(showStackFromMenu))
+-        stackCollectMenuItem = addStack("Start collecting copied text…", #selector(toggleStackCollection))
+-        stackSummaryMenuItem = NSMenuItem(title: "No clips · memory only", action: nil, keyEquivalent: "")
+-        stackMenu.addItem(stackSummaryMenuItem!)
+-        _ = addStack("Paste clipboard text as one clip", #selector(pasteStackClip))
+-        _ = addStack("Review / reorder / copy handoff…", #selector(reviewStack))
+-        _ = addStack("Clear this project's stack…", #selector(clearStack))
+-        stackRoot.submenu = stackMenu; menu.addItem(stackRoot)
+-        menu.addItem(.separator())
+-        let screenshotRoot = NSMenuItem(title: "Screenshot Shelf", action: nil, keyEquivalent: "")
+-        let screenshotMenu = NSMenu(title: "Screenshot Shelf")
+-        func addShot(_ title: String, _ action: Selector) -> NSMenuItem {
+-            let item = NSMenuItem(title: title, action: action, keyEquivalent: "")
+-            item.target = self; screenshotMenu.addItem(item); return item
+-        }
+-        screenshotPageMenuItem = addShot("Show five screenshot thumbnails", #selector(showScreenshotsFromMenu))
+-        screenshotAutoOpenMenuItem = addShot("Automatically show viewer after a screenshot", #selector(toggleScreenshotAutoOpen))
+-        screenshotAutoOpenMenuItem?.state = screenshotPresentation.autoOpenEnabled ? .on : .off
+-        _ = addShot("Choose screenshot save folder…", #selector(chooseScreenshotFolder))
+-        screenshotWatchMenuItem = addShot("Start screenshot collection", #selector(toggleScreenshotWatching))
+-        _ = addShot("Add clipboard image", #selector(addScreenshotClipboard))
+-        _ = addShot("Clear screenshot shelf…", #selector(clearScreenshotShelf))
+-        screenshotRoot.submenu = screenshotMenu; menu.addItem(screenshotRoot)
+-        menu.addItem(.separator())
+-        _ = add("Edit current project…", #selector(editFromMenu))
+-        _ = add("New project…", #selector(newProjectFromMenu))
+-        _ = add("Load checkpoint…", #selector(loadCheckpointFromMenu))
+-        _ = add("Reveal local data", #selector(revealData))
+-        menu.addItem(.separator())
+-        followMenuItem = add("Follow active desktop assistant", #selector(toggleFollow))
+-        desktopMenuItem = add("Prefer desktop apps over browser", #selector(toggleDesktop))
+-        _ = add("Choose ChatGPT application…", #selector(chooseChatGPT))
+-        _ = add("Choose Claude application…", #selector(chooseClaude))
+-        menu.addItem(.separator())
+-        overlayMenuItem = add("Experimental cross-app Touch Bar…", #selector(toggleOverlay))
+-        _ = add("Hide cross-app Touch Bar", #selector(disableOverlay))
+-        _ = add("Enable selected-text permission…", #selector(requestAccessibility))
+-        menu.addItem(.separator())
+-        _ = add("About / privacy", #selector(showAbout))
+         _ = add("Quit RelayBar", #selector(quit), key: "q")
+         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+         statusItem.button?.title = "RB"
+@@ -300,18 +250,21 @@
+         editItem.submenu = editMenu; main.addItem(editItem); NSApp.mainMenu = main
+     }
+ 
+-    private func buildPanel() {
++    private func buildPanel(selfTest: Bool = false) {
+         panel = RelayPanel(contentRect: NSRect(x: 0, y: 0, width: 940, height: 790),
+                            styleMask: [.titled, .closable, .resizable, .miniaturizable], backing: .buffered, defer: false)
+-        panel.title = "RelayBar · native app-aware controls"
++        panel.title = "RelayBar · Button Families"
+         panel.minSize = NSSize(width: 820, height: 550)
+         panel.isReleasedWhenClosed = false
+         panel.hidesOnDeactivate = false
+         panel.delegate = self
+-        panel.onEscape = { [weak self] in self?.hidePanel() }
++        panel.onEscape = { [weak self] in
++            guard let self = self else { return }
++            if self.navigation.page == .home { self.hidePanel() } else { self.navigateBack() }
++        }
+         panel.touchBar = panelBar.bar
+         panel.center()
+-        panel.setFrameAutosaveName("RelayBarPanel")
++        if !selfTest { panel.setFrameAutosaveName("RelayBarPanel") }
+ 
+         let scroll = NSScrollView()
+         scroll.hasVerticalScroller = true
+@@ -341,6 +294,7 @@
+         body.addArrangedSubview(label("Native app controls. Local screenshots. No browser extension.", size: 14, secondary: true))
+         full(appContextLabel)
+ 
++        body.addArrangedSubview(label("WORKSPACE · PROJECT & DESTINATION", size: 11, weight: .semibold))
+         targetPicker.addItems(withTitles: AssistantTarget.allCases.map(\.rawValue))
+         modePicker.addItems(withTitles: WorkflowMode.allCases.map(\.rawValue))
+         targetPicker.target = self; targetPicker.action = #selector(targetChanged)
+@@ -354,22 +308,16 @@
+         mirror.wantsLayer = true; mirror.layer?.cornerRadius = 10
+         mirror.layer?.backgroundColor = NSColor.black.cgColor
+         mirror.edgeInsets = NSEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
++        full(familyPathLabel)
+         full(mirror)
+         full(screenshotLabel)
+-        full(row([
+-            ActionButton("Context Stack") { [weak self] in self?.showStackFromMenu() },
+-            ActionButton("Review stack") { [weak self] in self?.reviewStack() },
+-            ActionButton("Screenshots") { [weak self] in self?.showScreenshotsFromMenu() },
+-            ActionButton("AI tools") { [weak self] in self?.showToolsPage() },
+-            ActionButton("Add clipboard image", help: "Explicitly add a clipboard-only screenshot. This is not background clipboard monitoring.") { [weak self] in self?.addScreenshotClipboard() },
+-            ActionButton("Screenshot folder…") { [weak self] in self?.chooseScreenshotFolder() }
+-        ]))
+         full(contextLabel)
+ 
+         let captureButton = ActionButton("Capture selection", help: "Read only selected text from the last active app; optional Accessibility permission.") { [weak self] in self?.captureSelection() }
++        body.addArrangedSubview(label("CONTEXT · CAPTURE", size: 11, weight: .semibold))
+         full(row([captureButton,
+                   ActionButton("Use clipboard", help: "Read plain text from the clipboard once, only on this click.") { [weak self] in self?.captureClipboard() },
+-                  ActionButton("Clear") { [weak self] in self?.clearSession() }, originLabel]))
++                  ActionButton("Clear session…") { [weak self] in self?.confirmClearSession() }, originLabel]))
+         let (referenceScroll, reference) = textEditor(height: 115)
+         referenceView = reference; reference.delegate = self; reference.touchBar = panelBar.bar
+         reference.setAccessibilityLabel("Explicit reference text; editable and not automatically saved")
+@@ -380,11 +328,12 @@
+         taskField.setAccessibilityLabel("Specific task or next step")
+         full(taskField)
+ 
++        body.addArrangedSubview(label("PROMPTING · COMPOSE", size: 11, weight: .semibold))
+         actionPicker.addItems(withTitles: PromptAction.allCases.map(\.title))
+         actionPicker.target = self; actionPicker.action = #selector(actionChanged)
+         full(row([label("Action"), actionPicker,
+                   ActionButton("Compose draft") { [weak self] in self?.composeSelected() },
+-                  ActionButton("Handoff → other assistant") { [weak self] in self?.performAction(.handoff) }]))
++                  ActionButton("Prompting ›") { [weak self] in self?.navigate(to: .prompting) }]))
+         full(draftLabel)
+         let (draftScroll, draftText) = textEditor(height: 195, mono: true)
+         draftView = draftText; draftText.delegate = self; draftText.touchBar = panelBar.bar
+@@ -398,7 +347,7 @@
+             ActionButton("Save checkpoint…") { [weak self] in self?.saveCheckpoint() }
+         ]))
+         full(statusLabel)
+-        full(label("⌃⌥⌘Space opens this panel. Screenshot watching is opt-in. Context Stack collects only after Start and stays in memory. Reference capture is on-demand; drafts stay in memory unless checkpointed. Esc hides the panel; the RB menu remains available.", size: 11, secondary: true))
++        full(label("⌃⌥⌘Space opens this panel. Screenshot watching is opt-in. Context Stack collects only after Start and stays in memory. Reference capture is on-demand; drafts stay in memory unless checkpointed. Esc goes Back; at Home it hides the panel. The RB menu remains available.", size: 11, secondary: true))
+     }
+ 
+     private func refreshControls() {
+@@ -459,25 +408,8 @@
+     }
+ 
+     private func rebuildBars() {
+-        let suggested = ContextEngine.actions(mode: configuration.mode, text: capture.text)
+-        let tools: [TouchBarDriver.Slot] = [
+-            pinnedChatsSlot(),
+-            .init(key: "stack-open", title: "Stack", help: "Collect copied passages and copy one combined handoff", width: 46) { [weak self] in self?.showStackFromMenu() },
+-            .init(key: "screenshots", title: "Shots", help: "Show the five most recent screenshot thumbnails", width: 44) { [weak self] in self?.showScreenshotsFromMenu() },
+-            .init(key: "target", title: configuration.target.rawValue, help: "Switch assistant destination", width: 60) { [weak self] in self?.cycleTarget() },
+-            .init(key: "project", title: String(configuration.selectedProject.name.prefix(13)), help: "Cycle project brief; text stacks remain separate", width: 60) { [weak self] in self?.cycleProject() },
+-            .init(key: "capture", title: "Capture", help: "Capture selected text on demand", width: 58) { [weak self] in self?.captureSelection() },
+-            .init(key: "smart1", title: suggested[0].title, help: "Compose \(suggested[0].title) from explicit reference", width: 76) { [weak self] in self?.performAction(suggested[0]) },
+-            .init(key: "smart2", title: suggested[1].title, help: "Compose \(suggested[1].title) from explicit reference", width: 76) { [weak self] in self?.performAction(suggested[1]) },
+-            .init(key: "handoff", title: "Handoff", help: "Compose a handoff for the other assistant", width: 58) { [weak self] in self?.performAction(.handoff) },
+-            .init(key: "hide", title: "×", help: "Hide panel and disable the experimental cross-app bar", width: 28) { [weak self] in self?.disableOverlay(); self?.hidePanel() }
+-        ]
+-        let slots: [TouchBarDriver.Slot]
+-        if showingPinnedChats, let pins = pinnedChats {
+-            slots = pins.slots(back: { [weak self] in self?.showToolsPage() }, hide: { [weak self] in self?.disableOverlay(); self?.hidePanel() })
+-        } else if showingContextStack, let stack = contextStack {
+-            slots = stack.slots(back: { [weak self] in self?.showToolsPage() }, hide: { [weak self] in self?.disableOverlay(); self?.hidePanel() })
+-        } else { slots = showingScreenshots ? screenshotSlots() : appAwareSlots(fallback: tools) }
++        let slots = familySlots()
++        familyPathLabel.stringValue = navigation.page.breadcrumb
+         let previousIdentifiers = overlayBar.bar.defaultItemIdentifiers
+         panelBar.update(slots); overlayBar.update(slots)
+         panel?.touchBar = panelBar.bar
+@@ -509,16 +441,11 @@
+         updateOverlay(for: NSWorkspace.shared.frontmostApplication)
+     }
+     @objc private func showScreenshotsFromMenu() {
+-        nativeMenus.cancelInteraction()
+-        stopPinnedChats()
+-        showingContextStack = false
+-        screenshotPresentation.showScreenshots(); refreshScreenshotUI()
++        navigate(to: .screenshots)
++        if !overlayEnabled { showPanel() }
+     }
+     private func showToolsPage() {
+-        nativeMenus.cancelInteraction()
+-        stopPinnedChats()
+-        showingContextStack = false
+-        screenshotPresentation.showTools(); refreshScreenshotUI()
++        navigate(to: .home)
+     }
+     @objc private func toggleScreenshotAutoOpen() {
+         screenshotPresentation.setAutoOpenEnabled(!screenshotPresentation.autoOpenEnabled)
+@@ -542,10 +469,8 @@
+         }
+     }
+     @objc private func chooseScreenshotFolder() {
+-        nativeMenus.cancelInteraction()
+-        stopPinnedChats()
+-        showingContextStack = false
+-        showPanel(); screenshotShelf?.chooseFolder(); screenshotPresentation.showScreenshots(); refreshScreenshotUI()
++        navigate(to: .screenshotOptions)
++        showPanel(); screenshotShelf?.chooseFolder(); refreshScreenshotUI()
+     }
+     @objc private func toggleScreenshotWatching() {
+         if screenshotShelf?.folderURL == nil { showPanel() }
+@@ -712,6 +637,7 @@
+             draft = try PromptEngine.compose(action: currentAction, project: configuration.selectedProject,
+                                              capture: capture, task: taskField.stringValue, target: configuration.target)
+             suppressEdits = true; draftView.string = draft!.text; suppressEdits = false
++            navigate(to: .draft)
+             refreshControls(); showPanel()
+             setStatus("Draft prepared locally for \(configuration.target.rawValue). Nothing was copied, opened, or sent.")
+         } catch { showError(error.localizedDescription) }
+@@ -888,6 +814,7 @@
+             invalidateDraft(); refreshControls()
+         } else if view === draftView {
+             if draft != nil { draft?.text = view.string }
++            rebuildBars()
+         }
+     }
+     func controlTextDidChange(_ notification: Notification) {
+@@ -924,6 +851,7 @@
+     @objc private func revealData() { if let store = store { NSWorkspace.shared.open(store.directory) } }
+     @objc private func quit() { NSApp.terminate(nil) }
+     @objc private func disableOverlay() {
++        navigation.leaveUnavailablePins()
+         stopPinnedChats()
+         contextStack?.pause("Collection paused because the cross-app bar was hidden.")
+         nativeMenus.clear()
+@@ -958,7 +886,11 @@
+         let appChanged = liveBundle != bundle
+         if appChanged {
+             liveBundle = bundle; lastKnownNativeRoute = nil; scriptPage = 0; manualAITools = false
+-            if appAwareEnabled { screenshotPresentation.showTools() }
++            if appAwareEnabled {
++                let previousPage = navigation.page
++                navigation.externalContextChanged(appAware: true)
++                if navigation.page != previousPage { reconcileNavigation() }
++            }
+         }
+         nativeMenus.observe(pid: front.processIdentifier, bundle: bundle,
+                             enabled: appAwareEnabled && nativeMenusEnabled && overlayEnabled)
+@@ -967,7 +899,11 @@
+         if let route = route {
+             if let old = lastKnownNativeRoute, old != route {
+                 scriptPage = 0; manualAITools = false
+-                if appAwareEnabled { screenshotPresentation.showTools() }
++                if appAwareEnabled {
++                let previousPage = navigation.page
++                navigation.externalContextChanged(appAware: true)
++                if navigation.page != previousPage { reconcileNavigation() }
++            }
+             }
+             lastKnownNativeRoute = route
+         }
+@@ -978,19 +914,21 @@
+         else if knownSite == .sheets { liveProfile = "sheets" }
+         else if NativeMenuPolicy.browserBundles.contains(bundle) || ["org.mozilla.firefox", "company.thebrowser.Browser"].contains(bundle) { liveProfile = "browser" }
+         else { liveProfile = "other" }
+-        if showingPinnedChats && (liveProfile == "other" || route?.site == .sheets) { stopPinnedChats() }
++        if showingPinnedChats && (liveProfile == "other" || route?.site == .sheets) {
++            navigation.leaveUnavailablePins(); stopPinnedChats(); reconcileNavigation()
++        }
+         if configuration.followDesktopAssistant, draft == nil, knownSite == .chatgpt || knownSite == .claude {
+             let target: AssistantTarget = knownSite == .chatgpt ? .chatgpt : .claude
+             if configuration.target != target { configuration.target = target; saveConfiguration(); refreshControls() }
+         }
+         let details: String
+-        if !appAwareEnabled { details = "App-aware layouts paused · original AI tools" }
++        if !appAwareEnabled { details = "App-aware detection paused · button families retained" }
+         else if liveProfile == "sheets" || liveProfile == "browser" {
+             if !nativeMenusEnabled { details = "\(liveAppName) · enable native controls in RB · no extension needed" }
+             else if !overlayEnabled { details = "\(liveAppName) · cross-app mode is off for this session" }
+             else { details = "\(liveAppName) · " + (snapshot?.status ?? "Reading native menus…") }
+         } else if liveProfile == "other" { details = "\(liveAppName) · its native Touch Bar is unchanged" }
+-        else { details = "\(liveAppName) · AI tools" }
++        else { details = "\(liveAppName) · button families" }
+         let statusChanged = details != appContextLabel.stringValue
+         appContextLabel.stringValue = details
+         appContextMenuItem?.title = String(details.prefix(160))
+@@ -1001,7 +939,7 @@
+     }
+ 
+     private func appAwareSlots(fallback: [TouchBarDriver.Slot]) -> [TouchBarDriver.Slot] {
+-        guard appAwareEnabled, !manualAITools, liveProfile != "assistant" else { return fallback }
++        guard appAwareEnabled, liveProfile != "assistant" else { return fallback }
+         let stack = TouchBarDriver.Slot(key: "stack-open", title: "Stack", help: "Open the Context Stack", width: 44) { [weak self] in self?.showStackFromMenu() }
+         let shots = TouchBarDriver.Slot(key: "screenshots", title: "Shots", help: "Show the latest screenshots", width: 44) { [weak self] in self?.showScreenshotsFromMenu() }
+         let hide = TouchBarDriver.Slot(key: "hide", title: "×", help: "Hide RelayBar and disable cross-app controls", width: 30) { [weak self] in self?.disableOverlay(); self?.hidePanel() }
+@@ -1049,8 +987,7 @@
+             slots.append(.init(key: "native-label", title: String(liveAppName.prefix(18)), help: "This app retains its native Touch Bar", isEnabled: false, width: 160, action: {}))
+         }
+         slots.append(.init(key: "manual-ai", title: "AI tools", help: "Use AI tools until the next app or document switch", width: 80) { [weak self] in
+-            guard let self = self else { return }; self.nativeMenus.cancelInteraction(); self.manualAITools = true
+-            self.rebuildBars(); self.updateOverlay(for: NSWorkspace.shared.frontmostApplication)
++            guard let self = self else { return }; self.navigate(to: .home)
+         })
+         slots.append(hide); return slots
+     }
+@@ -1074,19 +1011,18 @@
+         rebuildBars(); updateOverlay(for: NSWorkspace.shared.frontmostApplication)
+     }
+     @objc private func showStackFromMenu() {
+-        nativeMenus.cancelInteraction(); stopPinnedChats()
+-        showingContextStack = true; screenshotPresentation.showTools(); refreshStackUI()
++        navigate(to: .stack)
+         if !overlayEnabled { showPanel() }
+     }
+     @objc private func toggleStackCollection() {
+-        nativeMenus.cancelInteraction(); stopPinnedChats()
+-        showingContextStack = true; screenshotPresentation.showTools()
++        if !navigation.isStackPage { navigate(to: .stack) }
++        nativeMenus.cancelInteraction()
+         contextStack?.toggleCollection(); refreshStackUI()
+     }
+     @objc private func pasteStackClip() { contextStack?.pasteClip(); showStackFromMenu() }
+     @objc private func reviewStack() {
+-        nativeMenus.cancelInteraction(); stopPinnedChats()
+-        showingContextStack = true; screenshotPresentation.showTools()
++        if !navigation.isStackPage { navigate(to: .stack) }
++        nativeMenus.cancelInteraction()
+         // Preserve the current external app for Back to work.
+         if let front = NSWorkspace.shared.frontmostApplication, !ownApp(front) { lastExternalApp = front }
+         contextStack?.showReview()
+@@ -1123,11 +1059,7 @@
+         pinnedChats?.update(front: front, nativeProvider: native, force: force)
+     }
+     @objc private func showPinnedChats() {
+-        nativeMenus.cancelInteraction()
+-        showingContextStack = false; screenshotPresentation.showTools()
+-        showingPinnedChats = true; pinnedChats?.start()
+-        if panel?.isKeyWindow == true { hidePanel() }
+-        refreshPinnedContext(force: true); rebuildBars(); updateOverlay(for: NSWorkspace.shared.frontmostApplication)
++        navigate(to: .pins)
+     }
+     @objc private func refreshPinnedChats() {
+         if !showingPinnedChats { showPinnedChats() }
+@@ -1206,8 +1138,317 @@
+     }
+     @objc private func showAbout() {
+         showPanel()
+-        let alert = NSAlert(); alert.messageText = "RelayBar 0.6 · Pinned Chats"
++        let alert = NSAlert(); alert.messageText = "RelayBar 0.7 · Button Families"
+         alert.informativeText = "Pinned Chats reads only the active assistant’s exposed sidebar metadata after you open Pins: chat titles, IDs, link URLs and pin/star indicators. It re-checks the app, window, document, pin state and target before requesting one Accessibility press. No message content, clipboard access, keystroke, JavaScript, network request or pin-list persistence is added by Pins. Hidden or ambiguous pins are not guessed.\n\nNative Sheets remains extension-free and asks before leaf actions by default. Context Stack separately reads future text copies only while Collect is explicitly on, keeps up to 20 clips per project in memory, and never pastes or sends. Quit loses stacks. Private-marker filters cannot identify every secret; pause Collect before sensitive work. Screenshot Shelf retains its existing five cached images and manual clipboard copy.\n\nAccessibility is a broad system permission. The experimental cross-app Touch Bar starts OFF each launch. These sources require Mac SDK compilation and live app / physical Touch Bar validation."
+         alert.addButton(withTitle: "OK"); alert.runModal()
+     }
+ }
++
++// MARK: - Button Families (presentation adapter; existing feature engines unchanged)
++extension RelayAppDelegate {
++    private func familyMenu(_ page: RelayPage) -> NSMenuItem {
++        let root = NSMenuItem(title: page.title, action: nil, keyEquivalent: "")
++        let menu = NSMenu(title: page.title)
++        let show = FamilyMenuItem("Show " + page.title + " on Touch Bar", help: page.breadcrumb) { [weak self] in
++            guard let self = self else { return }
++            self.navigate(to: page)
++            if !self.overlayEnabled { self.showPanel() }
++        }
++        menu.addItem(show)
++        if page == .screenshots { screenshotPageMenuItem = show }
++        if page == .stack {
++            stackSummaryMenuItem = NSMenuItem(title: "No clips · memory only", action: nil, keyEquivalent: "")
++            menu.addItem(stackSummaryMenuItem!)
++        }
++        menu.addItem(.separator())
++        for item in RelayHierarchy.items(on: page) {
++            switch item {
++            case .page(let child): menu.addItem(familyMenu(child))
++            case .command(let command):
++                let control = FamilyMenuItem(command.title, help: command.help) { [weak self] in self?.runFamilyCommand(command) }
++                menu.addItem(control)
++                switch command {
++                case .collectStack: stackCollectMenuItem = control
++                case .watchScreenshots: screenshotWatchMenuItem = control
++                case .autoScreenshots:
++                    screenshotAutoOpenMenuItem = control
++                    control.state = screenshotPresentation.autoOpenEnabled ? .on : .off
++                case .appAware:
++                    appAwareMenuItem = control; control.state = appAwareEnabled ? .on : .off
++                case .overlay: overlayMenuItem = control
++                case .nativeDetection:
++                    nativePauseMenuItem = control; control.state = nativeMenusEnabled ? .on : .off
++                case .nativeConfirmation:
++                    nativeAskMenuItem = control; control.state = nativeAskActions ? .on : .off
++                case .followAssistant: followMenuItem = control
++                case .preferDesktop: desktopMenuItem = control
++                default: break
++                }
++            }
++        }
++        if page == .pins {
++            menu.addItem(FamilyMenuItem("Refresh the active sidebar") { [weak self] in self?.refreshPinnedChats() })
++            menu.addItem(FamilyMenuItem("Setup / detection status…") { [weak self] in self?.showPinnedStatus() })
++        }
++        if page == .modes {
++            for mode in WorkflowMode.allCases {
++                menu.addItem(FamilyMenuItem(mode.rawValue) { [weak self] in
++                    guard let self = self else { return }
++                    self.configuration.mode = mode; self.saveConfiguration(); self.refreshControls()
++                })
++            }
++        }
++        if page == .appControls {
++            menu.addItem(FamilyMenuItem("Native connection report…") { [weak self] in self?.showNativeReport() })
++        }
++        root.submenu = menu; return root
++    }
++    private func navigate(to destination: RelayPage) {
++        nativeMenus.cancelInteraction()
++        navigation.open(destination)
++        reconcileNavigation()
++        if destination == .pins, panel?.isKeyWindow == true { hidePanel() }
++        rebuildBars(); updateOverlay(for: NSWorkspace.shared.frontmostApplication)
++    }
++    private func navigateBack() {
++        // Cancel is local. Back never presses a key or an item in Google Sheets.
++        if navigation.page == .appControls {
++            let decision = RelayHierarchy.nativeBack(pending: nativeMenus.pendingLabel != nil,
++                showingOpenMenu: !nativeMenus.forceRoots && !(nativeMenus.snapshot?.openItems.isEmpty ?? true))
++            switch decision {
++            case .cancelConfirmation:
++                nativeMenus.cancelConfirmation(); rebuildBars(); return
++            case .menuRoots:
++                nativeMenus.showMenus(); rebuildBars(); return
++            case .parent: break
++            }
++        }
++        nativeMenus.cancelInteraction()
++        navigation.back(); reconcileNavigation()
++        rebuildBars(); updateOverlay(for: NSWorkspace.shared.frontmostApplication)
++    }
++    private func reconcileNavigation() {
++        showingContextStack = navigation.isStackPage
++        if navigation.page == .pins {
++            if !showingPinnedChats { showingPinnedChats = true; pinnedChats?.start() }
++            refreshPinnedContext(force: true)
++        } else { stopPinnedChats() }
++        if navigation.page == .screenshots { screenshotPresentation.showScreenshots() }
++        else { screenshotPresentation.showTools() }
++    }
++
++    /// The only place determining the visible Touch Bar hierarchy.
++    /// The same slots feed the native panel, text editors, review window and overlay.
++    private func familySlots() -> [TouchBarDriver.Slot] {
++        var body: [TouchBarDriver.Slot]
++        switch navigation.page {
++        case .pins:
++            body = (pinnedChats?.slots(back: {}, hide: {}) ?? []).filter { !["pins-tools", "hide"].contains($0.key) }.map {
++                var item = $0
++                if item.key.hasPrefix("pin-") { item.width = 96 }
++                return item
++            }
++        case .screenshots:
++            body = screenshotSlots().filter { $0.key.hasPrefix("shot-") || $0.key.hasPrefix("emptyShot") }
++            body.append(groupSlot(.screenshotOptions, compact: "More ›"))
++        case .stack:
++            let original = contextStack?.slots(back: {}, hide: {}) ?? []
++            body = [commandSlot(.collectStack), groupSlot(.stackClips)]
++            if let pack = original.first(where: { $0.key.hasPrefix("stack-pack-") }) { body.append(pack) }
++            body += [commandSlot(.reviewStack), groupSlot(.stackOptions, compact: "More ›")]
++        case .stackClips:
++            body = (contextStack?.slots(back: {}, hide: {}) ?? []).filter { $0.key.hasPrefix("stack-clip-") || $0.key.hasPrefix("stack-empty-") }
++            body.append(commandSlot(.reviewStack))
++        case .projects:
++            let count = configuration.projects.count
++            let page = min(navigation.projectPage, RelayHierarchy.projectPageCount(count) - 1)
++            let range = RelayHierarchy.projectRange(count: count, page: page)
++            body = range.map { index in
++                let project = configuration.projects[index]
++                return TouchBarDriver.Slot(key: "choose-project-\(project.id)", title: (project.id == configuration.selectedProjectID ? "✓ " : "") + String(project.name.prefix(12)),
++                    help: "Select \(project.name). This clears the prior reference/draft, not its separate Context Stack.", width: 86) { [weak self] in
++                        guard let self = self, self.configuration.projects.contains(where: { $0.id == project.id }) else { return }
++                        self.changeProject(to: project.id)
++                    }
++            }
++            let pages = RelayHierarchy.projectPageCount(count)
++            body.append(.init(key: "projects-page-\(page)-\(count)", title: "\(page+1)/\(pages) ›", help: "Next project page; all projects remain reachable", isEnabled: pages > 1, width: 46) { [weak self] in
++                guard let self = self else { return }
++                self.navigation.setProjectPage((page+1) % pages, count: self.configuration.projects.count)
++                self.rebuildBars(); self.updateOverlay(for: NSWorkspace.shared.frontmostApplication)
++            })
++            body.append(groupSlot(.projectOptions, compact: "Manage ›"))
++        case .modes:
++            body = WorkflowMode.allCases.map { mode in
++                .init(key: "mode-\(mode.rawValue)", title: (configuration.mode == mode ? "✓ " : "") + mode.rawValue,
++                      help: "Use \(mode.rawValue) prompt suggestions. Does not generate, copy or send anything.", width: 95) { [weak self] in
++                    guard let self = self else { return }
++                    self.configuration.mode = mode; self.saveConfiguration(); self.refreshControls()
++                }
++            }
++        case .appControls:
++            // Keep native revision, confirmation and request closures unchanged.
++            // Only strip unrelated global shortcuts from this child page.
++            let original = appAwareSlots(fallback: [
++                .init(key: "app-no-actions", title: "No Sheet active", help: "Focus a supported browser's Google Sheet to use its exposed menus.", isEnabled: false, width: 210, action: {}),
++                commandSlot(.nativeReport)
++            ])
++            body = original.filter { !["pins-open", "stack-open", "screenshots", "hide", "manual-ai"].contains($0.key) }
++        default:
++            body = RelayHierarchy.items(on: navigation.page).map { item in
++                switch item { case .page(let page): return groupSlot(page); case .command(let command): return commandSlot(command) }
++            }
++        }
++        var slots: [TouchBarDriver.Slot] = []
++        if navigation.page != .home {
++            let parent = navigation.backDestination?.title ?? "Home"
++            slots.append(.init(key: "family-back", title: "‹ Back", help: "Back to \(parent). Cancel pending menu actions; do not hide the bar.", width: 52) { [weak self] in self?.navigateBack() })
++            slots.append(.init(key: "family-home", title: "⌂", help: "Home — all five button families", width: 32) { [weak self] in self?.navigate(to: .home) })
++        }
++        slots += body
++        slots.append(.init(key: "family-hide", title: "×", help: "Hide RelayBar, disable cross-app controls, and pause text collection", width: 28) { [weak self] in
++            self?.disableOverlay(); self?.hidePanel()
++        })
++        // A retired view can never run even if AppKit delivers a delayed tap.
++        let ticket = navigation.generation
++        return slots.map { item in
++            var bound = item
++            bound.key = "family-\(ticket.uuidString)-\(item.key)"
++            let action = item.action
++            bound.action = { [weak self] in
++                guard let self = self, self.navigation.accepts(ticket), item.isEnabled else { return }
++                self.screenshotPresentation.cancelRecovery()
++                action()
++            }
++            return bound
++        }
++    }
++    private func groupSlot(_ page: RelayPage, compact: String? = nil) -> TouchBarDriver.Slot {
++        let shortNames: [RelayPage: String] = [.stack: "Stack ›", .stackClips: "Clips ›", .modes: "Mode ›",
++            .connections: "Connections ›", .assistantSettings: "Assistants ›", .promptLibrary: "More ›",
++            .buildPrompts: "Build / review ›", .writePrompts: "Writing ›"]
++        var title = compact ?? shortNames[page] ?? page.title + " ›"
++        if page == .appControls { title = liveProfile == "sheets" ? "Sheets ›" : "App controls ›" }
++        return .init(key: "group-\(page.rawValue)", title: title,
++                     help: "Open \(page.breadcrumb). This group does not execute any child action.", width: navigation.page == .home ? 106 : (compact != nil ? 60 : 96)) { [weak self] in
++            self?.navigate(to: page)
++        }
++    }
++    private func commandSlot(_ command: RelayCommand) -> TouchBarDriver.Slot {
++        var title = command.title
++        var enabled = true
++        switch command {
++        case .prompt(let action):
++            // Suggestions are marked in place, never moved or substituted under a finger.
++            if ContextEngine.actions(mode: configuration.mode, text: capture.text).contains(action) { title = "★ " + title }
++        case .collectStack: title = contextStack?.session.collecting == true ? "Ⅱ Pause" : "● Collect"
++        case .selectGPT: title = (configuration.target == .chatgpt ? "✓ " : "") + title
++        case .selectClaude: title = (configuration.target == .claude ? "✓ " : "") + title
++        case .reviewDraft, .copyDraft, .copyAndOpen, .saveCheckpoint: enabled = draft != nil && !(draftView?.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
++        case .prefillClaude: enabled = draft != nil && configuration.target == .claude && !(draftView?.string.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
++        case .watchScreenshots: title = screenshotShelf?.watching == true ? "Ⅱ Stop images" : "● Collect images"
++        case .autoScreenshots: title = "Auto-open: " + (screenshotPresentation.autoOpenEnabled ? "On" : "Off")
++        case .appAware: title = "App-aware: " + (appAwareEnabled ? "On" : "Off")
++        case .overlay: title = overlayEnabled ? "Bar: On" : "Enable bar…"
++        case .nativeDetection: title = nativeMenusEnabled ? "Sheets: On" : "Sheets: Off"
++        case .nativeConfirmation: title = nativeAskActions ? "Confirm: On" : "Confirm: Off"
++        case .followAssistant: title = "Follow: " + (configuration.followDesktopAssistant ? "On" : "Off")
++        case .preferDesktop: title = "Desktop: " + (configuration.preferDesktop ? "On" : "Off")
++        default: break
++        }
++        return .init(key: command.id, title: title, help: command.help, isEnabled: enabled, width: 96) { [weak self] in self?.runFamilyCommand(command) }
++    }
++    private func runFamilyCommand(_ command: RelayCommand) {
++        switch command {
++        case .prompt(let action): performAction(action)
++        case .captureSelection: captureSelection()
++        case .captureClipboard: captureClipboard()
++        case .editReference: showPanel(); panel.makeFirstResponder(referenceView)
++        case .clearSession: confirmClearSession()
++        case .collectStack: toggleStackCollection()
++        case .pasteStack: pasteStackClip()
++        case .reviewStack: reviewStack()
++        case .clearStack: clearStack()
++        case .chooseScreenshotFolder: chooseScreenshotFolder()
++        case .watchScreenshots: toggleScreenshotWatching()
++        case .autoScreenshots: toggleScreenshotAutoOpen()
++        case .addClipboardImage: addScreenshotClipboard()
++        case .clearScreenshots: clearScreenshotShelf()
++        case .selectGPT: setTarget(.chatgpt)
++        case .selectClaude: setTarget(.claude)
++        case .openGPT: openPinnedAssistant(.chatgpt)
++        case .openClaude: openPinnedAssistant(.claude)
++        case .pinsStatus: showPinnedStatus()
++        case .reviewDraft: showPanel(); panel.makeFirstResponder(draftView)
++        case .copyDraft: copyDraft()
++        case .copyAndOpen: copyAndOpen()
++        case .prefillClaude: showPanel(); prefillClaude()
++        case .saveCheckpoint: showPanel(); saveCheckpoint()
++        case .loadCheckpoint: loadCheckpointFromMenu()
++        case .editProject: editProject(isNew: false)
++        case .newProject: editProject(isNew: true)
++        case .revealData: revealData()
++        case .appAware: toggleAppAware()
++        case .overlay: toggleOverlay()
++        case .disableOverlay: disableOverlay()
++        case .enableNative: enableNativeControls()
++        case .nativeDetection: toggleNativeDetection()
++        case .nativeConfirmation: toggleNativeConfirmation()
++        case .nativeReport: showNativeReport()
++        case .accessibility: requestAccessibility()
++        case .followAssistant: toggleFollow()
++        case .preferDesktop: toggleDesktop()
++        case .chooseGPTApp: chooseApp(.chatgpt)
++        case .chooseClaudeApp: chooseApp(.claude)
++        case .about: showAbout()
++        }
++        rebuildBars(); updateOverlay(for: NSWorkspace.shared.frontmostApplication)
++    }
++    private func confirmClearSession() {
++        showPanel()
++        let alert = NSAlert(); alert.messageText = "Clear this session's text?"
++        alert.informativeText = "This clears only the current in-memory reference, task and draft. Context Stack clips, screenshots, saved checkpoints and the system clipboard are unchanged."
++        alert.addButton(withTitle: "Cancel"); alert.addButton(withTitle: "Clear session")
++        if alert.runModal() == .alertSecondButtonReturn { clearSession() }
++    }
++}
++
++// MARK: - Native family construction checks (explicit Mac-only command; never run on launch)
++extension RelayAppDelegate {
++    func runButtonFamiliesSelfTest() -> Int32 {
++        var passed = 0
++        func check(_ condition: Bool, _ name: String) {
++            guard condition else { fputs("FAIL: \(name)\n", stderr); exit(1) }
++            passed += 1; print("PASS: \(name)")
++        }
++        buildPanel(selfTest: true) // Construct only; do not order front, save window state or activate an app.
++        let board = NSPasteboard(name: NSPasteboard.Name("local.relaybar.families-test.\(UUID().uuidString)"))
++        contextStack = ContextStackController(projectID: "test", projectName: "Test", board: board)
++        pinnedChats = PinnedChatsController() // No start / update / sidebar scan.
++        defer {
++            contextStack?.stopForTermination(); pinnedChats?.stopForTermination()
++            board.releaseGlobally(); panel.close()
++        }
++        for page in RelayPage.allCases {
++            navigation.open(page)
++            let slots = familySlots()
++            check(Set(slots.map(\.key)).count == slots.count, "Unique items: \(page.title)")
++            check(slots.reduce(CGFloat(0)) { $0 + ($1.width ?? 0) } + CGFloat(max(0, slots.count-1)) * 6 <= 650, "Width budget: \(page.title)")
++            panelBar.update(slots)
++            for id in panelBar.bar.defaultItemIdentifiers {
++                check(panelBar.touchBar(panelBar.bar, makeItemForIdentifier: id) is NSCustomTouchBarItem, "Native item: \(page.title) / \(id.rawValue)")
++            }
++        }
++        let before = configuration.target
++        navigation.home()
++        let old = familySlots().first { $0.key.hasSuffix("group-prompting") }!
++        navigation.open(.context); old.action()
++        check(navigation.page == .context && configuration.target == before, "Retired button is inert")
++        check(contextStack?.session.collecting == false, "Constructing Stack did not start collection")
++        for page in [RelayPage.prompting, .context, .chats, .workspace, .settings] {
++            check(familyMenu(page).submenu != nil, "Native menu family: \(page.title)")
++        }
++        print("PASS: \(passed) native construction checks. No assistant read, general clipboard access, overlay presentation, copy, paste or send. Hardware rendering is still a manual check.")
++        return 0
++    }
++}
+--- /dev/null
++++ b/Sources/Mac/FamilyMenuItem.swift
+@@ -0,0 +1,16 @@
++import Cocoa
++
++/// A menu command with its own stable closure, matching ActionButton's ownership.
++/// Building a family menu is passive; the closure only runs after an explicit click.
++@MainActor
++final class FamilyMenuItem: NSMenuItem {
++    private let handler: () -> Void
++    init(_ title: String, help: String = "", handler: @escaping () -> Void) {
++        self.handler = handler
++        super.init(title: title, action: nil, keyEquivalent: "")
++        target = self; action = #selector(run)
++        toolTip = help
++    }
++    required init(coder: NSCoder) { fatalError("Programmatic UI only") }
++    @objc private func run() { handler() }
++}
+--- a/Sources/Mac/NativeAXSource.swift
++++ b/Sources/Mac/NativeAXSource.swift
+@@ -19,17 +19,55 @@
+ final class NativeAXSource: NativeMenuSource {
+     typealias Node = NativeAXNode
+     private let cancellation: NativeCancellation
+-    private var deadline: Double = 0
+-    private var queries = 0
+-    private var hitLimit = false
++    private var budget = NativeReadBudget(now: 0)
++    private var headers: [Node: NativeNodeHeader] = [:]
++    private var headerBatches = 0, headerFallbacks = 0, childPages = 0, widestBranch = 0
+     init(cancellation: NativeCancellation) { self.cancellation = cancellation; beginRead() }
+     var now: Double { ProcessInfo.processInfo.systemUptime }
+     var trusted: Bool { !cancellation.cancelled && AXIsProcessTrusted() }
+-    var limited: Bool { hitLimit || cancellation.cancelled || now > deadline }
+-    func beginRead() { deadline = now + 0.85; queries = 0; hitLimit = false }
+-    private func take() -> Bool {
+-        guard !limited, queries < 3500 else { hitLimit = true; return false }
+-        queries += 1; return true
++    var limited: Bool { budget.currentFailure(now: now, cancelled: cancellation.cancelled) != .none }
++    var metrics: NativeReadMetrics {
++        var result = NativeReadMetrics()
++        result.queries = budget.queries
++        result.milliseconds = Int(max(0, min(60_000, (now - budget.start) * 1000)))
++        result.headerBatches = headerBatches; result.headerFallbacks = headerFallbacks
++        result.childPages = childPages; result.widestBranch = widestBranch
++        result.failure = budget.currentFailure(now: now, cancelled: cancellation.cancelled)
++        return result
++    }
++    func beginRead() {
++        budget = NativeReadBudget(now: now); headers.removeAll(keepingCapacity: true)
++        headerBatches = 0; headerFallbacks = 0; childPages = 0; widestBranch = 0
++    }
++    private func take() -> Bool { budget.take(now: now, cancelled: cancellation.cancelled) }
++
++    func header(_ node: Node) -> NativeNodeHeader {
++        // Role, subrole and hidden are static shape metadata for this read only.
++        // Cache is cleared before every discovery and every pre-tap rescan.
++        guard !limited else { return NativeNodeHeader(role: nil) }
++        if let cached = headers[node] { return cached }
++        guard take() else { return NativeNodeHeader(role: nil) }
++        AXUIElementSetMessagingTimeout(node.element, 0.08)
++        var result: CFArray?
++        let names = ["AXRole", "AXSubrole", "AXHidden"] as CFArray
++        let error = AXUIElementCopyMultipleAttributeValues(node.element, names,
++            AXCopyMultipleAttributeOptions(rawValue: 0), &result)
++        headerBatches += 1
++        let shape: NativeNodeHeader
++        if error == .success, let values = result as? [AnyObject], values.count == 3,
++           let role = values[0] as? String {
++            // Missing optional attributes are AXError values, not booleans or
++            // labels. Typed casts deliberately leave those fields nil.
++            shape = NativeNodeHeader(role: role, subrole: values[1] as? String, hidden: values[2] as? Bool)
++        } else {
++            // Browsers/providers that lack the batch API keep the safe scalar
++            // path. Still bounded; no fabricated successful metadata.
++            headerFallbacks += 1
++            shape = NativeNodeHeader(role: value(node, "AXRole") as? String,
++                subrole: value(node, "AXSubrole") as? String, hidden: value(node, "AXHidden") as? Bool)
++        }
++        headers[node] = shape
++        return shape
+     }
+     func frontmostPID() -> Int32 {
+         guard !cancellation.cancelled else { return -1 }
+@@ -49,6 +87,8 @@
+         return Node(unsafeBitCast(result, to: AXUIElement.self))
+     }
+     func string(_ node: Node, _ attribute: NativeAXAttribute) -> String? {
++        if attribute == .role { return header(node).role }
++        if attribute == .subrole { return header(node).subrole }
+         guard let result = value(node, attribute.rawValue) else { return nil }
+         if CFGetTypeID(result) == CFURLGetTypeID() {
+             guard let text = CFURLGetString(unsafeBitCast(result, to: CFURL.self)) else { return nil }
+@@ -58,6 +98,7 @@
+         return result as? String
+     }
+     func flag(_ node: Node, _ attribute: NativeAXAttribute) -> Bool? {
++        if attribute == .hidden { return header(node).hidden }
+         guard let result = value(node, attribute.rawValue) else { return nil }
+         if attribute == .hasPopup, let text = result as? String { return text == "menu" || text == "true" }
+         return result as? Bool
+@@ -68,13 +109,37 @@
+         var count: CFIndex = 0
+         let error = AXUIElementGetAttributeValueCount(node.element, kAXChildrenAttribute as CFString, &count)
+         if error == .attributeUnsupported || error == .noValue { return [] }
+-        guard error == .success, count >= 0, count <= 256 else { hitLimit = true; return nil }
++        guard error == .success, count >= 0 else { budget.fail(.readFailed); return nil }
++        widestBranch = max(widestBranch, count)
++        guard count <= NativeReadBudget.maximumChildren else { budget.fail(.children); return nil }
+         if count == 0 { return [] }
+-        guard take() else { return nil }
+-        var result: CFArray?
+-        guard AXUIElementCopyAttributeValues(node.element, kAXChildrenAttribute as CFString, 0, count, &result) == .success,
+-              let array = result as? [AXUIElement] else { return nil }
+-        return array.map(Node.init)
++        // A wide wrapper no longer poisons the scan at 257 children. Fetch
++        // bounded pages; do not silently return only the first page.
++        var children: [Node] = [], seen = Set<Node>(), offset = 0
++        while offset < count {
++            guard take() else { return nil }
++            let length = min(NativeReadBudget.childPageSize, count - offset)
++            var result: CFArray?
++            let read = AXUIElementCopyAttributeValues(node.element, kAXChildrenAttribute as CFString,
++                offset, length, &result)
++            childPages += 1
++            guard read == .success, let array = result as? [AXUIElement], array.count == length else {
++                budget.fail(.readFailed); return nil
++            }
++            for element in array {
++                let child = Node(element)
++                guard seen.insert(child).inserted else { budget.fail(.readFailed); return nil }
++                children.append(child)
++            }
++            offset += length
++        }
++        if count > NativeReadBudget.childPageSize {
++            guard take() else { return nil }
++            var finalCount: CFIndex = 0
++            guard AXUIElementGetAttributeValueCount(node.element, kAXChildrenAttribute as CFString, &finalCount) == .success,
++                  finalCount == count else { budget.fail(.readFailed); return nil }
++        }
++        return children
+     }
+     func rect(_ node: Node) -> NativeRect? {
+         guard let p = value(node, kAXPositionAttribute), let s = value(node, kAXSizeAttribute),
+--- a/Sources/Mac/NativeMenuController.swift
++++ b/Sources/Mac/NativeMenuController.swift
+@@ -128,12 +128,22 @@
+     }
+     var connectionReport: String {
+         let s = snapshot
+-        return "RelayBar 0.5.0 · Native Sheets\n" +
++        return "RelayBar 0.7.0 · Native Sheets scan engine 0.5.1 · Native Sheets · Lean Scan\n" +
+             "Accessibility: \(RBBridge.accessibilityTrusted() ? "granted" : "not granted")\n" +
+             "Browser bundle: \(s?.route?.bundle ?? "not identified")\n" +
+             "Page kind: \(s?.route?.site.rawValue ?? "not identified")\n" +
+             "Top-level controls: \(s?.roots.count ?? 0)\nOpen-menu controls: \(s?.openItems.count ?? 0)\n" +
+-            "Visited UI nodes: \(s?.nodesVisited ?? 0)\nStatus: \(s?.status ?? "Waiting for an active browser")\n" +
++            "Visited UI nodes: \(s?.nodesVisited ?? 0)\n" +
++            "AX queries: \(s?.readMetrics.queries ?? 0) / \(NativeReadBudget.maximumQueries)\n" +
++            "Scan duration ms: \(s?.readMetrics.milliseconds ?? 0) / 850\n" +
++            "Metadata batches / fallbacks: \(s?.readMetrics.headerBatches ?? 0) / \(s?.readMetrics.headerFallbacks ?? 0)\n" +
++            "Child pages / widest branch: \(s?.readMetrics.childPages ?? 0) / \(s?.readMetrics.widestBranch ?? 0)\n" +
++            "Deepest UI level: \(s?.deepestLevel ?? 0) / \(NativeMenuPolicy.maximumDepth)\n" +
++            "Skipped content / formatting branches: \(s?.prunedContentNodes ?? 0) / \(s?.prunedChromeNodes ?? 0)\n" +
++            "Menu containers / candidates seen: \(s?.menuContainersSeen ?? 0) / \(s?.candidatesSeen ?? 0)\n" +
++            "Scan phase: \(s?.scanPhase ?? "not started")\n" +
++            "Stop reason: \(s?.failure.explanation ?? "none")\n" +
++            "Status: \(s?.status ?? "Waiting for an active browser")\n" +
+             "No page URL, document title, cells, script source or screenshots are included in this report."
+     }
+ }
+--- a/Tests/AutoOpen/test_integration_contract.py
++++ b/Tests/AutoOpen/test_integration_contract.py
+@@ -68,7 +68,8 @@
+         for path, sha in pins.items():
+             self.assertEqual(hashlib.sha256((ROOT/path).read_bytes()).hexdigest(), sha)
+     def test_manual_choices_cancel_or_replace_pending_reveal(self):
+-        self.assertIn('screenshotPresentation.showTools()', body(APP, 'private func showToolsPage('))
++        self.assertIn('navigate(to: .home)', body(APP, 'private func showToolsPage('))
++        self.assertIn('screenshotPresentation.showTools()', body(APP, 'private func reconcileNavigation('))
+         self.assertIn('screenshotPresentation.cancelRecovery()', body(APP, 'private func copyScreenshot('))
+         self.assertIn('screenshotPresentation.overlayDisabled()', body(APP, '@objc private func disableOverlay('))
+     def test_fresh_bar_is_rebound_to_native_responders(self):
+@@ -80,11 +81,12 @@
+             self.assertIn(responder + '.touchBar = panelBar.bar', rebuild)
+     def test_version_and_auto_open_default(self):
+         info = plistlib.loads((ROOT/'Resources/Info.plist').read_bytes())
+-        self.assertEqual(info['CFBundleShortVersionString'], '0.6.0')
+-        self.assertEqual(info['CFBundleVersion'], '9')
++        self.assertEqual(info['CFBundleShortVersionString'], '0.7.0')
++        self.assertEqual(info['CFBundleVersion'], '11')
+         self.assertEqual(info['CFBundleIdentifier'], 'local.relaybar')
+         self.assertIn('UserDefaults.standard.object(forKey: autoOpenKey) as? Bool ?? true', APP)
+-        self.assertIn('Automatically show viewer after a screenshot', APP)
++        self.assertIn('case .autoScreenshots:', APP)
++        self.assertIn('screenshotAutoOpenMenuItem = control', APP)
+     def test_overlay_allowlist_adds_only_explicit_chromium_support(self):
+         expected = '["com.apple.Safari", "com.google.Chrome", "org.mozilla.firefox", "com.microsoft.edgemac", "company.thebrowser.Browser", "com.brave.Browser", "org.chromium.Chromium"]'
+         self.assertIn('let browsers = ' + expected, APP)
+--- /dev/null
++++ b/Tests/ButtonFamilies/adapter_harness.py
+@@ -0,0 +1,213 @@
++#!/usr/bin/env python3
++"""Execute the production family adapter with explicit AppKit/feature doubles.
++This is not a macOS SDK build, real sidebar scan, clipboard test or hardware test.
++Only `private` visibility is relaxed in the copied adapter to inspect its state.
++"""
++from pathlib import Path
++import subprocess, tempfile, json
++ROOT=Path(__file__).resolve().parents[2]
++source=(ROOT/'Sources/Mac/AppMain.swift').read_text()
++adapter=source.split('// MARK: - Button Families (presentation adapter; existing feature engines unchanged)',1)[1]
++adapter=adapter.replace('private func ', 'func ')
++# Native-only self-check, when present, is exercised by the separate Mac command.
++if '// MARK: - Native family construction checks' in adapter:
++    adapter=adapter.split('// MARK: - Native family construction checks',1)[0]
++stub=r'''
++import Foundation
++class NSMenuItem {
++ var title:String; var submenu:NSMenu?; var state=State.off
++ enum State {case on,off}
++ init(title:String="",action:String?=nil,keyEquivalent:String=""){self.title=title}
++ static func separator()->NSMenuItem { NSMenuItem(title:"--") }
++}
++class FamilyMenuItem:NSMenuItem {
++ let handler:()->Void
++ init(_ title:String,help:String="",handler:@escaping()->Void){self.handler=handler;super.init(title:title)}
++ func invoke(){handler()}
++}
++class NSMenu {var items:[NSMenuItem]=[];init(title:String=""){};func addItem(_ i:NSMenuItem){items.append(i)}}
++class FakeText {var string=""}
++class FakePanel {var isKeyWindow=false;func makeFirstResponder(_ x:Any?) {}}
++class NSAlert {
++ enum Response {case alertFirstButtonReturn,alertSecondButtonReturn}
++ static var response=Response.alertFirstButtonReturn
++ var messageText="",informativeText=""
++ func addButton(withTitle:String){}
++ func runModal()->Response{Self.response}
++}
++@MainActor class NSWorkspace {static let shared=NSWorkspace();var frontmostApplication:Int?=42}
++class TouchBarDriver {
++ struct Slot { var key:String;var title:String;var help:String;var isEnabled:Bool=true;var width:CGFloat?;var action:()->Void }
++}
++@MainActor final class NativeDouble {
++ struct Snapshot {var openItems:[Int]=[]}
++ var snapshot:Snapshot?;var forceRoots=false;var pendingLabel:String?
++ var cancellations=0, confirmsCancelled=0, roots=0
++ func cancelInteraction(){cancellations += 1;pendingLabel=nil}
++ func cancelConfirmation(){confirmsCancelled += 1;pendingLabel=nil}
++ func showMenus(){roots += 1;forceRoots=true}
++}
++@MainActor class PinsDouble {
++ var starts=0,stops=0,presses=0,refreshes=0
++ func start(){starts += 1};func stop(){stops += 1}
++ func slots(back:@escaping()->Void,hide:@escaping()->Void)->[TouchBarDriver.Slot] {
++  var s=[TouchBarDriver.Slot(key:"pins-tools",title:"Tools",help:"",width:46,action:back),
++         .init(key:"pins-provider-gpt",title:"GPT ⇄",help:"",width:78,action:{}),
++         .init(key:"pins-prev",title:"‹",help:"",width:28,action:{})]
++  for i in 0..<3{s.append(.init(key:"pin-gen-\(i)",title:"Example \(i)",help:"Chat \(i)",width:102,action:{self.presses += 1}))}
++  s += [.init(key:"pins-next",title:"1/2 ›",help:"",width:46,action:{}),.init(key:"pins-refresh",title:"↻",help:"",width:34,action:{self.refreshes += 1}),.init(key:"hide",title:"×",help:"",width:28,action:hide)]
++  return s
++ }
++}
++@MainActor class StackDouble {
++ struct Session {var collecting=false};var session=Session();var copies=0
++ func slots(back:@escaping()->Void,hide:@escaping()->Void)->[TouchBarDriver.Slot]{
++  var s:[TouchBarDriver.Slot]=[.init(key:"stack-back",title:"Tools",help:"",width:46,action:back)]
++  for i in 0..<3{s.append(.init(key:"stack-clip-\(i)",title:"Excerpt \(i)",help:"Original text \(i)",width:94,action:{self.copies += 1}))}
++  s += [.init(key:"stack-pack-rev",title:"Pack 3",help:"Copy ordered full-text handoff",width:64,action:{self.copies += 1}),.init(key:"stack-hide",title:"×",help:"",width:28,action:hide)]
++  return s
++ }
++}
++struct ShelfDouble {var watching=false}
++@MainActor class RelayAppDelegate {
++ var navigation=RelayNavigation(),configuration=AppConfiguration(),capture=Capture.empty
++ var draft:PromptDraft?;var draftView:FakeText?=FakeText(),referenceView=FakeText()
++ var nativeMenus=NativeDouble(),pinnedChats:PinsDouble?=PinsDouble(),contextStack:StackDouble?=StackDouble()
++ var showingContextStack=false,showingPinnedChats=false
++ var panel:FakePanel! = FakePanel()
++ var screenshotShelf:ShelfDouble?=ShelfDouble(),screenshotPresentation=ScreenshotPresentationState()
++ var liveProfile="assistant",appAwareEnabled=true,overlayEnabled=false,nativeMenusEnabled=false,nativeAskActions=true
++ var screenshotPageMenuItem:NSMenuItem?,stackSummaryMenuItem:NSMenuItem?,stackCollectMenuItem:NSMenuItem?
++ var screenshotWatchMenuItem:NSMenuItem?,screenshotAutoOpenMenuItem:NSMenuItem?,appAwareMenuItem:NSMenuItem?
++ var overlayMenuItem:NSMenuItem?,nativePauseMenuItem:NSMenuItem?,nativeAskMenuItem:NSMenuItem?,followMenuItem:NSMenuItem?,desktopMenuItem:NSMenuItem?
++ var effects:[String]=[],rebuilds=0,overlays=0,pinReads=0
++ func effect(_ s:String){effects.append(s)}
++ func refreshPinnedContext(force:Bool=false){if showingPinnedChats {pinReads += 1}}
++ func rebuildBars(){rebuilds += 1}
++ func updateOverlay(for app:Int?){overlays += 1}
++ func hidePanel(){effect("hidePanel")}
++ func stopPinnedChats(){if showingPinnedChats{showingPinnedChats=false;pinnedChats?.stop()}}
++ func screenshotSlots()->[TouchBarDriver.Slot]{
++  var s:[TouchBarDriver.Slot]=[.init(key:"shotTools",title:"Tools",help:"",width:46,action:{})]
++  for i in 0..<5 {s.append(.init(key:"shot-\(i)",title:"\(i+1)",help:"Full-resolution image \(i)",width:78,action:{self.effect("image-\(i)")}))}
++  s.append(.init(key:"pins-open",title:"Pins",help:"",width:44,action:{}));return s
++ }
++ func appAwareSlots(fallback:[TouchBarDriver.Slot])->[TouchBarDriver.Slot]{
++  guard liveProfile=="sheets" else{return fallback}
++  if nativeMenus.pendingLabel != nil {return [.init(key:"native-confirm-1",title:"Run: synthetic",help:"",width:340,action:{self.effect("confirm")}),.init(key:"native-cancel-1",title:"Cancel",help:"",width:85,action:{self.nativeMenus.cancelConfirmation()})]}
++  var s:[TouchBarDriver.Slot]=[.init(key:"stack-open",title:"Stack",help:"",width:44,action:{}),.init(key:"screenshots",title:"Shots",help:"",width:44,action:{})]
++  s.append(.init(key:"native-roots",title:"Menus",help:"",width:46,action:{self.nativeMenus.showMenus()}))
++  for i in 0..<4{s.append(.init(key:"native-\(i)",title:"Action \(i)",help:"",width:84,action:{self.effect("native-\(i)")}))}
++  s += [.init(key:"native-page-1",title:"1/2 ›",help:"",width:58,action:{}),.init(key:"hide",title:"×",help:"",width:28,action:{})]
++  return s
++ }
++ func changeProject(to id:String){configuration.selectedProjectID=id;effect("project-\(id)")}
++ func saveConfiguration(){effect("saveConfig")};func refreshControls(){rebuildBars()}
++ func showPanel(){effect("showPanel")}
++ func refreshPinnedChats(){effect("refreshPins")};func showPinnedStatus(){effect("pinsStatus")}
++ func performAction(_ a:PromptAction){effect("prompt-\(a.rawValue)")}
++ func captureSelection(){effect("captureSelection")};func captureClipboard(){effect("captureClipboard")};func clearSession(){effect("clearSession")}
++ func toggleStackCollection(){contextStack?.session.collecting.toggle();effect("collectStack")}
++ func pasteStackClip(){effect("pasteStack")};func reviewStack(){effect("reviewStack")};func clearStack(){effect("clearStack")}
++ func chooseScreenshotFolder(){effect("chooseFolder")};func toggleScreenshotWatching(){effect("watchImages")}
++ func toggleScreenshotAutoOpen(){effect("autoImages")};func addScreenshotClipboard(){effect("clipboardImage")};func clearScreenshotShelf(){effect("clearImages")}
++ func setTarget(_ t:AssistantTarget){configuration.target=t;effect("target-\(t.rawValue)")}
++ func openPinnedAssistant(_ p:PinProvider){effect("open-\(p.rawValue)")}
++ func copyDraft(){effect("copyDraft")};func copyAndOpen(){effect("copyAndOpen")};func prefillClaude(){effect("prefillClaude")}
++ func saveCheckpoint(){effect("saveCheckpoint")};func loadCheckpointFromMenu(){effect("loadCheckpoint")}
++ func editProject(isNew:Bool){effect(isNew ? "newProject":"editProject")};func revealData(){effect("revealData")}
++ func toggleAppAware(){effect("toggleAppAware")};func toggleOverlay(){effect("toggleOverlay")};func disableOverlay(){effect("disableOverlay")}
++ func enableNativeControls(){effect("enableNative")};func toggleNativeDetection(){effect("nativeDetection")};func toggleNativeConfirmation(){effect("nativeConfirmation")}
++ func showNativeReport(){effect("nativeReport")};func requestAccessibility(){effect("accessibility")}
++ func toggleFollow(){effect("follow")};func toggleDesktop(){effect("desktop")};func chooseApp(_ t:AssistantTarget){effect("chooseApp-\(t.rawValue)")};func showAbout(){effect("about")}
++}
++'''
++main=r'''
++@main struct AdapterChecks {
++ @MainActor static func main() {
++  var checks:[String]=[]
++  func check(_ value:Bool,_ name:String){if !value{fatalError("FAIL: "+name)};checks.append(name)}
++  let a=RelayAppDelegate()
++  func slot(_ suffix:String)->TouchBarDriver.Slot {guard let s=a.familySlots().first(where:{$0.key.hasSuffix(suffix)}) else{fatalError("Missing "+suffix)};return s}
++  let encoder=JSONEncoder();encoder.outputFormatting = .sortedKeys
++  let originalConfig=try! encoder.encode(a.configuration)
++  for p in RelayPage.allCases {
++   a.navigation.open(p)
++   let s=a.familySlots()
++   check(Set(s.map(\.key)).count==s.count,"unique real adapter keys: "+p.rawValue)
++   check(s.reduce(CGFloat(0)){$0+($1.width ?? 0)} + CGFloat(max(0,s.count-1))*6 <= 650,"width + gaps budget: "+p.rawValue)
++   check(s.last?.title=="×","Hide fixed at right: "+p.rawValue)
++   check(p == .home || s[0].key.hasSuffix("family-back"),"Back fixed at left: "+p.rawValue)
++  }
++  check(a.effects.isEmpty && a.pinReads==0,"building every page is passive")
++  check(a.contextStack?.session.collecting==false,"opening/rendering Stack does not collect")
++  check((try! encoder.encode(a.configuration))==originalConfig,"rendering never changes configuration")
++  a.navigation.home();let root=a.familySlots();check(root.count==6,"Home has five groups and Hide")
++  root.first{$0.key.hasSuffix("group-prompting")}!.action()
++  check(a.navigation.page == .prompting,"Prompting group opens child view")
++  check(a.effects.isEmpty,"opening group generates no prompt")
++  slot("prompt-nextSlice").action();check(a.effects.last=="prompt-nextSlice","Next slice uses original handler")
++  slot("prompt-challenge").action();check(a.effects.last=="prompt-challenge","Challenge uses original handler")
++  slot("prompt-handoff").action();check(a.effects.last=="prompt-handoff","Handoff uses original handler")
++  let retired=slot("prompt-handoff");a.navigate(to:.context);let before=a.effects.count;retired.action()
++  check(a.effects.count==before,"retired prompt cannot dispatch after navigation")
++  root.first{$0.key.hasSuffix("group-prompting")}!.action();check(a.navigation.page == .context,"retired Home group cannot reroute")
++  a.navigate(to:.stack);check(a.contextStack?.session.collecting==false,"entering Stack still does not collect")
++  slot("collectStack").action();check(a.contextStack?.session.collecting==true,"Collect is an explicit leaf action")
++  slot("stack-pack-rev").action();check(a.contextStack?.copies==1,"Pack reuses exact controller slot closure")
++  a.navigate(to:.stackClips);check(a.familySlots().filter{$0.key.contains("stack-clip-")}.count==3,"all three clip buttons retained")
++  slot("stack-clip-1").action();check(a.contextStack?.copies==2,"clip copy closure retained")
++  a.navigate(to:.screenshots);check(a.familySlots().filter{$0.key.contains("-shot-")}.count==5,"all five image buttons retained")
++  slot("shot-4").action();check(a.effects.last=="image-4","fifth image copies its original ID")
++  a.navigate(to:.pins);check(a.pinnedChats?.starts==1 && a.pinReads>0,"only explicit Pins leaf starts sidebar detection")
++  check(a.familySlots().filter{$0.key.contains("-pin-gen-")}.count==3,"all three pin titles retained")
++  let oldPin=slot("pin-gen-0");a.navigate(to:.chats);oldPin.action()
++  check(a.pinnedChats?.presses==0 && a.pinnedChats?.stops==1,"leaving Pins stops detection and retires navigation")
++  a.navigation.open(.draft);a.draft=nil;check(!slot("copyDraft").isEnabled,"copy disabled without draft")
++  a.draft=PromptDraft(text:"test",action:.nextSlice,projectID:"hearth",target:.chatgpt,createdAt:Date());a.draftView?.string="test"
++  check(slot("copyDraft").isEnabled,"copy enabled with nonempty draft")
++  check(!slot("prefillClaude").isEnabled,"Claude prefill disabled for GPT destination")
++  a.configuration.target = .claude;check(slot("prefillClaude").isEnabled,"Claude prefill enabled for Claude destination")
++  a.draftView?.string="  ";check(!slot("copyDraft").isEnabled,"empty edited draft disables copy")
++  a.nativeMenus.pendingLabel="synthetic";a.nativeMenus.snapshot = .init(openItems:[1]);a.liveProfile="sheets";a.navigation.open(.appControls)
++  a.navigateBack();check(a.navigation.page == .appControls && a.nativeMenus.confirmsCancelled==1,"Back cancels pending action without leaving menu")
++  a.navigateBack();check(a.navigation.page == .appControls && a.nativeMenus.forceRoots,"Back from open native menu returns roots")
++  a.navigateBack();check(a.navigation.page == .workspace,"Back from native roots returns Workspace")
++  a.navigate(to:.appControls)
++  let nativeSlots=a.familySlots()
++  check(!nativeSlots.contains{$0.title=="Stack" || $0.title=="Shots"},"native page has no unrelated capture shortcuts")
++  check(nativeSlots.reduce(CGFloat(0)){$0+($1.width ?? 0)}+CGFloat(nativeSlots.count-1)*6<=650,"populated native menu fits width budget")
++  slot("native-2").action();check(a.effects.last=="native-2","native original action closure preserved")
++  a.nativeMenus.pendingLabel="synthetic"
++  check(a.familySlots().reduce(CGFloat(0)){$0+($1.width ?? 0)}+CGFloat(a.familySlots().count-1)*6<=650,"native confirmation fits width budget")
++  a.navigation.open(.projects);a.configuration.projects=(0..<100).map{.init(id:"p\($0)",name:"Project \($0)",brief:"",constraints:"")};a.configuration.selectedProjectID="p0"
++  var seen=Set<String>()
++  for p in 0..<25 {a.navigation.setProjectPage(p,count:100);for s in a.familySlots() where s.key.contains("choose-project-"){seen.insert(s.title)} }
++  check(seen.count==100,"adapter exposes all 100 project choices")
++  a.navigation.setProjectPage(0,count:100);let oldProject=slot("choose-project-p0");slot("projects-page-0-100").action();let prior=a.effects.count;oldProject.action();check(a.effects.count==prior,"retired project-page controls are inert")
++  check(a.navigation.projectPage==1,"project pager advances once")
++  a.navigation.open(.draft);a.navigation.screenshotArrived(autoOpen:true);a.reconcileNavigation();slot("family-back").action();check(a.navigation.page == .draft,"actual Back adapter resumes interrupted draft")
++  let menus=RelayHierarchy.items(on:.home).compactMap{ i->NSMenuItem? in if case .page(let p)=i{return a.familyMenu(p)};return nil }
++  check(menus.map(\.title)==["Prompting","Context","Chats","Workspace","Settings"],"RB menu shares exactly the five families")
++  check(a.overlayMenuItem != nil && a.stackCollectMenuItem != nil && a.nativeAskMenuItem != nil,"existing stateful RB menu controls remain bound")
++  NSAlert.response = .alertFirstButtonReturn;a.runFamilyCommand(.clearSession);check(a.effects.last != "clearSession","Clear session cancel preserves draft")
++  NSAlert.response = .alertSecondButtonReturn;a.runFamilyCommand(.clearSession);check(a.effects.last == "clearSession","Clear session requires explicit confirmation")
++  let result:[String:Any] = ["passed":checks.count,"failed":0,"checks":checks,"boundary":"Actual production family adapter compiled with explicit AppKit and feature doubles. Not a macOS SDK or hardware test."]
++  print(String(decoding:try! JSONSerialization.data(withJSONObject:result,options:[.prettyPrinted,.sortedKeys]),as:UTF8.self))
++ }
++}
++'''
++with tempfile.TemporaryDirectory(prefix='relaybar-families-') as tmp:
++    t=Path(tmp)
++    (t/'Stubs.swift').write_text(stub)
++    (t/'Adapter.swift').write_text('import Foundation\n'+adapter)
++    (t/'Main.swift').write_text('import Foundation\n'+main)
++    args=['swiftc','-swift-version','5','-parse-as-library']+[str(p) for p in (ROOT/'Sources/Core').glob('*.swift')]+[str(t/x) for x in ['Stubs.swift','Adapter.swift','Main.swift']]+['-o',str(t/'run')]
++    r=subprocess.run(args,capture_output=True,text=True,timeout=45)
++    if r.returncode: raise SystemExit(r.stdout+r.stderr)
++    if r.stderr: print(r.stderr)
++    r=subprocess.run([str(t/'run')],capture_output=True,text=True,timeout=20)
++    if r.returncode: raise SystemExit(r.stdout+r.stderr)
++    result=json.loads(r.stdout)
++    (ROOT/'Docs/ButtonFamilies/ADAPTER_RESULTS.json').write_text(json.dumps(result,indent=2)+'\n')
++    print(r.stdout)
+--- /dev/null
++++ b/Tests/ButtonFamilies/test_map.py
+@@ -0,0 +1,45 @@
++#!/usr/bin/env python3
++"""Offline browser check for the interactive GUIDE, not native Touch Bar evidence."""
++from pathlib import Path
++import json, shutil
++from playwright.sync_api import sync_playwright
++R=Path(__file__).resolve().parents[2]; out=R/'Docs/ButtonFamilies';out.mkdir(parents=True,exist_ok=True)
++checks=[];requests=[];errors=[]
++def check(value,name):
++ if not value:raise AssertionError(name)
++ checks.append(name)
++with sync_playwright() as p:
++ browser=p.chromium.launch(headless=True, executable_path=shutil.which('chromium'))
++ page=browser.new_page(viewport={'width':1280,'height':920})
++ page.on('request',lambda r:requests.append(r.url));page.on('pageerror',lambda e:errors.append(str(e)))
++ page.route('**/*',lambda route:route.abort())
++ page.set_content((R/'Button_Families_Map.html').read_text(),wait_until='load')
++ check(page.locator('#cards .card').count()==5,'Home has exactly five families')
++ check(page.locator('#heading').inner_text()=='Home','Starts at Home')
++ page.locator('#bar button',has_text='Prompting').click()
++ check(page.locator('#heading').inner_text()=='Prompting','Prompting folder opens')
++ for title in ['Next slice','Challenge','Handoff']:
++  check(page.locator('#bar button',has_text=title).count()==1,title+' stays in Prompting')
++ page.locator('#bar button',has_text='Challenge').click()
++ check('Nothing was executed' in page.locator('#feedback').inner_text(),'Guide actions do not pretend to execute')
++ check(page.locator('#heading').inner_text()=='Prompting','Action explanation keeps page')
++ page.screenshot(path=str(out/'GUIDE_DESKTOP.png'),full_page=True)
++ page.locator('#bar button',has_text='More prompts').click()
++ page.locator('#bar button',has_text='Build & review').click()
++ check(page.locator('#heading').inner_text()=='Build & review','Nested prompt family reachable')
++ page.locator('#bar button',has_text='Back').click()
++ check(page.locator('#heading').inner_text()=='More prompts','Back goes to parent not Home')
++ page.keyboard.press('Escape');check(page.locator('#heading').inner_text()=='Prompting','Escape goes back')
++ page.locator('#bar button',has_text='Home').click();check(page.locator('#heading').inner_text()=='Home','Home button goes to root')
++ for item in json.loads((out/'FEATURE_MAP.json').read_text())['pages']:
++  page.evaluate('(id)=>go(id)',item['id']);check(page.locator('#heading').inner_text()==item['title'],'Catalog page renders: '+item['id'])
++ check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Desktop has no horizontal overflow')
++ page.set_viewport_size({'width':390,'height':844});page.evaluate('go("prompting")')
++ check(page.locator('#cards .card').count()==5,'Phone retains all Prompting items')
++ check(page.evaluate('document.documentElement.scrollWidth<=innerWidth'),'Phone has no horizontal overflow')
++ page.screenshot(path=str(out/'GUIDE_PHONE.png'),full_page=True)
++ check(not requests,'Zero observed runtime network requests')
++ check(not errors,'Zero observed JavaScript exceptions')
++ browser.close()
++result={'boundary':'Offline Chromium set_content of guide HTML only; NOT native AppKit, Touch Bar, installed Mac, or live provider validation.','passed':len(checks),'failed':0,'requests':requests,'errors':errors,'checks':checks}
++(out/'MAP_TEST_RESULTS.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))
+--- /dev/null
++++ b/Tests/ButtonFamilies/test_merge.py
+@@ -0,0 +1,112 @@
++#!/usr/bin/env python3
++"""Execute the actual safe-copy merger on temporary source fixtures.
++Not a Mac install/build; input tree and installed apps are never touched.
++"""
++import importlib.util, json, pathlib, plistlib, shutil, tempfile, unittest
++R=pathlib.Path(__file__).resolve().parents[2]
++spec=importlib.util.spec_from_file_location('merge_families',R/'Scripts/merge_button_families.py')
++M=importlib.util.module_from_spec(spec);spec.loader.exec_module(M)
++class MergeTests(unittest.TestCase):
++ def setUp(self):
++  self.temp=tempfile.TemporaryDirectory(); self.root=pathlib.Path(self.temp.name)
++  self.source=self.root/'Current RelayBar'; self.out=self.root/'Reviewed Copy'
++  self.source.mkdir()
++  # Reconstruct the exact changed-file 0.6 ancestors. Other source files come
++  # from this package; scanner old ancestors are included in MergeSupport.
++  for name in M.REQUIRED:
++   f=self.source/name;f.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(R/name,f)
++  for item in json.loads((R/'MergeSupport/manifest.json').read_text())['files']:
++   if item['base_sha256']:
++    f=self.source/item['path'];f.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(R/'MergeSupport/base'/item['path'],f)
++  self.before=M.inventory(self.source)
++ def tearDown(self):self.temp.cleanup()
++ def unchanged(self):self.assertEqual(self.before,M.inventory(self.source))
++ def test_clean_ancestor_creates_copy_only(self):
++  result=M.merge(self.source,self.out);self.unchanged();self.assertTrue(self.out.is_dir());self.assertFalse(result['installed'])
++  self.assertEqual((self.out/'Sources/Mac/AppMain.swift').read_bytes(),(R/'Sources/Mac/AppMain.swift').read_bytes())
++ def test_source_never_modified_by_dry_run(self):
++  self.assertEqual(M.merge(self.source,self.out,True)['mode'],'dry-run');self.assertFalse(self.out.exists());self.unchanged()
++ def test_unrelated_engine_edit_and_extra_file_retained(self):
++  f=self.source/'Sources/Mac/ContextStackMac.swift';f.write_text(f.read_text()+'\n// LOCAL CUSTOMIZATION: retain me\n')
++  extra=self.source/'MyNotes.txt';extra.write_text('private local test notes\n');self.before=M.inventory(self.source)
++  M.merge(self.source,self.out);self.unchanged();self.assertEqual((self.out/f.relative_to(self.source)).read_bytes(),f.read_bytes());self.assertEqual((self.out/'MyNotes.txt').read_bytes(),extra.read_bytes())
++ def test_nonoverlapping_appmain_edit_three_way_merges(self):
++  f=self.source/'Sources/Mac/AppMain.swift';f.write_text(f.read_text().replace('private var suppressEdits = false','private var suppressEdits = false // preserved local note'))
++  self.before=M.inventory(self.source);M.merge(self.source,self.out);self.unchanged();s=(self.out/'Sources/Mac/AppMain.swift').read_text();self.assertIn('preserved local note',s);self.assertIn('familySlots()',s)
++ def test_conflicting_appmain_edit_refuses_output(self):
++  f=self.source/'Sources/Mac/AppMain.swift';f.write_text(f.read_text().replace('private func rebuildBars()', 'private func rebuildCustomBars()'))
++  self.before=M.inventory(self.source)
++  # Also edit a line that this release replaces, guaranteeing overlap.
++  f.write_text(f.read_text().replace('if showingPinnedChats, let pins = pinnedChats', 'if false, let pins = pinnedChats'))
++  self.before=M.inventory(self.source)
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.unchanged();self.assertFalse(self.out.exists())
++ def test_new_family_file_collision_refuses_output(self):
++  f=self.source/'Sources/Core/ButtonHierarchy.swift';f.write_text('// unrelated local hierarchy\n');self.before=M.inventory(self.source)
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.unchanged();self.assertFalse(self.out.exists())
++ def test_existing_output_is_not_overwritten(self):
++  self.out.mkdir();(self.out/'keep').write_text('safe')
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.assertEqual((self.out/'keep').read_text(),'safe');self.unchanged()
++ def test_output_cannot_be_inside_source(self):
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.source/'New')
++  self.unchanged()
++ def test_symlinked_source_file_is_refused(self):
++  (self.source/'link').symlink_to(self.source/'Sources/Mac/AppMain.swift')
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.assertFalse(self.out.exists())
++ def test_symlinked_source_root_is_refused(self):
++  link=self.root/'Alias';link.symlink_to(self.source,target_is_directory=True)
++  with self.assertRaises(M.MergeError):M.merge(link,self.out)
++  self.unchanged()
++ def test_incomplete_native_only_branch_is_refused(self):
++  (self.source/'Sources/Core/PinnedChats.swift').unlink();self.before=M.inventory(self.source)
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.unchanged()
++ def test_newer_release_is_not_downgraded(self):
++  f=self.source/'Resources/Info.plist';info=plistlib.loads(f.read_bytes());info['CFBundleShortVersionString']='0.8.0';f.write_bytes(plistlib.dumps(info));self.before=M.inventory(self.source)
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.unchanged()
++ def test_extra_local_plist_metadata_preserved(self):
++  f=self.source/'Resources/Info.plist';info=plistlib.loads(f.read_bytes());info['LocalTestSetting']='keep';info['CFBundleVersion']='20';f.write_bytes(plistlib.dumps(info));self.before=M.inventory(self.source)
++  M.merge(self.source,self.out);self.unchanged();out=plistlib.loads((self.out/'Resources/Info.plist').read_bytes());self.assertEqual(out['LocalTestSetting'],'keep');self.assertEqual(out['CFBundleShortVersionString'],'0.7.0');self.assertEqual(out['CFBundleVersion'],'21')
++ def test_removed_baseline_file_is_not_resurrected(self):
++  (self.source/'Install.command').unlink();self.before=M.inventory(self.source)
++  with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  self.unchanged()
++ def test_known_lean_scan_engine_is_not_reverted(self):
++  for name in ['Sources/Core/NativeMenus.swift','Sources/Mac/NativeAXSource.swift','Sources/Mac/NativeMenuController.swift']:
++   shutil.copy2(R/name,self.source/name)
++  controller=self.source/'Sources/Mac/NativeMenuController.swift'
++  controller.write_text(controller.read_text().replace('RelayBar 0.7.0 · Native Sheets scan engine 0.5.1','RelayBar 0.5.1'))
++  self.before=M.inventory(self.source);M.merge(self.source,self.out);self.unchanged()
++  for name in ['Sources/Core/NativeMenus.swift','Sources/Mac/NativeAXSource.swift','Sources/Mac/NativeMenuController.swift']:
++   self.assertEqual((self.out/name).read_bytes(),(R/name).read_bytes())
++ def test_generated_and_repository_directories_excluded(self):
++  for name in ['.git','.build','build','BuildLogs']:
++   (self.source/name).mkdir();(self.source/name/'dummy').write_text('ignored')
++  M.merge(self.source,self.out)
++  for name in ['.git','.build','build','BuildLogs']:self.assertFalse((self.out/name).exists())
++ def test_output_inventory_verifies_every_regular_file(self):
++  M.merge(self.source,self.out)
++  for line in (self.out/'SHA256SUMS.txt').read_text().splitlines():
++   digest,name=line.split('  ',1);self.assertEqual(M.sha((self.out/name).read_bytes()),digest,name)
++ def test_corrupt_release_manifest_payload_refused(self):
++  saved=M.PACKAGE
++  fake=self.root/'Fake release';shutil.copytree(R/'MergeSupport',fake/'MergeSupport')
++  for item in json.loads((R/'MergeSupport/manifest.json').read_text())['files']:
++   target=fake/item['path'];target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(R/item['path'],target)
++  p=fake/'Sources/Core/ButtonHierarchy.swift';p.write_text('bad payload')
++  try:
++   M.PACKAGE=fake
++   with self.assertRaises(M.MergeError):M.merge(self.source,self.out)
++  finally:M.PACKAGE=saved
++  self.unchanged();self.assertFalse(self.out.exists())
++ def test_already_updated_tree_can_be_copied_without_reapplying_edits(self):
++  M.merge(self.source,self.out)
++  for name in ['BUTTON_FAMILIES_MERGE_REPORT.json','SHA256SUMS.txt']:
++   (self.out/name).unlink()
++  before=M.inventory(self.out);second=self.root/'Second Copy';M.merge(self.out,second)
++  self.assertEqual(before,M.inventory(self.out));self.assertEqual((self.out/'Sources/Mac/AppMain.swift').read_bytes(),(second/'Sources/Mac/AppMain.swift').read_bytes())
++if __name__=='__main__':unittest.main(verbosity=2)
+--- /dev/null
++++ b/Tests/ButtonFamilies/test_wiring.py
+@@ -0,0 +1,48 @@
++"""Hierarchy integration contracts. Source checks, NOT native AppKit execution."""
++from pathlib import Path
++import hashlib, json, plistlib, unittest
++R=Path(__file__).resolve().parents[2]
++A=(R/'Sources/Mac/AppMain.swift').read_text();C=(R/'Sources/Core/ButtonHierarchy.swift').read_text()
++def body(signature):
++ i=A.index(signature);i=A.index('{',i);n=0
++ for j in range(i,len(A)):
++  n+=(A[j]=='{')-(A[j]=='}')
++  if n==0:return A[i:j+1]
++ raise ValueError(signature)
++class FamilyWiring(unittest.TestCase):
++ def test_bar_has_one_catalog_adapter(self):self.assertIn('let slots = familySlots()',body('private func rebuildBars()'))
++ def test_menu_uses_shared_catalog(self):self.assertIn('RelayHierarchy.items(on: page)',body('private func familyMenu('))
++ def test_all_five_families_in_main_menu(self):
++  b=body('private func buildMenu()')
++  self.assertIn('RelayHierarchy.items(on: .home)',b);self.assertIn('familyMenu(page)',b)
++  for name in ['.prompting','.context','.chats','.workspace','.settings']:self.assertIn(name,C)
++ def test_folders_do_not_run_actions(self):
++  b=body('private func groupSlot(');self.assertIn('navigate(to: page)',b)
++  for bad in ['runFamilyCommand(', 'performAction(', 'copyDraft(', 'toggleStackCollection(']:self.assertNotIn(bad,b)
++ def test_prompt_actions_use_original_composer(self):self.assertIn('case .prompt(let action): performAction(action)',A)
++ def test_successful_compose_opens_draft(self):self.assertIn('composeSelected()',body('private func performAction('));self.assertIn('navigate(to: .draft)',body('private func composeSelected('))
++ def test_every_leaf_guarded_by_generation(self):
++  b=body('private func familySlots()');self.assertIn('self.navigation.accepts(ticket)',b);self.assertIn('item.isEnabled',b)
++ def test_native_confirmation_back_prioritizes_cancel(self):
++  b=body('private func navigateBack()');self.assertIn('RelayHierarchy.nativeBack(',b);self.assertIn('nativeMenus.cancelConfirmation()',b);self.assertIn('nativeMenus.showMenus()',b)
++ def test_navigation_cancels_pending_native_interaction(self):
++  b=body('private func navigate(to destination:');self.assertLess(b.index('nativeMenus.cancelInteraction()'),b.index('navigation.open(destination)'))
++ def test_screenshot_interrupt_remembers_nav_path(self):self.assertIn('navigation.screenshotArrived(autoOpen: true)',body('screenshotShelf?.onChange ='))
++ def test_native_refresh_does_not_reset_ordinary_groups(self):
++  b=body('private func refreshAppContext()');self.assertIn('navigation.externalContextChanged(appAware: true)',b);self.assertNotIn('navigate(to: .home)',b)
++ def test_dynamic_data_reuses_original_controllers(self):
++  b=body('private func familySlots()')
++  for term in ['pinnedChats?.slots(', 'contextStack?.slots(', 'screenshotSlots()', 'appAwareSlots(fallback:'] :self.assertIn(term,b)
++ def test_escape_back_then_hide(self):
++  b=body('panel.onEscape =');self.assertIn('navigation.page == .home',b);self.assertIn('navigateBack()',b);self.assertIn('hidePanel()',b)
++ def test_breadcrumb_is_on_native_panel(self):self.assertIn('full(familyPathLabel)',A);self.assertIn('navigation.page.breadcrumb',A)
++ def test_clear_session_requires_second_button(self):self.assertIn('alertSecondButtonReturn',body('private func confirmClearSession()'))
++ def test_retains_collection_pause_on_hide(self):self.assertIn('contextStack?.pause(',body('@objc private func disableOverlay()'))
++ def test_selftest_uses_named_clipboard_not_general(self):
++  b=body('func runButtonFamiliesSelfTest()');self.assertIn('NSPasteboard(name:',b);self.assertNotIn('NSPasteboard.general',b);self.assertNotIn('refreshPinnedContext(',b);self.assertNotIn('presentOverlay',b)
++ def test_release_metadata(self):
++  p=plistlib.loads((R/'Resources/Info.plist').read_bytes());self.assertEqual((p['CFBundleShortVersionString'],p['CFBundleVersion']),('0.7.0','11'))
++ def test_no_extension_resurrection(self):
++  self.assertFalse((R/'BrowserExtension').exists());self.assertFalse((R/'Sources/Mac/BrowserNativeHost.swift').exists())
++ def test_suggestions_marked_not_moved(self):self.assertIn('title = "★ " + title',body('private func commandSlot('));self.assertIn('.prompt(.nextSlice)',C)
++if __name__=='__main__':unittest.main(verbosity=2)
+--- a/Tests/ContextStack/test_integration.py
++++ b/Tests/ContextStack/test_integration.py
+@@ -47,12 +47,13 @@
+     def test_screenshot_add_still_takes_priority(self):
+         b=body(APP,'screenshotShelf?.onChange =')
+         self.assertIn('screenshotPresentation.screenshotAdded()',b)
+-        self.assertIn('if ticket != nil { self.showingContextStack = false; self.stopPinnedChats() }',b)
++        self.assertIn('if ticket != nil',b);self.assertIn('self.showingContextStack = false',b);self.assertIn('self.stopPinnedChats()',b);self.assertIn('navigation.screenshotArrived(autoOpen: true)',b)
+     def test_stack_opens_from_all_existing_pages(self):
+-        for signature in ['private func screenshotSlots()', 'private func rebuildBars()', 'private func appAwareSlots(']:
+-            self.assertIn('stack-open',body(APP,signature))
++        catalog=(ROOT/'Sources/Core/ButtonHierarchy.swift').read_text()
++        self.assertIn('case .context: return [.page(.capture), .page(.stack), .page(.screenshots)]',catalog)
++        b=body(APP,'private func familySlots()');self.assertIn('case .stack:',b);self.assertIn('case .stackClips:',b);self.assertIn('contextStack?.slots(',b)
+     def test_context_page_coexists_without_changing_overlay_allowlist(self):
+-        self.assertIn('if showingContextStack, let stack = contextStack',APP)
++        self.assertIn('showingContextStack = navigation.isStackPage',APP)
+         self.assertNotIn('showingContextStack',body(APP,'private func updateOverlay('))
+     def test_project_switch_uses_workspace(self):
+         self.assertIn('contextStack?.syncProject(id: configuration.selectedProject.id',body(APP,'private func refreshControls()'))
+@@ -93,7 +94,7 @@
+         self.assertIn('previous app was restored',s)
+     def test_current_versions_and_no_per_sheet_instructions(self):
+         p=plistlib.loads((ROOT/'Resources/Info.plist').read_bytes())
+-        self.assertEqual(p['CFBundleShortVersionString'],'0.6.0');self.assertEqual(p['CFBundleVersion'],'9')
++        self.assertEqual(p['CFBundleShortVersionString'],'0.7.0');self.assertEqual(p['CFBundleVersion'],'11')
+         b=body(APP,'@objc private func enableNativeControls()')
+         self.assertNotIn('RelayBarAddMenu_()',b); self.assertNotIn('add AppsScript',b)
+         self.assertIn('No spreadsheet files',b)
+--- a/Tests/NativeSheets/test_contracts.py
++++ b/Tests/NativeSheets/test_contracts.py
+@@ -21,8 +21,10 @@
+   for token in ['"AXValue"','AXSelectedText','AXAttributedString','AXSelectedRows','AXRows']:
+    self.assertNotIn(token,enum)
+  def test_read_budget_and_per_call_timeout(self):
+-  for token in ['now + 0.85','queries < 3500','count <= 256','AXUIElementSetMessagingTimeout']:
++  for token in ['NativeReadBudget(now: now)', 'count <= NativeReadBudget.maximumChildren', 'AXUIElementSetMessagingTimeout']:
+    self.assertIn(token,M)
++  for token in ['seconds: Double = 0.85', 'maximumQueries = 3500', 'maximumChildren = 4096', 'childPageSize = 64']:
++   self.assertIn(token,E)
+  def test_cancel_token_checked_by_native_perform(self):
+   action=M.split('func perform(',1)[1].split('/// Ask',1)[0]
+   self.assertIn('take(), trusted',action)
+@@ -42,7 +44,8 @@
+    self.assertNotIn(token,A+M+(R/'Install.command').read_text())
+  def test_screenshot_and_hide_cancel_native_interactions(self):
+   self.assertIn('if didAdd { self.nativeMenus.cancelInteraction() }',A)
+-  self.assertIn('nativeMenus.clear()',A.split('@objc private func disableOverlay() {',1)[1].split('@objc private func toggleOverlay()',1)[0])
++  block=A.split('@objc private func disableOverlay() {',1)[1].split('@objc private func',1)[0]
++  self.assertIn('nativeMenus.clear()',block)
+  def test_inline_confirmation_does_not_open_a_panel(self):
+   block=A.split('if let pending = nativeMenus.pendingLabel',1)[1].split('if liveProfile == "sheets"',1)[0]
+   self.assertNotIn('showPanel',block); self.assertIn('nativeMenus.confirm(expectedRevision: rev)',block)
+@@ -54,7 +57,7 @@
+   self.assertIn('rebuildBars()',block); self.assertIn('updateOverlay(',block)
+  def test_version(self):
+   d=plistlib.loads((R/'Resources/Info.plist').read_bytes())
+-  self.assertEqual(d['CFBundleShortVersionString'],'0.6.0'); self.assertEqual(d['CFBundleVersion'],'9')
++  self.assertEqual(d['CFBundleShortVersionString'],'0.7.0'); self.assertEqual(d['CFBundleVersion'],'11')
+  def test_native_report_does_not_include_url_or_labels(self):
+   block=C.split('var connectionReport:',1)[1]
+   self.assertNotIn('.url',block); self.assertNotIn('.label',block); self.assertIn('nodesVisited',block)
+--- a/Tests/PinnedChats/test_wiring.py
++++ b/Tests/PinnedChats/test_wiring.py
+@@ -13,12 +13,16 @@
+  raise ValueError('unbalanced')
+ class PinsWiringTests(unittest.TestCase):
+  def test_real_controller_instantiated(self): self.assertIn('pinnedChats = PinnedChatsController()',APP)
+- def test_pins_page_uses_real_slots(self): self.assertIn('slots = pins.slots(',body(APP,'private func rebuildBars()'))
+- def test_primary_tools_button(self): self.assertIn('pinnedChatsSlot(),',body(APP,'private func rebuildBars()'))
++ def test_pins_page_uses_real_slots(self):
++  self.assertIn('let slots = familySlots()',body(APP,'private func rebuildBars()'));self.assertIn('pinnedChats?.slots(',body(APP,'private func familySlots()'))
++ def test_primary_chats_family(self):
++  catalog=(ROOT/'Sources/Core/ButtonHierarchy.swift').read_text();self.assertIn('case .chats: return [.page(.pins)',catalog)
+  def test_browser_entry_without_extension(self): self.assertIn('pinnedChatsSlot()',body(APP,'private func appAwareSlots('))
+  def test_screenshot_still_preempts(self): self.assertIn('self.stopPinnedChats()',body(APP,'screenshotShelf?.onChange ='))
+- def test_back_to_tools_stops_reading(self): self.assertIn('stopPinnedChats()',body(APP,'private func showToolsPage()'))
+- def test_stack_stops_pins_not_clips(self): self.assertIn('stopPinnedChats()',body(APP,'@objc private func showStackFromMenu()'))
++ def test_back_to_home_stops_reading(self):
++  self.assertIn('navigate(to: .home)',body(APP,'private func showToolsPage()'));self.assertIn('else { stopPinnedChats() }',body(APP,'private func reconcileNavigation()'))
++ def test_stack_stops_pins_not_clips(self):
++  self.assertIn('navigate(to: .stack)',body(APP,'@objc private func showStackFromMenu()'));self.assertIn('else { stopPinnedChats() }',body(APP,'private func reconcileNavigation()'))
+  def test_hide_stops_pins(self): self.assertIn('stopPinnedChats()',body(APP,'@objc private func disableOverlay()'))
+  def test_quit_clears(self): self.assertIn('pinnedChats?.stopForTermination()',body(APP,'func applicationWillTerminate('))
+  def test_no_title_based_identity(self):
+@@ -69,14 +73,15 @@
+   code=(ROOT/'Sources/Mac/PinnedChatsNativeChecks.swift').read_text()
+   self.assertNotIn('reader.scan',code);self.assertNotIn('NSPasteboard',code);self.assertNotIn('presentOverlay',code)
+  def test_metadata(self):
+-  p=plistlib.loads((ROOT/'Resources/Info.plist').read_bytes());self.assertEqual(p['CFBundleShortVersionString'],'0.6.0');self.assertEqual(p['CFBundleVersion'],'9')
++  p=plistlib.loads((ROOT/'Resources/Info.plist').read_bytes());self.assertEqual(p['CFBundleShortVersionString'],'0.7.0');self.assertEqual(p['CFBundleVersion'],'11')
+  def test_build_includes_new_sources_unchanged(self): self.assertIn('"$ROOT"/Sources/Core/*.swift "$ROOT"/Sources/Mac/*.swift',(ROOT/'Scripts/build.sh').read_text())
+  def test_merged_routes_do_not_restore_extension(self):
+   for token in ['browserMailbox', 'liveReceipt', 'dispatchBrowserAction', 'showSheetsSetup']:
+    self.assertNotIn(token,APP)
+   self.assertFalse((ROOT/'BrowserExtension').exists())
+  def test_pins_cancel_native_actions_before_reading(self):
+-  self.assertIn('nativeMenus.cancelInteraction()',body(APP,'@objc private func showPinnedChats()'))
++  self.assertIn('navigate(to: .pins)',body(APP,'@objc private func showPinnedChats()'))
++  b=body(APP,'private func navigate(to destination:');self.assertLess(b.index('nativeMenus.cancelInteraction()'),b.index('reconcileNavigation()'))
+  def test_stack_methods_survive_three_way_merge(self):
+   for name in ['refreshStackUI()', 'showStackFromMenu()', 'toggleStackCollection()', 'reviewStack()']:
+    self.assertIn('func '+name,APP)
+--- /dev/null
++++ b/Tests/RelayCoreTests/ButtonHierarchyTests.swift
+@@ -0,0 +1,68 @@
++import XCTest
++@testable import RelayCore
++
++final class ButtonHierarchyTests: XCTestCase {
++    func testHomeIsFiveFamiliesInStableOrder() { XCTAssertEqual(RelayHierarchy.items(on: .home), [.page(.prompting), .page(.context), .page(.chats), .page(.workspace), .page(.settings)]) }
++    func testRootContainsNoExecutionActions() { XCTAssertTrue(RelayHierarchy.items(on: .home).allSatisfy { if case .page = $0 { return true }; return false }) }
++    func testRequestedPromptTrioIsDirect() { XCTAssertEqual(Array(RelayHierarchy.items(on: .prompting).prefix(3)), [.command(.prompt(.nextSlice)), .command(.prompt(.challenge)), .command(.prompt(.handoff))]) }
++    func testAllNinePromptsHaveExactlyOneHome() {
++        let actions = RelayPage.allCases.flatMap { RelayHierarchy.items(on: $0) }.compactMap { item -> PromptAction? in
++            if case .command(.prompt(let a)) = item { return a }; return nil
++        }
++        XCTAssertEqual(Set(actions), Set(PromptAction.allCases)); XCTAssertEqual(actions.count, PromptAction.allCases.count)
++    }
++    func testWritingPromptsAreSiblings() { XCTAssertEqual(RelayHierarchy.items(on: .writePrompts), [.command(.prompt(.tighten)), .command(.prompt(.expand))]) }
++    func testTechnicalPromptsAreSiblings() { XCTAssertEqual(RelayHierarchy.items(on: .buildPrompts).count, 4) }
++    func testAllPagesReachableFromHome() {
++        var seen = Set<RelayPage>()
++        func walk(_ p: RelayPage) { guard seen.insert(p).inserted else { return }; for i in RelayHierarchy.items(on: p) { if case .page(let child) = i { walk(child) } } }
++        walk(.home); XCTAssertEqual(seen, Set(RelayPage.allCases))
++    }
++    func testEveryChildHasCorrectParent() { for p in RelayPage.allCases { for i in RelayHierarchy.items(on: p) { if case .page(let c) = i { XCTAssertEqual(c.parent, p) } } } }
++    func testNoDuplicateItemIDsOnPage() { for p in RelayPage.allCases { let ids=RelayHierarchy.items(on:p).map(\.id); XCTAssertEqual(ids.count, Set(ids).count, p.rawValue) } }
++    func testEveryPageHasUniqueAcyclicPath() { for p in RelayPage.allCases { XCTAssertEqual(p.path.first,.home);XCTAssertEqual(p.path.last,p);XCTAssertEqual(Set(p.path).count,p.path.count);XCTAssertLessThanOrEqual(p.path.count,4) } }
++    func testBreadcrumbsAreUnambiguous() { XCTAssertEqual(RelayPage.stackOptions.breadcrumb,"Home › Context › Context Stack › Stack options") }
++    func testNoEmptyDisplayLabels() { for p in RelayPage.allCases { XCTAssertFalse(p.title.isEmpty); for i in RelayHierarchy.items(on:p) { XCTAssertFalse(i.title.isEmpty);XCTAssertFalse(i.id.isEmpty) } } }
++    func testContextOwnsCaptureStackAndScreenshots() { XCTAssertEqual(RelayHierarchy.items(on:.context),[.page(.capture),.page(.stack),.page(.screenshots)]) }
++    func testChatsOwnsPinsAndDestinations() { XCTAssertEqual(RelayPage.pins.parent,.chats);XCTAssertEqual(RelayPage.destinations.parent,.chats) }
++    func testWorkspaceOwnsProjectAndApps() { XCTAssertEqual(RelayPage.projects.parent,.workspace);XCTAssertEqual(RelayPage.appControls.parent,.workspace);XCTAssertEqual(RelayPage.checkpoints.parent,.workspace) }
++    func testCaptureCommandsDoNotContainPromptGeneration() { for item in RelayHierarchy.items(on:.capture) { if case .command(.prompt) = item { XCTFail("Prompt under capture") } } }
++    func testScreenshotsOptionsHaveAllFiveTools() { XCTAssertEqual(RelayHierarchy.items(on:.screenshotOptions).count,5) }
++    func testSettingsDontAppearOnHomeAsCommands() { XCTAssertEqual(RelayPage.connections.parent,.settings);XCTAssertEqual(RelayPage.layout.parent,.settings) }
++    func testStaticPagesNeverHaveMoreThanFiveItems() { for p in RelayPage.allCases { XCTAssertLessThanOrEqual(RelayHierarchy.items(on:p).count,5) } }
++    func testNavigationStartsHome() { XCTAssertEqual(RelayNavigation().page,.home) }
++    func testHomeHasNoParent() { XCTAssertNil(RelayNavigation().backDestination) }
++    func testOpenNestedPageUsesCanonicalParent() { var n=RelayNavigation();n.open(.pins);XCTAssertEqual(n.backDestination,.chats) }
++    func testBackReturnsOneLevel() { var n=RelayNavigation();n.open(.buildPrompts);n.back();XCTAssertEqual(n.page,.promptLibrary);n.back();XCTAssertEqual(n.page,.prompting);n.back();XCTAssertEqual(n.page,.home) }
++    func testBackAtHomeIsSafe() { var n=RelayNavigation();n.back();XCTAssertEqual(n.page,.home) }
++    func testHomeFromAnyPage() { for p in RelayPage.allCases { var n=RelayNavigation();n.open(p);n.home();XCTAssertEqual(n.page,.home);XCTAssertNil(n.screenshotReturn) } }
++    func testOldNavigationTicketRejected() { var n=RelayNavigation();let t=n.generation;n.open(.context);XCTAssertFalse(n.accepts(t)) }
++    func testCurrentTicketAccepted() { let n=RelayNavigation();XCTAssertTrue(n.accepts(n.generation)) }
++    func testSamePageExplicitNavigationRetiresOldTicket() { var n=RelayNavigation();let t=n.generation;n.home();XCTAssertFalse(n.accepts(t)) }
++    func testOrdinaryReadingDoesNotRetireTicket() { let n=RelayNavigation();let t=n.generation;_ = n.page;_ = n.backDestination;XCTAssertTrue(n.accepts(t)) }
++    func testScreenshotTemporarilyInterruptsDraft() { var n=RelayNavigation();n.open(.draft);n.screenshotArrived(autoOpen:true);XCTAssertEqual(n.page,.screenshots);XCTAssertEqual(n.backDestination,.draft);n.back();XCTAssertEqual(n.page,.draft) }
++    func testBurstOfScreenshotsKeepsOriginalReturn() { var n=RelayNavigation();n.open(.buildPrompts);for _ in 0..<20 { n.screenshotArrived(autoOpen:true) };n.back();XCTAssertEqual(n.page,.buildPrompts) }
++    func testScreenshotAutoOffDoesNotNavigateOrRetireTicket() { var n=RelayNavigation();n.open(.stack);let t=n.generation;n.screenshotArrived(autoOpen:false);XCTAssertEqual(n.page,.stack);XCTAssertTrue(n.accepts(t)) }
++    func testManualScreenshotsReturnsToContext() { var n=RelayNavigation();n.open(.screenshots);n.back();XCTAssertEqual(n.page,.context) }
++    func testScreenshotArrivalRetiresPriorControls() { var n=RelayNavigation();let t=n.generation;n.screenshotArrived(autoOpen:true);XCTAssertFalse(n.accepts(t)) }
++    func testScreenshotOptionsBackRestoresViewerAndThenInterruptedPage() { var n=RelayNavigation();n.open(.stackClips);n.screenshotArrived(autoOpen:true);n.open(.screenshotOptions);n.back();XCTAssertEqual(n.page,.screenshots);n.back();XCTAssertEqual(n.page,.stackClips) }
++    func testExplicitHomeDismissesScreenshotReturn() { var n=RelayNavigation();n.open(.draft);n.screenshotArrived(autoOpen:true);n.home();n.open(.screenshots);n.back();XCTAssertEqual(n.page,.context) }
++    func testOtherFamilyDismissesScreenshotReturn() { var n=RelayNavigation();n.screenshotArrived(autoOpen:true);n.open(.chats);XCTAssertNil(n.screenshotReturn) }
++    func testExternalAppChangePreservesOrdinaryGroup() { for p in RelayPage.allCases where p != .screenshots && p != .screenshotOptions { var n=RelayNavigation();n.open(p);let t=n.generation;n.externalContextChanged(appAware:true);XCTAssertEqual(n.page,p);XCTAssertTrue(n.accepts(t)) } }
++    func testExternalChangeDismissesScreenshotToInterruptedPage() { var n=RelayNavigation();n.open(.appControls);n.screenshotArrived(autoOpen:true);n.externalContextChanged(appAware:true);XCTAssertEqual(n.page,.appControls) }
++    func testAppAwareOffDoesNotDismissViewer() { var n=RelayNavigation();n.screenshotArrived(autoOpen:true);n.externalContextChanged(appAware:false);XCTAssertEqual(n.page,.screenshots) }
++    func testUnrelatedAppLeavesPinsAtChats() { var n=RelayNavigation();n.open(.pins);n.leaveUnavailablePins();XCTAssertEqual(n.page,.chats) }
++    func testUnavailablePinsDoNotDisturbPrompting() { var n=RelayNavigation();n.open(.prompting);n.leaveUnavailablePins();XCTAssertEqual(n.page,.prompting) }
++    func testUnavailablePinReturnIsDowngraded() { var n=RelayNavigation();n.open(.pins);n.screenshotArrived(autoOpen:true);n.leaveUnavailablePins();n.back();XCTAssertEqual(n.page,.chats) }
++    func testStackSubpagesStayInStackFamily() { var n=RelayNavigation();for p in [RelayPage.stack,.stackClips,.stackOptions] { n.open(p);XCTAssertTrue(n.isStackPage) };n.open(.context);XCTAssertFalse(n.isStackPage) }
++    func testProjectPageCounts() { XCTAssertEqual(RelayHierarchy.projectPageCount(0),1);XCTAssertEqual(RelayHierarchy.projectPageCount(4),1);XCTAssertEqual(RelayHierarchy.projectPageCount(5),2);XCTAssertEqual(RelayHierarchy.projectPageCount(100),25) }
++    func testProjectRangesCoverAllHundredExactlyOnce() { let indices=(0..<25).flatMap { Array(RelayHierarchy.projectRange(count:100,page:$0)) };XCTAssertEqual(indices,Array(0..<100)) }
++    func testNegativeProjectInputsAreSafe() { XCTAssertEqual(RelayHierarchy.projectRange(count:-4,page:-1),0..<0) }
++    func testProjectPageClampsAfterRemoval() { var n=RelayNavigation();n.setProjectPage(24,count:100);n.setProjectPage(n.projectPage,count:2);XCTAssertEqual(n.projectPage,0) }
++    func testProjectPaginationRetiresOldControls() { var n=RelayNavigation();n.open(.projects);let t=n.generation;n.setProjectPage(1,count:8);XCTAssertFalse(n.accepts(t)) }
++    func testProjectPaginationSurvivesVisitingSibling() { var n=RelayNavigation();n.open(.projects);n.setProjectPage(3,count:20);n.open(.projectOptions);n.back();XCTAssertEqual(n.projectPage,3) }
++    func testNativeBackCancelsConfirmationFirst() { XCTAssertEqual(RelayHierarchy.nativeBack(pending:true,showingOpenMenu:true),.cancelConfirmation) }
++    func testNativeBackShowsRootsBeforeLeaving() { XCTAssertEqual(RelayHierarchy.nativeBack(pending:false,showingOpenMenu:true),.menuRoots) }
++    func testNativeBackLeavesRootPage() { XCTAssertEqual(RelayHierarchy.nativeBack(pending:false,showingOpenMenu:false),.parent) }
++    func testDeepNavigationAndBackNeverMutateProjectSettings() { let config=AppConfiguration();var n=RelayNavigation();for p in RelayPage.allCases { n.open(p);n.back() };XCTAssertEqual(config.selectedProjectID,"hearth");XCTAssertEqual(config.target,.chatgpt) }
++}
+--- a/Tests/RelayCoreTests/NativeMenuTests.swift
++++ b/Tests/RelayCoreTests/NativeMenuTests.swift
+@@ -302,4 +302,44 @@
+         let s=FakeAX(); let a=scan(s); s.now=101; let b=scan(s)
+         XCTAssertTrue(a.sameContent(as:b)); XCTAssertNotEqual(a.sampledAt,b.sampledAt)
+     }
++    func testLeanScanFormattingToolbarPrunedBeforeChildren() {
++        let s=FakeAX(); s.add(90,"AXToolbar",children:[91]); s.add(91,"AXGroup"); s.tree[90]?.kids=nil
++        s.tree[3]?.kids?.insert(90,at:0)
++        let r=scan(s); XCTAssertTrue(r.ready); XCTAssertEqual(r.prunedChromeNodes,1)
++        XCTAssertFalse(s.childReads.contains(90))
++    }
++    func testLeanScanToolbarWithinMenuIsStillTraversed() {
++        let s=FakeAX(); s.add(90,"AXToolbar",children:[91]); s.add(91,"AXMenuItem","Nested toolbar item")
++        s.tree[9]?.kids?.append(90); s.fixParents()
++        let r=scan(s); XCTAssertTrue(r.openItems.contains { $0.label == "Nested toolbar item" })
++        XCTAssertTrue(s.childReads.contains(90))
++    }
++    func testLeanScanNoContentLabelReadWhilePruning() {
++        let s=FakeAX(); s.add(90,"AXLink","PRIVATE LINK"); s.tree[3]?.kids?.append(90)
++        XCTAssertTrue(scan(s).ready)
++        XCTAssertFalse(s.childReads.contains(90))
++        XCTAssertFalse(s.reads.contains { $0.0 == 90 && ($0.1 == .title || $0.1 == .description) })
++    }
++    func testLeanScanDepthFailureIsExplicit() {
++        let s=FakeAX(); s.tree[3]?.kids?.append(100)
++        for n in 100...130 { s.add(n,"AXGroup",children:n == 130 ? [] : [n+1]) }
++        let r=scan(s); XCTAssertEqual(r.failure,.depth); XCTAssertTrue(r.status.contains("depth"))
++        XCTAssertEqual(r.scanPhase,"Sheet menu discovery"); XCTAssertFalse(r.ready)
++    }
++    func testLeanScanUnreadableMenuFailsExplicitlyWithoutPartialActions() {
++        let s=FakeAX(); s.tree[9]?.kids=nil
++        let r=scan(s); XCTAssertEqual(r.failure,.readFailed); XCTAssertFalse(r.ready)
++        XCTAssertGreaterThan(r.candidatesSeen,0); XCTAssertTrue(r.roots.isEmpty); XCTAssertTrue(r.openItems.isEmpty)
++    }
++    func testLeanScanMetricsHeartbeatDoesNotInvalidateButtons() {
++        let s=FakeAX(); let a=scan(s); var b=a
++        b.readMetrics.queries=123; b.readMetrics.milliseconds=456; b.prunedContentNodes=99
++        XCTAssertTrue(a.sameContent(as:b))
++    }
++    func testLeanScanHardNodeBoundRetained() {
++        let s=FakeAX(); s.tree[3]?.kids?.append(1000)
++        for n in 1000..<1950 { let k=3*(n-1000)+1001; s.add(n,"AXGroup",children:(0..<3).map { k+$0 }.filter { $0<1950 }) }
++        let r=scan(s); XCTAssertEqual(r.failure,.nodes); XCTAssertFalse(r.ready)
++        XCTAssertTrue(r.roots.isEmpty); XCTAssertTrue(r.openItems.isEmpty)
++    }
+ }
+--- /dev/null
++++ b/Tests/RelayCoreTests/NativeScanBudgetTests.swift
+@@ -0,0 +1,59 @@
++import XCTest
++@testable import RelayCore
++
++final class NativeScanBudgetTests: XCTestCase {
++    func testReadPolicyKeepsTimeQueryNodeAndDepthBounds() {
++        XCTAssertEqual(NativeReadBudget.seconds,0.85)
++        XCTAssertEqual(NativeReadBudget.maximumQueries,3500)
++        XCTAssertEqual(NativeMenuPolicy.maximumNodes,900)
++        XCTAssertEqual(NativeMenuPolicy.maximumDepth,24)
++    }
++    func testPagesRemainSmallAndTotalChildListBounded() {
++        XCTAssertEqual(NativeReadBudget.childPageSize,64)
++        XCTAssertEqual(NativeReadBudget.maximumChildren,4096)
++    }
++    func testExactly3500QueriesAllowedThenStop() {
++        var b=NativeReadBudget(now:0)
++        for _ in 0..<3500 { XCTAssertTrue(b.take(now:0.1,cancelled:false)) }
++        XCTAssertFalse(b.take(now:0.1,cancelled:false)); XCTAssertEqual(b.failure,.queries)
++        XCTAssertEqual(b.queries,3500)
++    }
++    func testDeadlineFailsBeforeAnAdditionalIPC() {
++        var b=NativeReadBudget(now:0)
++        XCTAssertFalse(b.take(now:0.851,cancelled:false)); XCTAssertEqual(b.failure,.deadline)
++        XCTAssertEqual(b.queries,0)
++    }
++    func testExactDeadlineBoundaryAllowed() {
++        var b=NativeReadBudget(now:0); XCTAssertTrue(b.take(now:0.85,cancelled:false))
++    }
++    func testCancellationDoesNotConsumeAQuery() {
++        var b=NativeReadBudget(now:0); XCTAssertFalse(b.take(now:0.1,cancelled:true))
++        XCTAssertEqual(b.queries,0); XCTAssertEqual(b.failure,.cancelled)
++    }
++    func testClockRegressionAndNonFiniteClockFailClosed() {
++        for time in [-1.0,Double.nan,Double.infinity] {
++            var b=NativeReadBudget(now:0); XCTAssertFalse(b.take(now:time,cancelled:false))
++            XCTAssertEqual(b.failure,.deadline)
++        }
++    }
++    func testInvalidStartFailsClosed() {
++        var b=NativeReadBudget(now:.nan); XCTAssertFalse(b.take(now:0,cancelled:false))
++    }
++    func testFirstFailureIsPreserved() {
++        var b=NativeReadBudget(now:0); b.fail(.children); b.fail(.readFailed)
++        XCTAssertEqual(b.currentFailure(now:0.1,cancelled:false),.children)
++    }
++    func testCancellationOverridesOlderFailureInCurrentReport() {
++        var b=NativeReadBudget(now:0); b.fail(.queries)
++        XCTAssertEqual(b.currentFailure(now:0.1,cancelled:true),.cancelled)
++    }
++    func testNewReadResetsFailuresAndCounts() {
++        var b=NativeReadBudget(now:0); _=b.take(now:0.1,cancelled:false);b.fail(.children)
++        b=NativeReadBudget(now:2); XCTAssertEqual(b.queries,0);XCTAssertEqual(b.failure,.none)
++        XCTAssertTrue(b.take(now:2.1,cancelled:false))
++    }
++    func testAllFailureDescriptionsAreDistinct() {
++        let cases:[NativeScanFailure]=[.none,.deadline,.queries,.children,.depth,.nodes,.readFailed,.cancelled]
++        XCTAssertEqual(Set(cases.map(\.explanation)).count,cases.count)
++    }
++}

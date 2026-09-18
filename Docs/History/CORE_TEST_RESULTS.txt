@@ -1,0 +1,109 @@
+[0/1] Planning build
+Building for debugging...
+[0/4] Write swift-version--1BA0962812E73E12.txt
+Build complete! (0.10s)
+Test Suite 'All tests' started at 2026-09-17 05:07:24.694
+Test Suite 'debug.xctest' started at 2026-09-17 05:07:24.696
+Test Suite 'RelayCoreTests' started at 2026-09-17 05:07:24.696
+Test Case 'RelayCoreTests.testAllActionsHaveInstructions' started at 2026-09-17 05:07:24.696
+Test Case 'RelayCoreTests.testAllActionsHaveInstructions' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testAssistantToggle' started at 2026-09-17 05:07:24.696
+Test Case 'RelayCoreTests.testAssistantToggle' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testBuildMode' started at 2026-09-17 05:07:24.697
+Test Case 'RelayCoreTests.testBuildMode' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCheckpointProjectMismatchRejected' started at 2026-09-17 05:07:24.697
+Test Case 'RelayCoreTests.testCheckpointProjectMismatchRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCheckpointRoundTripAndUniqueNames' started at 2026-09-17 05:07:24.697
+Test Case 'RelayCoreTests.testCheckpointRoundTripAndUniqueNames' passed (0.004 seconds)
+Test Case 'RelayCoreTests.testClaudeEmptyRejected' started at 2026-09-17 05:07:24.701
+Test Case 'RelayCoreTests.testClaudeEmptyRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testClaudeExactLimit' started at 2026-09-17 05:07:24.701
+Test Case 'RelayCoreTests.testClaudeExactLimit' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testClaudeOversizeRejectedNotTruncated' started at 2026-09-17 05:07:24.701
+Test Case 'RelayCoreTests.testClaudeOversizeRejectedNotTruncated' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testClaudeURLRoundTrip' started at 2026-09-17 05:07:24.701
+Test Case 'RelayCoreTests.testClaudeURLRoundTrip' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCodeActions' started at 2026-09-17 05:07:24.702
+Test Case 'RelayCoreTests.testCodeActions' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCodeClassification' started at 2026-09-17 05:07:24.702
+Test Case 'RelayCoreTests.testCodeClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testConfigurationDoesNotPersistCaptureOrDraft' started at 2026-09-17 05:07:24.702
+Test Case 'RelayCoreTests.testConfigurationDoesNotPersistCaptureOrDraft' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCorruptConfigurationNotOverwritten' started at 2026-09-17 05:07:24.702
+Test Case 'RelayCoreTests.testCorruptConfigurationNotOverwritten' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testDraftContainsCorrectProjectAndTask' started at 2026-09-17 05:07:24.703
+Test Case 'RelayCoreTests.testDraftContainsCorrectProjectAndTask' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testDuplicateIDsRejected' started at 2026-09-17 05:07:24.703
+Test Case 'RelayCoreTests.testDuplicateIDsRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testEmptyActions' started at 2026-09-17 05:07:24.703
+Test Case 'RelayCoreTests.testEmptyActions' passed (0.1 seconds)
+Test Case 'RelayCoreTests.testEmptyClassification' started at 2026-09-17 05:07:24.804
+Test Case 'RelayCoreTests.testEmptyClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testEmptyProjectNameRejected' started at 2026-09-17 05:07:24.804
+Test Case 'RelayCoreTests.testEmptyProjectNameRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testEmptyProjectsRejected' started at 2026-09-17 05:07:24.804
+Test Case 'RelayCoreTests.testEmptyProjectsRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testErrorActions' started at 2026-09-17 05:07:24.804
+Test Case 'RelayCoreTests.testErrorActions' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testErrorClassification' started at 2026-09-17 05:07:24.804
+Test Case 'RelayCoreTests.testErrorClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testExactReferenceLimitAllowed' started at 2026-09-17 05:07:24.805
+Test Case 'RelayCoreTests.testExactReferenceLimitAllowed' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testFilenameEmojiFallback' started at 2026-09-17 05:07:24.806
+Test Case 'RelayCoreTests.testFilenameEmojiFallback' passed (0.1 seconds)
+Test Case 'RelayCoreTests.testFilenameLengthBound' started at 2026-09-17 05:07:24.907
+Test Case 'RelayCoreTests.testFilenameLengthBound' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testFilenameTraversalCannotEscape' started at 2026-09-17 05:07:24.907
+Test Case 'RelayCoreTests.testFilenameTraversalCannotEscape' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testHandoffEvidenceBoundary' started at 2026-09-17 05:07:24.907
+Test Case 'RelayCoreTests.testHandoffEvidenceBoundary' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testLongBriefRejected' started at 2026-09-17 05:07:24.908
+Test Case 'RelayCoreTests.testLongBriefRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testLongOriginRejected' started at 2026-09-17 05:07:24.908
+Test Case 'RelayCoreTests.testLongOriginRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testLongTaskRejected' started at 2026-09-17 05:07:24.908
+Test Case 'RelayCoreTests.testLongTaskRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testMissingSelectionRejected' started at 2026-09-17 05:07:24.908
+Test Case 'RelayCoreTests.testMissingSelectionRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testModeOverridesClassification' started at 2026-09-17 05:07:24.909
+Test Case 'RelayCoreTests.testModeOverridesClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testNoFalseScreenshotAttachment' started at 2026-09-17 05:07:24.909
+Test Case 'RelayCoreTests.testNoFalseScreenshotAttachment' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testOversizeCaptureRejected' started at 2026-09-17 05:07:24.909
+Test Case 'RelayCoreTests.testOversizeCaptureRejected' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testOversizeFileRejected' started at 2026-09-17 05:07:24.910
+Test Case 'RelayCoreTests.testOversizeFileRejected' passed (0.002 seconds)
+Test Case 'RelayCoreTests.testPrivateFilePermissions' started at 2026-09-17 05:07:24.911
+Test Case 'RelayCoreTests.testPrivateFilePermissions' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testProseActions' started at 2026-09-17 05:07:24.912
+Test Case 'RelayCoreTests.testProseActions' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testProseClassification' started at 2026-09-17 05:07:24.912
+Test Case 'RelayCoreTests.testProseClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testPythonTraceback' started at 2026-09-17 05:07:24.912
+Test Case 'RelayCoreTests.testPythonTraceback' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testReferenceIsEscapedJSON' started at 2026-09-17 05:07:24.912
+Test Case 'RelayCoreTests.testReferenceIsEscapedJSON' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testReviewMode' started at 2026-09-17 05:07:24.913
+Test Case 'RelayCoreTests.testReviewMode' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testStablePairCount' started at 2026-09-17 05:07:24.913
+Test Case 'RelayCoreTests.testStablePairCount' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testStarterConfigurationValid' started at 2026-09-17 05:07:24.913
+Test Case 'RelayCoreTests.testStarterConfigurationValid' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testStoreRoundTrip' started at 2026-09-17 05:07:24.913
+Test Case 'RelayCoreTests.testStoreRoundTrip' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testSymlinkConfigIsRejected' started at 2026-09-17 05:07:24.914
+Test Case 'RelayCoreTests.testSymlinkConfigIsRejected' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testUnknownSchemaRejected' started at 2026-09-17 05:07:24.915
+Test Case 'RelayCoreTests.testUnknownSchemaRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testWordErrorAloneDoesNotTriggerDiagnosis' started at 2026-09-17 05:07:24.915
+Test Case 'RelayCoreTests.testWordErrorAloneDoesNotTriggerDiagnosis' passed (0.0 seconds)
+Test Suite 'RelayCoreTests' passed at 2026-09-17 05:07:24.915
+	 Executed 46 tests, with 0 failures (0 unexpected) in 0.219 (0.219) seconds
+Test Suite 'debug.xctest' passed at 2026-09-17 05:07:24.915
+	 Executed 46 tests, with 0 failures (0 unexpected) in 0.219 (0.219) seconds
+Test Suite 'All tests' passed at 2026-09-17 05:07:24.915
+	 Executed 46 tests, with 0 failures (0 unexpected) in 0.219 (0.219) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

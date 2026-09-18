@@ -1,0 +1,1 @@
+PASS: Foundation host typecheck with an explicit NSWorkspace test stub. AppKit/macOS integration NOT tested.

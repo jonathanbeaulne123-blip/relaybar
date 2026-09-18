@@ -1,0 +1,64 @@
+{
+  "release": "RelayBar 0.8.1 build 14 \u2014 Adaptive menu bounds",
+  "prepared": "2026-09-17",
+  "input_archive": {
+    "name": "RelayBar_v0.8_Unified.zip",
+    "sha256": "5c86ef9d970226a4fdcb1b605c3c9b9b941b6534361168b38d9542c8b3a12309"
+  },
+  "user_report_target": {
+    "phase": "Sheet menu discovery",
+    "visited_total_nodes": 983,
+    "ax_queries_used": 2236,
+    "ax_query_limit": 3500,
+    "duration_ms": 127,
+    "duration_limit_ms": 850,
+    "stop_reason": "node bound reached",
+    "menu_containers_seen": 1,
+    "candidates_seen": 11
+  },
+  "policy_changes": {
+    "identity_node_limit": 900,
+    "menu_node_limit_old": 900,
+    "menu_node_limit_new": 1600,
+    "query_limit_old": 3500,
+    "query_limit_new": 5000,
+    "deadline_ms": 850,
+    "depth_limit": 24,
+    "child_limit": 4096,
+    "child_page_size": 64
+  },
+  "changed_production_swift": [
+    "Sources/Core/NativeMenus.swift",
+    "Sources/Mac/AppMain.swift",
+    "Sources/Mac/NativeMenuController.swift"
+  ],
+  "unchanged_production_swift": [
+    "Sources/Bridge/NativeBridge.h",
+    "Sources/Bridge/NativeBridge.m",
+    "Sources/Core/AppContext.swift",
+    "Sources/Core/BrowserMailbox.swift",
+    "Sources/Core/ButtonHierarchy.swift",
+    "Sources/Core/ContextStack.swift",
+    "Sources/Core/LocalStore.swift",
+    "Sources/Core/Models.swift",
+    "Sources/Core/PinnedChats.swift",
+    "Sources/Core/PromptEngine.swift",
+    "Sources/Core/ScreenshotPresentation.swift",
+    "Sources/Core/ScreenshotShelf.swift",
+    "Sources/Mac/Components.swift",
+    "Sources/Mac/ContextStackMac.swift",
+    "Sources/Mac/ContextStackNativeChecks.swift",
+    "Sources/Mac/FamilyMenuItem.swift",
+    "Sources/Mac/NativeAXSource.swift",
+    "Sources/Mac/PinnedChatsAX.swift",
+    "Sources/Mac/PinnedChatsMac.swift",
+    "Sources/Mac/PinnedChatsNativeChecks.swift",
+    "Sources/Mac/ScreenshotNativeChecks.swift",
+    "Sources/Mac/ScreenshotShelfMac.swift"
+  ],
+  "notes": [
+    "No browser extension or Apps Script runtime added.",
+    "No automatic action execution or retry added.",
+    "Mac/live Sheets/physical Touch Bar acceptance remains unverified."
+  ]
+}

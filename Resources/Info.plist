@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>RelayBar</string>
+	<key>CFBundleIdentifier</key>
+	<string>local.relaybar</string>
+	<key>CFBundleName</key>
+	<string>RelayBar</string>
+	<key>CFBundleDisplayName</key>
+	<string>RelayBar Command Center</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0.0</string>
+	<key>CFBundleVersion</key>
+	<string>20</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>12.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>Read screenshots from the save folder you choose to show the latest five on the Touch Bar. Original files are not changed.</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Read screenshots only from the save folder you choose for the five-image Touch Bar shelf.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>Read screenshots only from the save folder you choose for the five-image Touch Bar shelf.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>RelayBar uses Apple Events to display your open browser tabs and switch between them from the Touch Bar.</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>RelayBar — free local prototype. MIT licensed.</string>
+</dict>
+</plist>

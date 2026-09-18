@@ -1,0 +1,8 @@
+PASS bash syntax: Doctor.command
+PASS bash syntax: Install.command
+PASS bash syntax: Test.command
+PASS bash syntax: Toolchain_Check.command
+PASS bash syntax: Uninstall.command
+PASS bash syntax: build.sh
+PASS bash syntax: toolchain.sh
+PASS Swift parser only. No macOS SDK typecheck.

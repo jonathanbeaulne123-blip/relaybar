@@ -1,0 +1,7 @@
+{
+  "release": "RelayBar 0.9.1 build 17",
+  "target_installed_version": "0.9.1 build 17",
+  "tests": "see TEST_RESULTS.txt",
+  "permission_granted_by_helper": false,
+  "root_helper_sha256": "0b56f129ee5d82facee9e8ae254a1a91c538d991f5427bda5111e4aaeac3a231"
+}

@@ -1,0 +1,35 @@
+Building for debugging...
+[0/6] Write sources
+[2/6] Write swift-version--1BA0962812E73E12.txt
+[4/8] Emitting module RelayCore
+[5/8] Compiling RelayCore NativeMenus.swift
+[7/12] Compiling RelayCoreTests NativeScanBudgetTests.swift
+[8/12] Emitting module RelayCoreTests
+[9/12] Compiling RelayCoreTests NativeMenuTests.swift
+[10/13] /mnt/data/relaybar08/RelayBar_0.8_Unified/.build/x86_64-unknown-linux-gnu/debug/RelayBarCorePackageDiscoveredTests.derived/all-discovered-tests.swift
+[11/14] Write sources
+[13/17] Emitting module RelayBarCorePackageDiscoveredTests
+[14/17] Compiling RelayBarCorePackageDiscoveredTests all-discovered-tests.swift
+[15/17] Compiling RelayBarCorePackageDiscoveredTests RelayCoreTests.swift
+[16/18] Wrapping AST for RelayBarCorePackageDiscoveredTests for debugging
+[17/23] /mnt/data/relaybar08/RelayBar_0.8_Unified/.build/x86_64-unknown-linux-gnu/debug/RelayBarCorePackageTests.derived/runner.swift
+[18/24] Write sources
+[19/24] Wrapping AST for RelayCore for debugging
+[20/24] Wrapping AST for RelayCoreTests for debugging
+[22/26] Emitting module RelayBarCorePackageTests
+[23/26] Compiling RelayBarCorePackageTests runner.swift
+[24/26] Write Objects.LinkFileList
+[25/26] Linking RelayBarCorePackageTests.xctest
+Build complete! (4.02s)
+Test Suite 'Selected tests' started at 2026-09-17 18:38:32.304
+Test Suite 'NativeMenuTests' started at 2026-09-17 18:38:32.305
+Test Case 'NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound' started at 2026-09-17 18:38:32.305
+Test Case 'NativeMenuTests.testLiveSizedSheetTreeCanReachLazyMenuBeyondOldNodeBound' passed (0.008 seconds)
+Test Suite 'NativeMenuTests' passed at 2026-09-17 18:38:32.313
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.008 (0.008) seconds
+Test Suite 'Selected tests' passed at 2026-09-17 18:38:32.313
+	 Executed 1 test, with 0 failures (0 unexpected) in 0.008 (0.008) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

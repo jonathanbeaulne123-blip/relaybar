@@ -1,0 +1,154 @@
+{
+  "release": "0.7.0",
+  "build": 11,
+  "environment": "Linux x86_64, Swift 6.2.1",
+  "inputs": [
+    {
+      "name": "RelayBar_v0.6_Pinned_Chats.zip",
+      "bytes": 458662,
+      "sha256": "f23973ef2b3e19dd0139bca02c8a29e31813bb41be64fde4008dfd58a3898011"
+    },
+    {
+      "name": "RelayBar_v0.5.1_Lean_Scan.zip",
+      "bytes": 339293,
+      "sha256": "a68beb1991ba67714a7b550d7123ff96f6e78221d06aa8e11ef7d480edc5c61b"
+    },
+    {
+      "name": "RelayBar_v0.5_Native_Sheets.zip",
+      "bytes": 300480,
+      "sha256": "874077179fee63697d580a2313a2e36075a69fb75f08be7b2810add3df40b6ba",
+      "role": "Common ancestor verification; not used to replace the newer merged AppMain"
+    }
+  ],
+  "unchanged_production_files_from_0_6": [
+    {
+      "path": "Sources/Bridge/NativeBridge.h",
+      "sha256": "4808436e6e1133e0dcd541ddbdd257852eaba5e0ffcc30f084202aa933c6c00f"
+    },
+    {
+      "path": "Sources/Bridge/NativeBridge.m",
+      "sha256": "f6247ceffd0f846928dad7458b3876581796b3a71d04cc83f6fa8fa5cc776ca8"
+    },
+    {
+      "path": "Sources/Core/AppContext.swift",
+      "sha256": "06ffda76166635b9b5a31f4e81c6a4ec45f0563858c418bd8fac102a749eaba9"
+    },
+    {
+      "path": "Sources/Core/BrowserMailbox.swift",
+      "sha256": "4bd955deca4f645915e07eab5040a74e65b5319435243d5ddedca1e91ae8039f"
+    },
+    {
+      "path": "Sources/Core/ContextStack.swift",
+      "sha256": "399f266bf8c41308525dee39b0258a9f0779680f306641fb6e4d0a0209dfb518"
+    },
+    {
+      "path": "Sources/Core/LocalStore.swift",
+      "sha256": "f1e8e292af5a8617ec3b00163102ee0b3e7357c6084121dcc4714cfdd751856a"
+    },
+    {
+      "path": "Sources/Core/Models.swift",
+      "sha256": "3493c6266de27a68e487dcbc003e6599e00999cfec6d760cf425e63f46417fa3"
+    },
+    {
+      "path": "Sources/Core/PinnedChats.swift",
+      "sha256": "e32b3df37b05408bbac3c55977ae634159738b57028912a344c18198a8cc305e"
+    },
+    {
+      "path": "Sources/Core/PromptEngine.swift",
+      "sha256": "1e9f4ce82d15f5d12caec34bc685264bae7b6e6214132d22283d99ee2c2082f4"
+    },
+    {
+      "path": "Sources/Core/ScreenshotPresentation.swift",
+      "sha256": "0c7506e20273d2f2f8ea99685dc66722ac33e76eddd5a32905305caf0786500b"
+    },
+    {
+      "path": "Sources/Core/ScreenshotShelf.swift",
+      "sha256": "a4d01354268eeb9d85938c22f22ab687a81b0c4b43005a78afdf50a374666095"
+    },
+    {
+      "path": "Sources/Mac/Components.swift",
+      "sha256": "23f6b636f1b4f98d33653a3443abb29eb841120ce190e858828a214ae14d471d"
+    },
+    {
+      "path": "Sources/Mac/ContextStackMac.swift",
+      "sha256": "501f049905fca617c6b483a05b0adc5c90cd78de4d083e03c4aec79114469d77"
+    },
+    {
+      "path": "Sources/Mac/ContextStackNativeChecks.swift",
+      "sha256": "159f0d86bd186f9d782f60d70595a1e12b30457cb9c3bfb37efe2268f7cf36ec"
+    },
+    {
+      "path": "Sources/Mac/PinnedChatsAX.swift",
+      "sha256": "20ebde514ce6fa0e02047cf47f33056a276e111a8b444fe3321f061ac022839c"
+    },
+    {
+      "path": "Sources/Mac/PinnedChatsMac.swift",
+      "sha256": "69c676d9aa1579933dcef56587249d4a1c75c62755ab53524772adeb95e956d6"
+    },
+    {
+      "path": "Sources/Mac/PinnedChatsNativeChecks.swift",
+      "sha256": "cd20fbea462dec2f340829424943da96328c286c65cb90c439231a68729621c6"
+    },
+    {
+      "path": "Sources/Mac/ScreenshotNativeChecks.swift",
+      "sha256": "3af558686d389f8cdd35efd6832e5e8044bdddc6d4bd85f59e2352acbe0ff0b7"
+    },
+    {
+      "path": "Sources/Mac/ScreenshotShelfMac.swift",
+      "sha256": "54333f51dbe8da0104110f32c8532b77d85277dbc45e9051ae0d0f7c3d4d1702"
+    }
+  ],
+  "changed_production_files_from_0_6": [
+    {
+      "path": "Sources/Core/NativeMenus.swift",
+      "sha256": "f4a1d835518adf98d4ab46c04d0b66ac50711e0622ced6ea0a0ce66ae2b02fa2",
+      "baseline_sha256": "476a5e470412fee3fc60c199ce80ed5a31d72290d43655c1324a4127c0b9944b"
+    },
+    {
+      "path": "Sources/Mac/AppMain.swift",
+      "sha256": "20f54c4a04fa0754b762993715cc96fe614ba2a74bc3e3cbd212427b6e19fc50",
+      "baseline_sha256": "2b4d9c19236a5ab9b6268cc888c1e903b14fbdbe6f087c1ce3aa1fc832fa909a"
+    },
+    {
+      "path": "Sources/Mac/NativeAXSource.swift",
+      "sha256": "450d4ea1fa6f1c3049e5940a04f9bb67942022ea08041a098bf6b89ed4ca7257",
+      "baseline_sha256": "fc5ba3ccba50998e91ccc5816dc0748f18d868ec96090b925a42649ce5ebcaf5"
+    },
+    {
+      "path": "Sources/Mac/NativeMenuController.swift",
+      "sha256": "0336b2a76f4a13751fbecf66ee588213e6eb38928a2b27ea9b0ef6863ac5cec9",
+      "baseline_sha256": "e930516b3cad9c34bce7cc539524755f1e243ec0027ed37ce735e512dfb7b03b"
+    }
+  ],
+  "added_production_files": [
+    {
+      "path": "Sources/Core/ButtonHierarchy.swift",
+      "sha256": "6b0544e56dae5695867c18487634adac852a02fa268e4664b07b5ab30ce8b3ee"
+    },
+    {
+      "path": "Sources/Mac/FamilyMenuItem.swift",
+      "sha256": "337052ca9d04b36cc0ce2b793d57d227a4d3cb738006dcce023d79875224d50e"
+    }
+  ],
+  "exact_upstream_scan_files": [
+    {
+      "path": "Sources/Core/NativeMenus.swift",
+      "sha256": "f4a1d835518adf98d4ab46c04d0b66ac50711e0622ced6ea0a0ce66ae2b02fa2"
+    },
+    {
+      "path": "Sources/Mac/NativeAXSource.swift",
+      "sha256": "450d4ea1fa6f1c3049e5940a04f9bb67942022ea08041a098bf6b89ed4ca7257"
+    }
+  ],
+  "native_controller_change_from_lean_scan": "Only release / engine report label adjusted; otherwise byte-identical",
+  "protected_build_scripts": [
+    "Scripts/build.sh",
+    "Scripts/toolchain.sh"
+  ],
+  "limitations": [
+    "No Mac SDK typecheck/build/sign/install",
+    "No physical Touch Bar or live assistant / Sheets test",
+    "No actual user pins, clipboard, local Mac source or spreadsheet read",
+    "Safe-copy text merge cannot certify unshared code compatibility"
+  ]
+}

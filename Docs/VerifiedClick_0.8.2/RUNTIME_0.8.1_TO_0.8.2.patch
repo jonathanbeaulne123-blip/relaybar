@@ -1,0 +1,104 @@
+--- /mnt/data/RelayBar_0.8.1_Unified/Sources/Core/NativeMenus.swift	2026-09-17 18:38:24.551401536 +0000
++++ Sources/Core/NativeMenus.swift	2026-09-17 18:51:43.352650273 +0000
+@@ -98,6 +98,9 @@
+     func rect(_ node: Node) -> NativeRect?
+     func actions(_ node: Node) -> [String]
+     func hitTest(_ app: Node, x: Double, y: Double) -> Node?
++    /// Post one verified primary-button click at a point already revalidated by
++    /// the engine. Implementations must never retry an uncertain delivery.
++    func pointerClick(x: Double, y: Double) -> Bool
+     func perform(_ node: Node, action: String) -> Bool
+ }
+ public extension NativeMenuSource {
+@@ -114,6 +117,11 @@
+ public enum NativeMenuPolicy {
+     public static let browserBundles: Set<String> = ["com.google.Chrome", "com.microsoft.edgemac",
+         "com.brave.Browser", "org.chromium.Chromium", "com.apple.Safari"]
++    /// Chromium exposes web accessibility actions asynchronously. For Sheet
++    /// controls we therefore use one literal pointer click after the same fresh
++    /// AX route/frame/hit-test verification. Safari keeps native AX actions.
++    public static let verifiedPointerBundles: Set<String> = ["com.google.Chrome", "com.microsoft.edgemac",
++        "com.brave.Browser", "org.chromium.Chromium"]
+     public static let maximumNodes = 900
+     // Google Sheets can expose well over 900 non-content UI nodes around its
+     // custom-menu layer. Keep browser identity at 900, but give only the Sheet
+@@ -420,8 +428,14 @@
+               source.actions(control.node).contains(control.action) else {
+             return .refused("The target is covered, changed, or no longer in the foreground.")
+         }
+-        // A single AX action, never a coordinate click or a keyboard fallback.
+-        // Failure can mean the application already received it: DO NOT RETRY.
++        // Chromium's web accessibility actions are asynchronous and some Google
++        // Sheets menu controls expose AXPress while failing to behave like a
++        // literal click. After the exact target has been freshly revalidated and
++        // hit-tested above, send ONE primary-button click at its center. There is
++        // no fallback/retry: an uncertain delivery must be checked by the user.
++        if NativeMenuPolicy.verifiedPointerBundles.contains(route.bundle) {
++            return source.pointerClick(x: x, y: y) ? .requested : .uncertain
++        }
+         return source.perform(control.node, action: control.action) ? .requested : .uncertain
+     }
+ }
+--- /mnt/data/RelayBar_0.8.1_Unified/Sources/Mac/NativeAXSource.swift	2026-09-17 17:28:46.000000000 +0000
++++ Sources/Mac/NativeAXSource.swift	2026-09-17 18:51:43.352880751 +0000
+@@ -165,6 +165,21 @@
+               let element = result else { return nil }
+         return Node(element)
+     }
++    func pointerClick(x: Double, y: Double) -> Bool {
++        guard take(), trusted, !cancellation.cancelled, x.isFinite, y.isFinite,
++              abs(x) < 1_000_000, abs(y) < 1_000_000,
++              !CGEventSource.buttonState(.combinedSessionState, button: .left) else { return false }
++        let point = CGPoint(x: x, y: y)
++        guard let down = CGEvent(mouseEventSource: nil, mouseType: .leftMouseDown,
++                                 mouseCursorPosition: point, mouseButton: .left),
++              let up = CGEvent(mouseEventSource: nil, mouseType: .leftMouseUp,
++                               mouseCursorPosition: point, mouseButton: .left),
++              !cancellation.cancelled, trusted else { return false }
++        // One click = one down/up pair. Never retry after posting either event.
++        down.post(tap: .cghidEventTap)
++        up.post(tap: .cghidEventTap)
++        return true
++    }
+     func perform(_ node: Node, action: String) -> Bool {
+         guard take(), trusted, action == "AXPress" || action == "AXShowMenu" else { return false }
+         AXUIElementSetMessagingTimeout(node.element, 0.2)
+--- /mnt/data/RelayBar_0.8.1_Unified/Sources/Mac/NativeMenuController.swift	2026-09-17 18:39:44.101620290 +0000
++++ Sources/Mac/NativeMenuController.swift	2026-09-17 18:54:47.331028913 +0000
+@@ -123,6 +123,7 @@
+         case .execute(let request):
+             guard let expected = snapshot, controls.indices.contains(request.index) else { gate.cancel(); return }
+             let control = controls[request.index]
++            let pointerDispatch = expected.route.map { NativeMenuPolicy.verifiedPointerBundles.contains($0.bundle) } ?? false
+             let token = NativeCancellation(); work = token; working = true
+             onChange?()
+             queue.async { [weak self] in
+@@ -137,9 +138,13 @@
+                             self.forceRoots = false
+                             self.menuExpansionUntil = ProcessInfo.processInfo.systemUptime + 2.2
+                             self.lastMenuExpansion = "waiting after menu request"
+-                            self.onStatus?("Opened “\(control.label)”. Reading its available tools…")
++                            self.onStatus?(pointerDispatch ?
++                                "Clicked “\(control.label)”. Reading its available tools…" :
++                                "Opened “\(control.label)”. Reading its available tools…")
+                         } else {
+-                            self.onStatus?("Requested “\(control.label)”. Check Sheets; script completion is not verified.")
++                            self.onStatus?(pointerDispatch ?
++                                "Clicked “\(control.label)”. Check Sheets; script completion is not verified." :
++                                "Requested “\(control.label)”. Check Sheets; script completion is not verified.")
+                         }
+                     case .refused(let message): self.onStatus?(message)
+                     case .uncertain:
+@@ -155,10 +160,11 @@
+     }
+     var connectionReport: String {
+         let s = snapshot
+-        return "RelayBar 0.8.1 · Native Sheets engine 0.5.3 · Menu Cascade + Lean Scan + Adaptive Bounds\n" +
++        return "RelayBar 0.8.2 · Native Sheets engine 0.5.4 · Menu Cascade + Lean Scan + Verified Click\n" +
+             "Accessibility: \(RBBridge.accessibilityTrusted() ? "granted" : "not granted")\n" +
+             "Browser bundle: \(s?.route?.bundle ?? "not identified")\n" +
+             "Page kind: \(s?.route?.site.rawValue ?? "not identified")\n" +
++            "Dispatch transport: \((s?.route.map { NativeMenuPolicy.verifiedPointerBundles.contains($0.bundle) } ?? false) ? "verified pointer click" : "accessibility action")\n" +
+             "Top-level controls: \(s?.roots.count ?? 0)\nOpen-menu controls: \(s?.openItems.count ?? 0)\n" +
+             "Visited UI nodes: \(s?.nodesVisited ?? 0)\n" +
+             "Menu node budget: \(NativeMenuPolicy.maximumMenuNodes)\n" +

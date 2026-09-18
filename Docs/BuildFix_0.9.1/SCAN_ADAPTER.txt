@@ -1,0 +1,70 @@
+=== SCAN_ADAPTER ===
+{
+  "current": {
+    "boundary": "Actual adapter/engine bodies; explicit Foundation and AX API service doubles. Not Apple SDK, native IPC, live Sheets, or Touch Bar execution.",
+    "checks": [
+      "batched role decoded",
+      "optional AXError sentinels not misread as visibility",
+      "shape metadata read once and cached per scan",
+      "new scan invalidates shape cache",
+      "unsupported batching uses scalar fallback",
+      "complete menu scan works through scalar compatibility fallback",
+      "missing role in batch safely falls back",
+      "malformed batch length safely falls back",
+      "hidden boolean retained",
+      "300-child wrapper uses five complete bounded pages",
+      "paged children preserve ordering without truncation",
+      "wide-branch metrics reported",
+      "short page fails closed",
+      "changing child count fails closed",
+      "duplicate child handles fail closed",
+      "oversized wrapper still has hard bound",
+      "cancelled read does no work",
+      "query bound remains 5000",
+      "time budget remains 850ms",
+      "800-group tree succeeds within bounded scan limits",
+      "large-tree report identifies successful bounded scan",
+      "wide structural wrapper reaches menus after 300 content leaves",
+      "formatting toolbar skipped before massive child-list read",
+      "discovery never executes an action",
+      "node bound still disables all partially scanned actions",
+      "batched dialog subrole still blocks actions",
+      "fresh Chromium target issues one verified click pair",
+      "covered target refused after fresh scan",
+      "changed action rejected after cache reset",
+      "permission revocation before dispatch blocks action"
+    ],
+    "failed": 0,
+    "large_fixture": {
+      "batches": 809,
+      "nodes": 810,
+      "queries": 1926,
+      "status": "Google Sheets \u00b7 native menu controls"
+    },
+    "passed": 30
+  },
+  "baseline": [
+    {
+      "childCountReads": 804,
+      "childPageReads": 270,
+      "fixture": "800-group tree",
+      "nodes": 806,
+      "openItems": 0,
+      "ready": false,
+      "roots": 0,
+      "scalarAttributeReads": 2426,
+      "status": "Accessibility scan limit reached; actions disabled."
+    },
+    {
+      "childCountReads": 3,
+      "childPageReads": 2,
+      "fixture": "300-child wrapper",
+      "nodes": 5,
+      "openItems": 0,
+      "ready": false,
+      "roots": 0,
+      "scalarAttributeReads": 19,
+      "status": "Accessibility scan limit reached; actions disabled."
+    }
+  ]
+}

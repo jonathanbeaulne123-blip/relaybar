@@ -1,0 +1,27 @@
+test_context_page_coexists_without_changing_overlay_allowlist (__main__.WiringTests.test_context_page_coexists_without_changing_overlay_allowlist) ... ok
+test_current_versions_and_no_per_sheet_instructions (__main__.WiringTests.test_current_versions_and_no_per_sheet_instructions) ... ok
+test_existing_extension_not_replaced_by_native_installer (__main__.WiringTests.test_existing_extension_not_replaced_by_native_installer) ... ok
+test_native_output_prepares_item_before_clear (__main__.WiringTests.test_native_output_prepares_item_before_clear) ... ok
+test_native_selftest_does_not_use_general_pasteboard (__main__.WiringTests.test_native_selftest_does_not_use_general_pasteboard) ... ok
+test_native_tick_uses_tested_session_poll (__main__.WiringTests.test_native_tick_uses_tested_session_poll) ... ok
+test_no_automatic_send_paste_or_assistant_activation (__main__.WiringTests.test_no_automatic_send_paste_or_assistant_activation) ... ok
+test_no_persistence_or_network_in_feature (__main__.WiringTests.test_no_persistence_or_network_in_feature) ... ok
+test_no_polling_timer_in_initializer (__main__.WiringTests.test_no_polling_timer_in_initializer) ... ok
+test_privacy_denial_and_unavailable_read_stop_polling (__main__.WiringTests.test_privacy_denial_and_unavailable_read_stop_polling) ... ok
+test_production_instantiates_real_controller (__main__.WiringTests.test_production_instantiates_real_controller) ... ok
+test_project_switch_uses_workspace (__main__.WiringTests.test_project_switch_uses_workspace) ... ok
+test_protected_screenshot_engine_unchanged (__main__.WiringTests.test_protected_screenshot_engine_unchanged) ... ok
+test_recording_indicator_is_visible (__main__.WiringTests.test_recording_indicator_is_visible) ... ok
+test_review_binds_real_touchbar_and_manual_input_limit (__main__.WiringTests.test_review_binds_real_touchbar_and_manual_input_limit) ... ok
+test_screenshot_add_still_takes_priority (__main__.WiringTests.test_screenshot_add_still_takes_priority) ... ok
+test_sleep_and_session_change_pause (__main__.WiringTests.test_sleep_and_session_change_pause) ... ok
+test_stable_ids_and_revision_keys_in_actual_slots (__main__.WiringTests.test_stable_ids_and_revision_keys_in_actual_slots) ... ok
+test_stack_opens_from_all_existing_pages (__main__.WiringTests.test_stack_opens_from_all_existing_pages) ... ok
+test_termination_clears_ephemeral_data (__main__.WiringTests.test_termination_clears_ephemeral_data) ... ok
+test_timer_started_only_from_explicit_collect (__main__.WiringTests.test_timer_started_only_from_explicit_collect) ... ok
+test_timing_bounded_and_common_runloop_mode (__main__.WiringTests.test_timing_bounded_and_common_runloop_mode) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.004s
+
+OK

@@ -1,0 +1,32 @@
+{
+  "boundary" : "Exact controller, explicit workspace\/AX doubles. Not native macOS or browser testing.",
+  "checks" : [
+    "actual controller accepts native-source fixture",
+    "open menu items become controller buttons",
+    "foreground detection performs no actions",
+    "browser preparation runs once",
+    "leaf tap asks inline confirmation",
+    "confirmation does not execute",
+    "duplicate confirm\/tap cannot cancel or duplicate first request",
+    "dispatch invalidates old button snapshot",
+    "status does not claim script completion",
+    "polling does not repeat browser preparation",
+    "retired revision cannot stage a new action",
+    "cancel leaves script untouched",
+    "Menus returns custom-first root list",
+    "clear cancels queued dispatch before native action",
+    "retired callback cannot restore cleared context",
+    "paused controller does not inspect",
+    "missing permission is a real unavailable state",
+    "granting permission later still prepares the browser",
+    "report excludes document URL and cell fixture",
+    "app or screenshot interruption cancels pending confirmation",
+    "custom menu trigger is available without explicit AXEnabled",
+    "menu tap expands lazy generic popup into Touch Bar actions",
+    "expanded Hearth action still uses leaf confirmation",
+    "expanded Hearth action revalidates and dispatches through same popup policy"
+  ],
+  "failed" : 0,
+  "passed" : 24
+}
+

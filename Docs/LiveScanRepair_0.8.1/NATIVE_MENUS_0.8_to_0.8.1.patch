@@ -1,0 +1,48 @@
+--- /mnt/data/relaybar08baseline/RelayBar_0.8_Unified/Sources/Core/NativeMenus.swift	2026-09-17 18:20:28.000000000 +0000
++++ Sources/Core/NativeMenus.swift	2026-09-17 18:38:24.551401536 +0000
+@@ -59,7 +59,7 @@
+ /// hard bounds, not a setting the user has to tune for each workbook.
+ public struct NativeReadBudget {
+     public static let seconds: Double = 0.85
+-    public static let maximumQueries = 3500
++    public static let maximumQueries = 5000
+     public static let maximumChildren = 4096
+     public static let childPageSize = 64
+     public private(set) var start: Double
+@@ -115,6 +115,10 @@
+     public static let browserBundles: Set<String> = ["com.google.Chrome", "com.microsoft.edgemac",
+         "com.brave.Browser", "org.chromium.Chromium", "com.apple.Safari"]
+     public static let maximumNodes = 900
++    // Google Sheets can expose well over 900 non-content UI nodes around its
++    // custom-menu layer. Keep browser identity at 900, but give only the Sheet
++    // menu phase bounded extra room; time/query/depth/child caps still fail closed.
++    public static let maximumMenuNodes = 1600
+     public static let maximumDepth = 24
+     public static let pageSize = 4
+     public static let freshness = 2.5
+@@ -287,7 +291,7 @@
+         while let (node, depth, path, inBar, inMenu) = stack.popLast() {
+             guard seen.insert(node).inserted else { continue }
+             result.deepestLevel = max(result.deepestLevel, depth)
+-            if seen.count > NativeMenuPolicy.maximumNodes || depth > NativeMenuPolicy.maximumDepth || source.limited {
++            if seen.count > NativeMenuPolicy.maximumMenuNodes || depth > NativeMenuPolicy.maximumDepth || source.limited {
+                 result.failure = source.limited ? source.metrics.failure :
+                     (depth > NativeMenuPolicy.maximumDepth ? .depth : .nodes)
+                 incomplete = true; break
+--- /mnt/data/relaybar08baseline/RelayBar_0.8_Unified/Sources/Mac/NativeMenuController.swift	2026-09-17 18:21:08.000000000 +0000
++++ Sources/Mac/NativeMenuController.swift	2026-09-17 18:39:44.101620290 +0000
+@@ -155,12 +155,13 @@
+     }
+     var connectionReport: String {
+         let s = snapshot
+-        return "RelayBar 0.8.0 · Native Sheets engine 0.5.2 · Menu Cascade + Lean Scan\n" +
++        return "RelayBar 0.8.1 · Native Sheets engine 0.5.3 · Menu Cascade + Lean Scan + Adaptive Bounds\n" +
+             "Accessibility: \(RBBridge.accessibilityTrusted() ? "granted" : "not granted")\n" +
+             "Browser bundle: \(s?.route?.bundle ?? "not identified")\n" +
+             "Page kind: \(s?.route?.site.rawValue ?? "not identified")\n" +
+             "Top-level controls: \(s?.roots.count ?? 0)\nOpen-menu controls: \(s?.openItems.count ?? 0)\n" +
+             "Visited UI nodes: \(s?.nodesVisited ?? 0)\n" +
++            "Menu node budget: \(NativeMenuPolicy.maximumMenuNodes)\n" +
+             "AX queries: \(s?.readMetrics.queries ?? 0) / \(NativeReadBudget.maximumQueries)\n" +
+             "Scan duration ms: \(s?.readMetrics.milliseconds ?? 0) / 850\n" +
+             "Metadata batches / fallbacks: \(s?.readMetrics.headerBatches ?? 0) / \(s?.readMetrics.headerFallbacks ?? 0)\n" +

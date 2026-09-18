@@ -1,0 +1,21 @@
+test_clang_duplicate_fails_then_overlay_passes (__main__.RepairTests.test_clang_duplicate_fails_then_overlay_passes) ... ok
+test_different_comments_and_whitespace_are_allowed (__main__.RepairTests.test_different_comments_and_whitespace_are_allowed) ... ok
+test_different_header_refused (__main__.RepairTests.test_different_header_refused) ... ok
+test_duplicate_error_with_unknown_map_stops (__main__.RepairTests.test_duplicate_error_with_unknown_map_stops) ... ok
+test_exact_error_retries_and_gates_success (__main__.RepairTests.test_exact_error_retries_and_gates_success) ... ok
+test_existing_output_preserved (__main__.RepairTests.test_existing_output_preserved) ... ok
+test_extra_module_refused (__main__.RepairTests.test_extra_module_refused) ... ok
+test_missing_current_map_refused (__main__.RepairTests.test_missing_current_map_refused) ... ok
+test_missing_header_refused (__main__.RepairTests.test_missing_header_refused) ... ok
+test_passing_preflight_does_not_make_overlay (__main__.RepairTests.test_passing_preflight_does_not_make_overlay) ... ok
+test_quoted_and_space_paths (__main__.RepairTests.test_quoted_and_space_paths) ... ok
+test_retry_failure_is_not_reported_as_success (__main__.RepairTests.test_retry_failure_is_not_reported_as_success) ... ok
+test_swift_duplicate_fails_then_overlay_passes (__main__.RepairTests.test_swift_duplicate_fails_then_overlay_passes) ... ok
+test_symlink_map_refused (__main__.RepairTests.test_symlink_map_refused) ... ok
+test_unrelated_error_never_masks_map (__main__.RepairTests.test_unrelated_error_never_masks_map) ... ok
+test_verified_pair_creates_one_file_overlay (__main__.RepairTests.test_verified_pair_creates_one_file_overlay) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 3.148s
+
+OK

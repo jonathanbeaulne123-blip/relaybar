@@ -1,0 +1,4 @@
+Swift parsing only — Linux, Swift 6.2.1. This is NOT macOS SDK typechecking.
+PASS: application Swift syntax
+PASS: standalone icon-builder syntax
+PASS: all shell-script syntax

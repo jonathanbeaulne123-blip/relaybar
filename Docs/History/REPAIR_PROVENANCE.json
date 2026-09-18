@@ -1,0 +1,114 @@
+{
+  "release": "0.1.1",
+  "date": "2026-09-17",
+  "source_archive": "RelayBar_v0.1_Source_and_Installer.zip",
+  "source_archive_sha256": "5936dbe8b63f0bf361454b9411cc068fe44f9423854a653158ed8547ef465bb7",
+  "changes_before_provenance_and_checksums": [
+    {
+      "path": "Docs/BUILD_REPAIR_TEST_RESULTS.txt",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "1029a7c7b0d304dcf385bf151ba0d92e05bfcf1ada90818defe9a4957cd27302"
+    },
+    {
+      "path": "Docs/CORE_TEST_RESULTS_0.1.1.txt",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "c9c5f7a2f79ad171df2e50fdece20c9692fb74e4c707dd7977cc4e25ac287eeb"
+    },
+    {
+      "path": "Docs/REPAIR_SYNTAX_RESULTS.txt",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "dfd1fb3334ae7b988fc255f2071c1ca82fd968b3efd4fbccdf09b70b0a15cd54"
+    },
+    {
+      "path": "Docs/VALIDATION_0.1.1.md",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "14b22ef3c734b2b2f3d8a4bdb7c3e6d025f7df05405314a526f962a066253f17"
+    },
+    {
+      "path": "Doctor.command",
+      "status": "modified",
+      "original_sha256": "7fe01c55db2a115515dcf7a7d200ef3913224f080dc291daa896ee5f7712621d",
+      "updated_sha256": "b5b35174245f5eda543d05a038e3594a2300de250a5721a3098cdf91ed06a153"
+    },
+    {
+      "path": "Install.command",
+      "status": "modified",
+      "original_sha256": "8d49f555e9d558c2e97cb4a978a65720fb72be0ab38c16b611fdb17a241dc2f8",
+      "updated_sha256": "1e43f43a781e6e9ac9a825e4ef649382e5b2f5142ba944dc8e01d73576f62d25"
+    },
+    {
+      "path": "REPAIR_README.md",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "a4b477dac960907ba7b33b91f371f7c397759218d8cd682fe3046cf0f0607aa1"
+    },
+    {
+      "path": "Resources/Info.plist",
+      "status": "modified",
+      "original_sha256": "bfb0a507aac8a8217298dbc5439c2ab7b0ed70444794125739c7b2460d574310",
+      "updated_sha256": "6f84762c1f7f55a7cb6383484c782b8608e07d367b1329cfff704776620c436e"
+    },
+    {
+      "path": "START_HERE.md",
+      "status": "modified",
+      "original_sha256": "b299b7f0764673404a27921ede6f2a2162343e5cb80df9fe33e964348e094d53",
+      "updated_sha256": "9a299aba6244e2a55765b839d39b587b2535f298d5224f278f141cc58d8961a7"
+    },
+    {
+      "path": "Scripts/CompileProbe.swift",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "e5ffb4746eedee9471c4716b606a7068f806710005cba2f8859644d12e1e16f7"
+    },
+    {
+      "path": "Scripts/build.sh",
+      "status": "modified",
+      "original_sha256": "58872dfd593f0200f8fd46b00b6ffd5f0d1a9d17637efdf59fa222bc2560d543",
+      "updated_sha256": "1020481e25125d0972e9729737376d2a664354543ec4618e09833ab8b4512422"
+    },
+    {
+      "path": "Scripts/toolchain.sh",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "b91541971c6a04d84133ab8b9778ace9e8a085809246e42b6b792bc252686dda"
+    },
+    {
+      "path": "Sources/Mac/AppMain.swift",
+      "status": "modified",
+      "original_sha256": "e5df106ff2567345fd9ce4c6ccb0a107bf3b197b1f86eb9dc77270d6a3be0126",
+      "updated_sha256": "b917a20f2f0e7994259714ac3845d345379d002184d700c15402d54f93f37555"
+    },
+    {
+      "path": "Test.command",
+      "status": "modified",
+      "original_sha256": "60cf4b374ca78db6c5f5ff3baab9255f518accfbcad48b09543302a6a587f39a",
+      "updated_sha256": "6c158070208357abf004dfbee7adfd6c454c65de2bfaebdb5b47fe20dbf468bd"
+    },
+    {
+      "path": "Tests/BuildRepair/test_toolchain.py",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "9c7fcf205c3fb83349698c01bb63e49ca04f3a9e7e8f77a05813412da895af6a"
+    },
+    {
+      "path": "Toolchain_Check.command",
+      "status": "added",
+      "original_sha256": null,
+      "updated_sha256": "eb82e42e1a9476111d122935b9f98ab300dc8a4c61465e0688177eaf34c06c90"
+    }
+  ],
+  "source_preservation": "All Core, Bridge and Components source bytes unchanged. AppMain only diagnostic version updated.",
+  "unchanged_source_paths": [
+    "Sources/Bridge/NativeBridge.h",
+    "Sources/Bridge/NativeBridge.m",
+    "Sources/Core/LocalStore.swift",
+    "Sources/Core/Models.swift",
+    "Sources/Core/PromptEngine.swift",
+    "Sources/Mac/Components.swift"
+  ],
+  "macOS_build_status": "NOT VERIFIED; requires actual Mac SDK and hardware"
+}

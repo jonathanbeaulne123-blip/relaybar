@@ -1,0 +1,496 @@
+TAP version 13
+# Subtest: exact Sheets URL
+ok 1 - exact Sheets URL
+  ---
+  duration_ms: 1.459799
+  type: 'test'
+  ...
+# Subtest: multi-account Sheets URL
+ok 2 - multi-account Sheets URL
+  ---
+  duration_ms: 0.325467
+  type: 'test'
+  ...
+# Subtest: reject URL https://docs.google.com.evil.com/spreadsheets/d/sheet_123456789
+ok 3 - reject URL https://docs.google.com.evil.com/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.125853
+  type: 'test'
+  ...
+# Subtest: reject URL http://docs.google.com/spreadsheets/d/sheet_123456789
+ok 4 - reject URL http://docs.google.com/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.081498
+  type: 'test'
+  ...
+# Subtest: reject URL https://docs.google.com:444/spreadsheets/d/sheet_123456789
+ok 5 - reject URL https://docs.google.com:444/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.176292
+  type: 'test'
+  ...
+# Subtest: reject URL https://user@docs.google.com/spreadsheets/d/sheet_123456789
+ok 6 - reject URL https://user@docs.google.com/spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.097438
+  type: 'test'
+  ...
+# Subtest: reject URL https://docs.google.com/document/d/sheet_123456789
+ok 7 - reject URL https://docs.google.com/document/d/sheet_123456789
+  ---
+  duration_ms: 0.133512
+  type: 'test'
+  ...
+# Subtest: reject URL javascript:alert(1)
+ok 8 - reject URL javascript:alert(1)
+  ---
+  duration_ms: 0.139203
+  type: 'test'
+  ...
+# Subtest: reject URL file:///spreadsheets/d/sheet_123456789
+ok 9 - reject URL file:///spreadsheets/d/sheet_123456789
+  ---
+  duration_ms: 0.297388
+  type: 'test'
+  ...
+# Subtest: valid sidebar https://script.google.com/macros/123
+ok 10 - valid sidebar https://script.google.com/macros/123
+  ---
+  duration_ms: 0.450323
+  type: 'test'
+  ...
+# Subtest: valid sidebar https://n-abc123-script.googleusercontent.com/userCodeAppPanel
+ok 11 - valid sidebar https://n-abc123-script.googleusercontent.com/userCodeAppPanel
+  ---
+  duration_ms: 0.234975
+  type: 'test'
+  ...
+# Subtest: valid sidebar https://script.googleusercontent.com/anything
+ok 12 - valid sidebar https://script.googleusercontent.com/anything
+  ---
+  duration_ms: 0.066624
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://googleusercontent.com/
+ok 13 - reject sidebar https://googleusercontent.com/
+  ---
+  duration_ms: 0.101411
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://evil.googleusercontent.com/
+ok 14 - reject sidebar https://evil.googleusercontent.com/
+  ---
+  duration_ms: 0.048899
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://script.google.com.evil/
+ok 15 - reject sidebar https://script.google.com.evil/
+  ---
+  duration_ms: 0.047414
+  type: 'test'
+  ...
+# Subtest: reject sidebar https://evil-script.googleusercontent.com.bad/
+ok 16 - reject sidebar https://evil-script.googleusercontent.com.bad/
+  ---
+  duration_ms: 0.078295
+  type: 'test'
+  ...
+# Subtest: valid manifest strips extraneous fields
+ok 17 - valid manifest strips extraneous fields
+  ---
+  duration_ms: 0.931899
+  type: 'test'
+  ...
+# Subtest: wrong workbook manifest
+ok 18 - wrong workbook manifest
+  ---
+  duration_ms: 0.411683
+  type: 'test'
+  ...
+# Subtest: duplicate actions
+ok 19 - duplicate actions
+  ---
+  duration_ms: 0.194595
+  type: 'test'
+  ...
+# Subtest: more than 120 rejected
+ok 20 - more than 120 rejected
+  ---
+  duration_ms: 0.137178
+  type: 'test'
+  ...
+# Subtest: no function payload accepted as action
+ok 21 - no function payload accepted as action
+  ---
+  duration_ms: 0.074024
+  type: 'test'
+  ...
+# Subtest: confirmation must be boolean
+ok 22 - confirmation must be boolean
+  ---
+  duration_ms: 0.063651
+  type: 'test'
+  ...
+# Subtest: linked Sheet context
+ok 23 - linked Sheet context
+  ---
+  duration_ms: 0.49859
+  type: 'test'
+  ...
+# Subtest: wrong cached workbook not actionable
+ok 24 - wrong cached workbook not actionable
+  ---
+  duration_ms: 0.106289
+  type: 'test'
+  ...
+# Subtest: incognito produces no identity
+ok 25 - incognito produces no identity
+  ---
+  duration_ms: 0.060295
+  type: 'test'
+  ...
+# Subtest: unavailable URL stays browser
+ok 26 - unavailable URL stays browser
+  ---
+  duration_ms: 0.116117
+  type: 'test'
+  ...
+# Subtest: pending navigation removes script controls
+ok 27 - pending navigation removes script controls
+  ---
+  duration_ms: 0.063859
+  type: 'test'
+  ...
+# Subtest: ChatGPT website route
+ok 28 - ChatGPT website route
+  ---
+  duration_ms: 0.060104
+  type: 'test'
+  ...
+# Subtest: Claude website route
+ok 29 - Claude website route
+  ---
+  duration_ms: 0.046459
+  type: 'test'
+  ...
+# Subtest: lookalike AI domain not detected
+ok 30 - lookalike AI domain not detected
+  ---
+  duration_ms: 0.115176
+  type: 'test'
+  ...
+# Subtest: tap valid
+ok 31 - tap valid
+  ---
+  duration_ms: 0.515053
+  type: 'test'
+  ...
+# Subtest: reject stale tabID
+ok 32 - reject stale tabID
+  ---
+  duration_ms: 0.22679
+  type: 'test'
+  ...
+# Subtest: reject stale windowID
+ok 33 - reject stale windowID
+  ---
+  duration_ms: 0.074088
+  type: 'test'
+  ...
+# Subtest: reject stale sheetID
+ok 34 - reject stale sheetID
+  ---
+  duration_ms: 0.054781
+  type: 'test'
+  ...
+# Subtest: reject stale pageToken
+ok 35 - reject stale pageToken
+  ---
+  duration_ms: 0.054355
+  type: 'test'
+  ...
+# Subtest: reject stale actionID
+ok 36 - reject stale actionID
+  ---
+  duration_ms: 0.048544
+  type: 'test'
+  ...
+# Subtest: reject stale expiresAt
+ok 37 - reject stale expiresAt
+  ---
+  duration_ms: 0.15772
+  type: 'test'
+  ...
+# Subtest: reject stale expiresAt
+ok 38 - reject stale expiresAt
+  ---
+  duration_ms: 0.058863
+  type: 'test'
+  ...
+# Subtest: reject stale version
+ok 39 - reject stale version
+  ---
+  duration_ms: 0.056528
+  type: 'test'
+  ...
+# Subtest: background window cannot run
+ok 40 - background window cannot run
+  ---
+  duration_ms: 0.070615
+  type: 'test'
+  ...
+# Subtest: bounded navigation requires focus
+ok 41 - bounded navigation requires focus
+  ---
+  duration_ms: 0.057075
+  type: 'test'
+  ...
+# Subtest: enabled live profile automatically polls current sheet without registration
+ok 42 - enabled live profile automatically polls current sheet without registration
+  ---
+  duration_ms: 22.651686
+  type: 'test'
+  ...
+# Subtest: snapshot is requested only in top frame
+ok 43 - snapshot is requested only in top frame
+  ---
+  duration_ms: 2.23234
+  type: 'test'
+  ...
+# Subtest: one native tap delivers one UI command to exact tab and top frame
+ok 44 - one native tap delivers one UI command to exact tab and top frame
+  ---
+  duration_ms: 3.125163
+  type: 'test'
+  ...
+# Subtest: duplicate command never retries
+ok 45 - duplicate command never retries
+  ---
+  duration_ms: 3.740235
+  type: 'test'
+  ...
+# Subtest: concurrent taps locked before async poll
+ok 46 - concurrent taps locked before async poll
+  ---
+  duration_ms: 4.07224
+  type: 'test'
+  ...
+# Subtest: reject stale pageToken
+ok 47 - reject stale pageToken
+  ---
+  duration_ms: 1.860603
+  type: 'test'
+  ...
+# Subtest: reject stale sheetID
+ok 48 - reject stale sheetID
+  ---
+  duration_ms: 1.415657
+  type: 'test'
+  ...
+# Subtest: reject stale tabID
+ok 49 - reject stale tabID
+  ---
+  duration_ms: 1.639918
+  type: 'test'
+  ...
+# Subtest: reject stale windowID
+ok 50 - reject stale windowID
+  ---
+  duration_ms: 1.982698
+  type: 'test'
+  ...
+# Subtest: reject stale actionID
+ok 51 - reject stale actionID
+  ---
+  duration_ms: 6.290872
+  type: 'test'
+  ...
+# Subtest: reject stale expiresAt
+ok 52 - reject stale expiresAt
+  ---
+  duration_ms: 5.915877
+  type: 'test'
+  ...
+# Subtest: reject stale expiresAt
+ok 53 - reject stale expiresAt
+  ---
+  duration_ms: 1.911503
+  type: 'test'
+  ...
+# Subtest: reject stale sessionID
+ok 54 - reject stale sessionID
+  ---
+  duration_ms: 4.451417
+  type: 'test'
+  ...
+# Subtest: focus loss blocks even a fresh tap
+ok 55 - focus loss blocks even a fresh tap
+  ---
+  duration_ms: 2.099478
+  type: 'test'
+  ...
+# Subtest: pending navigation suppresses controls
+ok 56 - pending navigation suppresses controls
+  ---
+  duration_ms: 2.753378
+  type: 'test'
+  ...
+# Subtest: loading tab suppresses controls
+ok 57 - loading tab suppresses controls
+  ---
+  duration_ms: 2.646647
+  type: 'test'
+  ...
+# Subtest: cross-workbook poll race fails closed
+ok 58 - cross-workbook poll race fails closed
+  ---
+  duration_ms: 3.415453
+  type: 'test'
+  ...
+# Subtest: same-url reload epoch invalidates in-flight poll
+ok 59 - same-url reload epoch invalidates in-flight poll
+  ---
+  duration_ms: 3.529795
+  type: 'test'
+  ...
+# Subtest: removed action fails closed
+ok 60 - removed action fails closed
+  ---
+  duration_ms: 1.462112
+  type: 'test'
+  ...
+# Subtest: wrong-workbook content response not accepted
+ok 61 - wrong-workbook content response not accepted
+  ---
+  duration_ms: 1.886083
+  type: 'test'
+  ...
+# Subtest: no injection on unrelated browser site
+ok 62 - no injection on unrelated browser site
+  ---
+  duration_ms: 1.406246
+  type: 'test'
+  ...
+# Subtest: incognito produces no controls
+ok 63 - incognito produces no controls
+  ---
+  duration_ms: 2.253148
+  type: 'test'
+  ...
+# Subtest: old sidebar cannot publish a manifest
+ok 64 - old sidebar cannot publish a manifest
+  ---
+  duration_ms: 1.325194
+  type: 'test'
+  ...
+# Subtest: sheet webpage cannot enable link
+ok 65 - sheet webpage cannot enable link
+  ---
+  duration_ms: 3.186774
+  type: 'test'
+  ...
+# Subtest: different extension cannot control preferences
+ok 66 - different extension cannot control preferences
+  ---
+  duration_ms: 1.005639
+  type: 'test'
+  ...
+# Subtest: only exact popup path allowed
+ok 67 - only exact popup path allowed
+  ---
+  duration_ms: 0.853996
+  type: 'test'
+  ...
+# Subtest: disabled setting remains disabled across update
+ok 68 - disabled setting remains disabled across update
+  ---
+  duration_ms: 1.8296
+  type: 'test'
+  ...
+# Subtest: popup pause stops future tap
+ok 69 - popup pause stops future tap
+  ---
+  duration_ms: 1.050839
+  type: 'test'
+  ...
+# Subtest: confirmation defaults on globally
+ok 70 - confirmation defaults on globally
+  ---
+  duration_ms: 1.669313
+  type: 'test'
+  ...
+# Subtest: explicit saved confirmation choice preserved
+ok 71 - explicit saved confirmation choice preserved
+  ---
+  duration_ms: 1.013112
+  type: 'test'
+  ...
+# Subtest: popup can set one global confirmation choice
+ok 72 - popup can set one global confirmation choice
+  ---
+  duration_ms: 1.519852
+  type: 'test'
+  ...
+# Subtest: bad confirmation preference rejected
+ok 73 - bad confirmation preference rejected
+  ---
+  duration_ms: 1.574218
+  type: 'test'
+  ...
+# Subtest: native navigation remains compatible
+ok 74 - native navigation remains compatible
+  ---
+  duration_ms: 3.219904
+  type: 'test'
+  ...
+# Subtest: failed UI command never falls back to a second click
+ok 75 - failed UI command never falls back to a second click
+  ---
+  duration_ms: 2.44845
+  type: 'test'
+  ...
+# Subtest: live pending UI click gets a one-use lease
+ok 76 - live pending UI click gets a one-use lease
+  ---
+  duration_ms: 1.403557
+  type: 'test'
+  ...
+# Subtest: pause invalidates pending confirmation lease
+ok 77 - pause invalidates pending confirmation lease
+  ---
+  duration_ms: 1.379783
+  type: 'test'
+  ...
+# Subtest: focus change invalidates pending confirmation lease
+ok 78 - focus change invalidates pending confirmation lease
+  ---
+  duration_ms: 1.589818
+  type: 'test'
+  ...
+# Subtest: wrong request cannot get confirmation lease
+ok 79 - wrong request cannot get confirmation lease
+  ---
+  duration_ms: 3.122502
+  type: 'test'
+  ...
+# Subtest: iframe cannot consume confirmation lease
+ok 80 - iframe cannot consume confirmation lease
+  ---
+  duration_ms: 1.43109
+  type: 'test'
+  ...
+# Subtest: new menu view invalidates pending action
+ok 81 - new menu view invalidates pending action
+  ---
+  duration_ms: 2.806818
+  type: 'test'
+  ...
+1..81
+# tests 81
+# suites 0
+# pass 81
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 219.512508

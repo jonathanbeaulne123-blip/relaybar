@@ -1,0 +1,312 @@
+{
+  "boundary": "Syntax/metadata/inventory only, NOT Apple SDK typechecking or a Mac build.",
+  "passed": 61,
+  "failed": 0,
+  "checks": [
+    {
+      "path": "Sources/Core/AppContext.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/BrowserMailbox.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/ButtonHierarchy.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/ContextStack.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/LocalStore.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/Models.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/NativeMenus.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/PinnedChats.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/PromptEngine.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/ScreenshotPresentation.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Core/ScreenshotShelf.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/AppMain.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/Components.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/ContextStackMac.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/ContextStackNativeChecks.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/FamilyMenuItem.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/NativeAXSource.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/NativeMenuController.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/PinnedChatsAX.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/PinnedChatsMac.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/PinnedChatsNativeChecks.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/ScreenshotNativeChecks.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Sources/Mac/ScreenshotShelfMac.swift",
+      "check": "Swift 5 syntax only",
+      "ok": true
+    },
+    {
+      "path": "Button_Families_Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Context_Stack_Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Diagnostics/Doctor.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Diagnostics/Screenshot_Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Diagnostics/Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Diagnostics/Toolchain_Check.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Docs/Historical_0.3_Tests/check_syntax.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Docs/Historical_0.3_Tests/sidebar_browser_test.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Doctor.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Install.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Merge_Into_Source_Copy.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Pinned_Chats_Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Screenshot_Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Scripts/build.sh",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Scripts/build_family_map.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Scripts/merge_button_families.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Scripts/toolchain.sh",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Test.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Tests/AutoOpen/test_integration_contract.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/Browser/test_preview.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/BuildRepair/test_toolchain.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ButtonFamilies/adapter_harness.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ButtonFamilies/test_map.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ButtonFamilies/test_merge.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ButtonFamilies/test_wiring.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ContextStack/test_integration.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/NativeSheets/controller_harness.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/NativeSheets/test_contracts.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/PinnedChats/controller_harness.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/PinnedChats/test_wiring.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ScanRepair/native_adapter_harness.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Tests/ScanRepair/test_package_contracts.py",
+      "check": "Python AST syntax",
+      "ok": true
+    },
+    {
+      "path": "Toolchain_Check.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Uninstall.command",
+      "check": "bash syntax + executable mode",
+      "ok": true
+    },
+    {
+      "path": "Resources/Info.plist",
+      "check": "Parsed release identity",
+      "ok": true
+    },
+    {
+      "path": "RelayBar_v0.6_Pinned_Chats.zip",
+      "check": "Input archive still byte-identical",
+      "ok": true
+    },
+    {
+      "path": "RelayBar_v0.5.1_Lean_Scan.zip",
+      "check": "Input archive still byte-identical",
+      "ok": true
+    },
+    {
+      "path": "RelayBar_v0.5_Native_Sheets.zip",
+      "check": "Input archive still byte-identical",
+      "ok": true
+    }
+  ]
+}

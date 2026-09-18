@@ -1,0 +1,58 @@
+{
+  "version": "0.2.0",
+  "baseline_archive": "RelayBar_v0.1.1_Compiler_Repair.zip",
+  "baseline_archive_sha256": "832b917d1d8fc660dd19b31e8531475925d806bced16dd85532925e8ec93773c",
+  "baseline": "Supplied actual 0.1.1 repaired source, extracted into a separate read-only working baseline.",
+  "user_confirmed_baseline": [
+    "native launch",
+    "physical Touch Bar visibility",
+    "cross-app visibility in ChatGPT workflow"
+  ],
+  "new_native_feature_hardware_tested_here": false,
+  "new_native_feature_macOS_SDK_compiled_here": false,
+  "portable_xctest": {
+    "passed": 77,
+    "failed": 0,
+    "new_screenshot_tests": 31
+  },
+  "compiler_repair_regressions": {
+    "passed": 16,
+    "failed": 0
+  },
+  "unchanged_implementation_files": {
+    "Sources/Bridge/NativeBridge.h": "4808436e6e1133e0dcd541ddbdd257852eaba5e0ffcc30f084202aa933c6c00f",
+    "Sources/Bridge/NativeBridge.m": "f6247ceffd0f846928dad7458b3876581796b3a71d04cc83f6fa8fa5cc776ca8",
+    "Scripts/toolchain.sh": "b91541971c6a04d84133ab8b9778ace9e8a085809246e42b6b792bc252686dda",
+    "Scripts/CompileProbe.swift": "e5ffb4746eedee9471c4716b606a7068f806710005cba2f8859644d12e1e16f7",
+    "Sources/Core/LocalStore.swift": "f1e8e292af5a8617ec3b00163102ee0b3e7357c6084121dcc4714cfdd751856a",
+    "Sources/Core/Models.swift": "3493c6266de27a68e487dcbc003e6599e00999cfec6d760cf425e63f46417fa3",
+    "Sources/Core/PromptEngine.swift": "1e9f4ce82d15f5d12caec34bc685264bae7b6e6214132d22283d99ee2c2082f4",
+    "Test.command": "6c158070208357abf004dfbee7adfd6c454c65de2bfaebdb5b47fe20dbf468bd",
+    "Doctor.command": "b5b35174245f5eda543d05a038e3594a2300de250a5721a3098cdf91ed06a153"
+  },
+  "added_files": [
+    "Docs/BUILD_REPAIR_TEST_RESULTS_0.2.txt",
+    "Docs/CORE_TEST_RESULTS_0.2.txt",
+    "Docs/SCREENSHOT_SHELF_DESIGN.md",
+    "Docs/SOURCES_0.2.md",
+    "Docs/START_HERE_0.1.1_HISTORICAL.md",
+    "Docs/SYNTAX_RESULTS_0.2.txt",
+    "Docs/VALIDATION_0.2.md",
+    "Screenshot_Test.command",
+    "Sources/Core/ScreenshotShelf.swift",
+    "Sources/Mac/ScreenshotNativeChecks.swift",
+    "Sources/Mac/ScreenshotShelfMac.swift",
+    "Tests/RelayCoreTests/ScreenshotShelfTests.swift"
+  ],
+  "modified_files": [
+    "Docs/README.md",
+    "Install.command",
+    "Resources/Info.plist",
+    "START_HERE.md",
+    "Scripts/build.sh",
+    "Sources/Mac/AppMain.swift",
+    "Sources/Mac/Components.swift",
+    "Uninstall.command"
+  ],
+  "scope": "Five saved-screenshot thumbnails, local retained copies and explicit full-image clipboard copy. No automatic sending or clipboard surveillance."
+}

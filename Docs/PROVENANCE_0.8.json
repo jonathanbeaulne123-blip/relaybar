@@ -1,0 +1,49 @@
+{
+  "release": "RelayBar 0.8.0 build 13 \u2014 Unified",
+  "created_utc": "2026-09-17",
+  "input_archives": {
+    "RelayBar_v0.7_Button_Families.zip": {
+      "bytes": 1085627,
+      "sha256": "feee915cc314a2f4fd91f981a53c05308ee3506466db60c32f10fa6bbcd1cb61"
+    },
+    "RelayBar_v0.5_Context_Stack.zip": {
+      "bytes": 459949,
+      "sha256": "c8f0e0465dcaf85d2257c1e4a6b4b5c168e7275d269e53ed2b0ef5730c506d56"
+    },
+    "RelayBar_v0.6_Pinned_Chats.zip": {
+      "bytes": 458662,
+      "sha256": "f23973ef2b3e19dd0139bca02c8a29e31813bb41be64fde4008dfd58a3898011"
+    },
+    "RelayBar_v0.5.2_Menu_Cascade.zip": {
+      "bytes": 383508,
+      "sha256": "ec829fb74ae1b0288f44fc698ebda100fd2ef2a1149dd9211afac3f06de68e87"
+    }
+  },
+  "merge_decisions": [
+    "Used RelayBar 0.7 Button Families as the unified source foundation.",
+    "Verified the 0.7 ContextStack.swift / ContextStackMac.swift are byte-identical to the supplied 0.5 Context Stack branch and the 0.6 Pinned Chats combined branch.",
+    "Verified the 0.7 PinnedChats.swift / PinnedChatsAX.swift / PinnedChatsMac.swift are byte-identical to the supplied 0.6 Pinned Chats branch.",
+    "Preserved the 0.7 ButtonHierarchy and family presentation layer.",
+    "Replaced NativeMenus.swift with the supplied/current 0.5.2 Menu Cascade engine; NativeAXSource.swift was already byte-identical between 0.7 Lean Scan and 0.5.2.",
+    "Replaced NativeMenuController.swift with the 0.5.2 Menu Cascade controller, changing only the release/report label for the unified build.",
+    "Added automatic transition into the App controls/Sheets page when a Sheet or Sheet document becomes active, while excluding screenshot-viewer interruption states.",
+    "Retargeted the conservative permission recovery helper to 0.8.0 build 13 and exposed it at package root as Fix_Access.command.",
+    "Removed current-product branch merge tooling; this package is the consolidated install source, not another patch branch."
+  ],
+  "current_feature_hashes": {
+    "ButtonHierarchy": "6b0544e56dae5695867c18487634adac852a02fa268e4664b07b5ab30ce8b3ee",
+    "ContextStackCore": "399f266bf8c41308525dee39b0258a9f0779680f306641fb6e4d0a0209dfb518",
+    "ContextStackMac": "501f049905fca617c6b483a05b0adc5c90cd78de4d083e03c4aec79114469d77",
+    "PinnedChatsCore": "e32b3df37b05408bbac3c55977ae634159738b57028912a344c18198a8cc305e",
+    "PinnedChatsAX": "20ebde514ce6fa0e02047cf47f33056a276e111a8b444fe3321f061ac022839c",
+    "ScreenshotPresentation": "0c7506e20273d2f2f8ea99685dc66722ac33e76eddd5a32905305caf0786500b",
+    "ScreenshotShelf": "a4d01354268eeb9d85938c22f22ab687a81b0c4b43005a78afdf50a374666095",
+    "NativeMenus": "382f9db1d3a47d36b58be8c8feed2b94df3273f8b862c1d036252b9102475085",
+    "NativeAXSource": "450d4ea1fa6f1c3049e5940a04f9bb67942022ea08041a098bf6b89ed4ca7257",
+    "NativeMenuController": "4eb39ee9851bf16b89678212b8f12d5d37a28c9fec126922dfb7fe3fe71d0bed",
+    "AppMain": "7f4b37a70bd1d9a8058adadf2be00fbdab589bdece7ac46127141da653bab991"
+  },
+  "runtime_extension_free": true,
+  "mac_build_performed": false,
+  "live_touchbar_test_performed": false
+}

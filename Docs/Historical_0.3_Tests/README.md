@@ -1,0 +1,1 @@
+Historical v0.3/sidebar test sources, preserved for provenance. They refer to the v0.3 source tree and are not the current runtime suite. Current JavaScript tests under Tests/AppAware exercise the actual automatic v0.4 adapter. The old AppsScript files and their service-double tests are historical only; do not add them to a workbook for v0.5.

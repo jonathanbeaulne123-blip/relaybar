@@ -1,0 +1,11 @@
+{
+  "release": "RelayBar 0.9.1 build 17",
+  "foundation": "RelayBar v0.9.0 Persistent Shell package that produced the user Mac compiler log",
+  "foundation_zip_sha256": "493b47b63bf0d01202877dd4ce4a5e0acf2868aca367a63b76bdcdcb6369e830",
+  "source_fix": {
+    "file": "Sources/Mac/AppMain.swift",
+    "old": "private func returnToRelayBar(showPanel: Bool) / if showPanel { showPanel() }",
+    "new": "private func returnToRelayBar(showPanel shouldShowPanel: Bool) / if shouldShowPanel { showPanel() }"
+  },
+  "behavioral_scope": "compile blocker plus release/installer/recovery metadata only; feature engines preserved"
+}

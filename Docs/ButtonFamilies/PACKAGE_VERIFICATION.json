@@ -1,0 +1,15 @@
+{
+  "release": "0.7.0",
+  "build": 11,
+  "merge_payload_files_verified": 33,
+  "source_provenance_hashes_verified": 25,
+  "all_changes_confined_to_working_copy": true,
+  "native_mac_build_performed": false,
+  "zip_checks": [
+    "No cache/build/repository directories",
+    "No symlinks or font/library binaries",
+    "All runnable .command scripts have executable bits; merge ancestors remain read-only reference bytes",
+    "SHA256SUMS inventory matches every included file except itself",
+    "ZIP testzip CRC check"
+  ]
+}

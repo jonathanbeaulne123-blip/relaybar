@@ -1,0 +1,23 @@
+test_cancel_token_checked_by_native_perform (__main__.NativeContracts.test_cancel_token_checked_by_native_perform) ... ok
+test_controller_callbacks_rebuild_native_bars (__main__.NativeContracts.test_controller_callbacks_rebuild_native_bars) ... ok
+test_inline_confirmation_does_not_open_a_panel (__main__.NativeContracts.test_inline_confirmation_does_not_open_a_panel) ... ok
+test_native_buttons_cannot_double_cancel_executing_request (__main__.NativeContracts.test_native_buttons_cannot_double_cancel_executing_request) ... ok
+test_native_detection_requires_explicit_global_consent_and_overlay (__main__.NativeContracts.test_native_detection_requires_explicit_global_consent_and_overlay) ... ok
+test_native_report_does_not_include_url_or_labels (__main__.NativeContracts.test_native_report_does_not_include_url_or_labels) ... ok
+test_no_automatic_keys_coordinate_clicks_or_javascript (__main__.NativeContracts.test_no_automatic_keys_coordinate_clicks_or_javascript) ... ok
+test_no_extension_or_spreadsheet_setup_shipped (__main__.NativeContracts.test_no_extension_or_spreadsheet_setup_shipped) ... ok
+test_no_live_mailbox_routing (__main__.NativeContracts.test_no_live_mailbox_routing) ... ok
+test_no_permission_bypass (__main__.NativeContracts.test_no_permission_bypass) ... ok
+test_no_persisted_browsing_or_cell_cache (__main__.NativeContracts.test_no_persisted_browsing_or_cell_cache) ... ok
+test_only_optin_browser_accessibility_tree_writes (__main__.NativeContracts.test_only_optin_browser_accessibility_tree_writes) ... ok
+test_read_budget_and_per_call_timeout (__main__.NativeContracts.test_read_budget_and_per_call_timeout) ... ok
+test_reads_have_no_value_or_selected_text_attribute (__main__.NativeContracts.test_reads_have_no_value_or_selected_text_attribute) ... ok
+test_retired_buttons_have_revision_keys (__main__.NativeContracts.test_retired_buttons_have_revision_keys) ... ok
+test_screenshot_and_hide_cancel_native_interactions (__main__.NativeContracts.test_screenshot_and_hide_cancel_native_interactions) ... ok
+test_snapshot_does_not_contain_document_title (__main__.NativeContracts.test_snapshot_does_not_contain_document_title) ... ok
+test_version (__main__.NativeContracts.test_version) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.002s
+
+OK

@@ -1,0 +1,26 @@
+test_all_five_families_in_main_menu (__main__.FamilyWiring.test_all_five_families_in_main_menu) ... ok
+test_bar_has_one_catalog_adapter (__main__.FamilyWiring.test_bar_has_one_catalog_adapter) ... ok
+test_breadcrumb_is_on_native_panel (__main__.FamilyWiring.test_breadcrumb_is_on_native_panel) ... ok
+test_clear_session_requires_second_button (__main__.FamilyWiring.test_clear_session_requires_second_button) ... ok
+test_dynamic_data_reuses_original_controllers (__main__.FamilyWiring.test_dynamic_data_reuses_original_controllers) ... ok
+test_escape_back_then_hide (__main__.FamilyWiring.test_escape_back_then_hide) ... ok
+test_every_leaf_guarded_by_generation (__main__.FamilyWiring.test_every_leaf_guarded_by_generation) ... ok
+test_folders_do_not_run_actions (__main__.FamilyWiring.test_folders_do_not_run_actions) ... ok
+test_menu_uses_shared_catalog (__main__.FamilyWiring.test_menu_uses_shared_catalog) ... ok
+test_native_confirmation_back_prioritizes_cancel (__main__.FamilyWiring.test_native_confirmation_back_prioritizes_cancel) ... ok
+test_native_refresh_does_not_reset_ordinary_groups (__main__.FamilyWiring.test_native_refresh_does_not_reset_ordinary_groups) ... ok
+test_navigation_cancels_pending_native_interaction (__main__.FamilyWiring.test_navigation_cancels_pending_native_interaction) ... ok
+test_no_extension_resurrection (__main__.FamilyWiring.test_no_extension_resurrection) ... ok
+test_prompt_actions_use_original_composer (__main__.FamilyWiring.test_prompt_actions_use_original_composer) ... ok
+test_release_metadata (__main__.FamilyWiring.test_release_metadata) ... ok
+test_retains_collection_pause_on_hide (__main__.FamilyWiring.test_retains_collection_pause_on_hide) ... ok
+test_screenshot_interrupt_remembers_nav_path (__main__.FamilyWiring.test_screenshot_interrupt_remembers_nav_path) ... ok
+test_selftest_uses_named_clipboard_not_general (__main__.FamilyWiring.test_selftest_uses_named_clipboard_not_general) ... ok
+test_sheet_context_automatically_enters_app_controls (__main__.FamilyWiring.test_sheet_context_automatically_enters_app_controls) ... ok
+test_successful_compose_opens_draft (__main__.FamilyWiring.test_successful_compose_opens_draft) ... ok
+test_suggestions_marked_not_moved (__main__.FamilyWiring.test_suggestions_marked_not_moved) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.003s
+
+OK

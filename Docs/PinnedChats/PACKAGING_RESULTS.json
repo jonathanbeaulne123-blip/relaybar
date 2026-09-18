@@ -1,0 +1,22 @@
+{
+  "version": "0.6.0",
+  "build": "9",
+  "handler_check": {
+    "selectors": 38,
+    "missing": []
+  },
+  "preserved_source_files_verified": 14,
+  "syntax_checks": 36,
+  "source_contract_suites": 5,
+  "excluded": [
+    ".build",
+    "build",
+    "BuildLogs",
+    "__pycache__",
+    ".git",
+    "*.pyc"
+  ],
+  "active_browser_extension_shipped": false,
+  "native_compilation_performed": false,
+  "installation_performed": false
+}

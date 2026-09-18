@@ -1,0 +1,12 @@
+{
+  "name": "Git Shortcuts",
+  "version": "1.0.0",
+  "description": "Common git operations as quick one-tap commands",
+  "author": "RelayBar",
+  "commands": [
+    { "name": "Quick Commit", "script": "quick-commit.sh", "icon": "💾", "description": "Stage all and commit as WIP" },
+    { "name": "Stash Pop", "script": "stash-pop.sh", "icon": "📤", "description": "Restore the most recent stash" },
+    { "name": "Branch Cleanup", "script": "branch-cleanup.sh", "icon": "🧹", "description": "Delete local branches already merged into main" },
+    { "name": "Undo Last Commit", "script": "undo-commit.sh", "icon": "⏪", "description": "Soft-reset the last commit keeping changes staged" }
+  ]
+}

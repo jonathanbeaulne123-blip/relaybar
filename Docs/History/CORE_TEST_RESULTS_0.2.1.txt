@@ -1,0 +1,250 @@
+Building for debugging...
+[0/13] Write sources
+[2/13] Write swift-version--1BA0962812E73E12.txt
+[4/18] Compiling RelayCore ScreenshotPresentation.swift
+[5/18] Compiling RelayCore PromptEngine.swift
+[6/18] Compiling RelayCore Models.swift
+[7/18] Compiling RelayCore LocalStore.swift
+[8/18] Emitting module RelayCore
+[9/19] Compiling RelayCore ScreenshotShelf.swift
+[10/20] Wrapping AST for RelayCore for debugging
+[12/24] Emitting module RelayCoreTests
+[13/24] Compiling RelayCoreTests RelayCoreTests.swift
+[14/24] Compiling RelayCoreTests ScreenshotShelfTests.swift
+[15/24] Compiling RelayCoreTests ScreenshotPresentationTests.swift
+[16/25] /mnt/data/RelayBar_0.2.1_Auto_Open/.build/x86_64-unknown-linux-gnu/debug/RelayBarCorePackageDiscoveredTests.derived/all-discovered-tests.swift
+[17/25] Write sources
+[18/25] Wrapping AST for RelayCoreTests for debugging
+[20/28] Emitting module RelayBarCorePackageDiscoveredTests
+[21/28] Compiling RelayBarCorePackageDiscoveredTests all-discovered-tests.swift
+[22/28] Compiling RelayBarCorePackageDiscoveredTests RelayCoreTests.swift
+[23/29] /mnt/data/RelayBar_0.2.1_Auto_Open/.build/x86_64-unknown-linux-gnu/debug/RelayBarCorePackageTests.derived/runner.swift
+[24/29] Write sources
+[25/29] Wrapping AST for RelayBarCorePackageDiscoveredTests for debugging
+[27/31] Compiling RelayBarCorePackageTests runner.swift
+[28/31] Emitting module RelayBarCorePackageTests
+[29/32] Wrapping AST for RelayBarCorePackageTests for debugging
+[30/32] Write Objects.LinkFileList
+[31/32] Linking RelayBarCorePackageTests.xctest
+Build complete! (9.13s)
+Test Suite 'All tests' started at 2026-09-17 07:07:02.668
+Test Suite 'debug.xctest' started at 2026-09-17 07:07:02.682
+Test Suite 'RelayCoreTests' started at 2026-09-17 07:07:02.682
+Test Case 'RelayCoreTests.testAllActionsHaveInstructions' started at 2026-09-17 07:07:02.682
+Test Case 'RelayCoreTests.testAllActionsHaveInstructions' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testAssistantToggle' started at 2026-09-17 07:07:02.683
+Test Case 'RelayCoreTests.testAssistantToggle' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testBuildMode' started at 2026-09-17 07:07:02.684
+Test Case 'RelayCoreTests.testBuildMode' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCheckpointProjectMismatchRejected' started at 2026-09-17 07:07:02.684
+Test Case 'RelayCoreTests.testCheckpointProjectMismatchRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCheckpointRoundTripAndUniqueNames' started at 2026-09-17 07:07:02.684
+Test Case 'RelayCoreTests.testCheckpointRoundTripAndUniqueNames' passed (0.005 seconds)
+Test Case 'RelayCoreTests.testClaudeEmptyRejected' started at 2026-09-17 07:07:02.689
+Test Case 'RelayCoreTests.testClaudeEmptyRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testClaudeExactLimit' started at 2026-09-17 07:07:02.689
+Test Case 'RelayCoreTests.testClaudeExactLimit' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testClaudeOversizeRejectedNotTruncated' started at 2026-09-17 07:07:02.690
+Test Case 'RelayCoreTests.testClaudeOversizeRejectedNotTruncated' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testClaudeURLRoundTrip' started at 2026-09-17 07:07:02.690
+Test Case 'RelayCoreTests.testClaudeURLRoundTrip' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCodeActions' started at 2026-09-17 07:07:02.691
+Test Case 'RelayCoreTests.testCodeActions' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCodeClassification' started at 2026-09-17 07:07:02.691
+Test Case 'RelayCoreTests.testCodeClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testConfigurationDoesNotPersistCaptureOrDraft' started at 2026-09-17 07:07:02.691
+Test Case 'RelayCoreTests.testConfigurationDoesNotPersistCaptureOrDraft' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testCorruptConfigurationNotOverwritten' started at 2026-09-17 07:07:02.691
+Test Case 'RelayCoreTests.testCorruptConfigurationNotOverwritten' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testDraftContainsCorrectProjectAndTask' started at 2026-09-17 07:07:02.692
+Test Case 'RelayCoreTests.testDraftContainsCorrectProjectAndTask' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testDuplicateIDsRejected' started at 2026-09-17 07:07:02.692
+Test Case 'RelayCoreTests.testDuplicateIDsRejected' passed (0.101 seconds)
+Test Case 'RelayCoreTests.testEmptyActions' started at 2026-09-17 07:07:02.793
+Test Case 'RelayCoreTests.testEmptyActions' passed (0.101 seconds)
+Test Case 'RelayCoreTests.testEmptyClassification' started at 2026-09-17 07:07:02.893
+Test Case 'RelayCoreTests.testEmptyClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testEmptyProjectNameRejected' started at 2026-09-17 07:07:02.894
+Test Case 'RelayCoreTests.testEmptyProjectNameRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testEmptyProjectsRejected' started at 2026-09-17 07:07:02.894
+Test Case 'RelayCoreTests.testEmptyProjectsRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testErrorActions' started at 2026-09-17 07:07:02.894
+Test Case 'RelayCoreTests.testErrorActions' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testErrorClassification' started at 2026-09-17 07:07:02.894
+Test Case 'RelayCoreTests.testErrorClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testExactReferenceLimitAllowed' started at 2026-09-17 07:07:02.894
+Test Case 'RelayCoreTests.testExactReferenceLimitAllowed' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testFilenameEmojiFallback' started at 2026-09-17 07:07:02.896
+Test Case 'RelayCoreTests.testFilenameEmojiFallback' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testFilenameLengthBound' started at 2026-09-17 07:07:02.896
+Test Case 'RelayCoreTests.testFilenameLengthBound' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testFilenameTraversalCannotEscape' started at 2026-09-17 07:07:02.896
+Test Case 'RelayCoreTests.testFilenameTraversalCannotEscape' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testHandoffEvidenceBoundary' started at 2026-09-17 07:07:02.896
+Test Case 'RelayCoreTests.testHandoffEvidenceBoundary' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testLongBriefRejected' started at 2026-09-17 07:07:02.896
+Test Case 'RelayCoreTests.testLongBriefRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testLongOriginRejected' started at 2026-09-17 07:07:02.897
+Test Case 'RelayCoreTests.testLongOriginRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testLongTaskRejected' started at 2026-09-17 07:07:02.897
+Test Case 'RelayCoreTests.testLongTaskRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testMissingSelectionRejected' started at 2026-09-17 07:07:02.897
+Test Case 'RelayCoreTests.testMissingSelectionRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testModeOverridesClassification' started at 2026-09-17 07:07:02.897
+Test Case 'RelayCoreTests.testModeOverridesClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testNoFalseScreenshotAttachment' started at 2026-09-17 07:07:02.897
+Test Case 'RelayCoreTests.testNoFalseScreenshotAttachment' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testOversizeCaptureRejected' started at 2026-09-17 07:07:02.897
+Test Case 'RelayCoreTests.testOversizeCaptureRejected' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testOversizeFileRejected' started at 2026-09-17 07:07:02.898
+Test Case 'RelayCoreTests.testOversizeFileRejected' passed (0.002 seconds)
+Test Case 'RelayCoreTests.testPrivateFilePermissions' started at 2026-09-17 07:07:02.899
+Test Case 'RelayCoreTests.testPrivateFilePermissions' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testProseActions' started at 2026-09-17 07:07:02.900
+Test Case 'RelayCoreTests.testProseActions' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testProseClassification' started at 2026-09-17 07:07:02.900
+Test Case 'RelayCoreTests.testProseClassification' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testPythonTraceback' started at 2026-09-17 07:07:02.900
+Test Case 'RelayCoreTests.testPythonTraceback' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testReferenceIsEscapedJSON' started at 2026-09-17 07:07:02.900
+Test Case 'RelayCoreTests.testReferenceIsEscapedJSON' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testReviewMode' started at 2026-09-17 07:07:02.901
+Test Case 'RelayCoreTests.testReviewMode' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testStablePairCount' started at 2026-09-17 07:07:02.901
+Test Case 'RelayCoreTests.testStablePairCount' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testStarterConfigurationValid' started at 2026-09-17 07:07:02.901
+Test Case 'RelayCoreTests.testStarterConfigurationValid' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testStoreRoundTrip' started at 2026-09-17 07:07:02.901
+Test Case 'RelayCoreTests.testStoreRoundTrip' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testSymlinkConfigIsRejected' started at 2026-09-17 07:07:02.902
+Test Case 'RelayCoreTests.testSymlinkConfigIsRejected' passed (0.001 seconds)
+Test Case 'RelayCoreTests.testUnknownSchemaRejected' started at 2026-09-17 07:07:02.903
+Test Case 'RelayCoreTests.testUnknownSchemaRejected' passed (0.0 seconds)
+Test Case 'RelayCoreTests.testWordErrorAloneDoesNotTriggerDiagnosis' started at 2026-09-17 07:07:02.903
+Test Case 'RelayCoreTests.testWordErrorAloneDoesNotTriggerDiagnosis' passed (0.0 seconds)
+Test Suite 'RelayCoreTests' passed at 2026-09-17 07:07:02.903
+	 Executed 46 tests, with 0 failures (0 unexpected) in 0.22 (0.22) seconds
+Test Suite 'ScreenshotPresentationTests' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testAutoOpenIsOnByDefault' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testAutoOpenIsOnByDefault' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testAutoOpenOffKeepsToolsAndReturnsNoTicket' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testAutoOpenOffKeepsToolsAndReturnsNoTicket' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testCaptureRequestsRealReopenNotCachedPresent' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testCaptureRequestsRealReopenNotCachedPresent' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testCaptureSelectsViewerFromTools' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testCaptureSelectsViewerFromTools' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testDisabledCrossAppNeverOpensAnOverlay' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testDisabledCrossAppNeverOpensAnOverlay' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testDisablingAutoOpenCancelsAlreadyScheduledRetries' started at 2026-09-17 07:07:02.903
+Test Case 'ScreenshotPresentationTests.testDisablingAutoOpenCancelsAlreadyScheduledRetries' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testHideDisablesAllScheduledRecovery' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testHideDisablesAllScheduledRecovery' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testLayoutChangeCannotEnableOverlay' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testLayoutChangeCannotEnableOverlay' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testLayoutChangesRequestFreshPresentation' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testLayoutChangesRequestFreshPresentation' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testManualShotsCancelsOldRecovery' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testManualShotsCancelsOldRecovery' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testManualShotsWorksWithAutoOpenOff' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testManualShotsWorksWithAutoOpenOff' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testNewCaptureAfterToolsStillAutoOpens' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testNewCaptureAfterToolsStillAutoOpens' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testOlderCaptureTicketCannotOverrideNewerCapture' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testOlderCaptureTicketCannotOverrideNewerCapture' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testRandomRecoveryTicketHasNoEffect' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testRandomRecoveryTicketHasNoEffect' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testRapidBurstCoalescesOntoLatestCapture' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testRapidBurstCoalescesOntoLatestCapture' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testRecoveryCanReopenSameBarAfterOSDisplacesIt' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testRecoveryCanReopenSameBarAfterOSDisplacesIt' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testRecoveryIsBoundedAndOrdered' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testRecoveryIsBoundedAndOrdered' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testReenableWaitsForNextCapture' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testReenableWaitsForNextCapture' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testReturnToEligibleAppFulfillsPendingReveal' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testReturnToEligibleAppFulfillsPendingReveal' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testScreenshotAppCannotBeOverridden' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testScreenshotAppCannotBeOverridden' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testSecondCaptureInViewerRequestsAnotherReopen' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testSecondCaptureInViewerRequestsAnotherReopen' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testSuccessfulPresentationDoesNotReopenOnRoutineUpdates' started at 2026-09-17 07:07:02.904
+Test Case 'ScreenshotPresentationTests.testSuccessfulPresentationDoesNotReopenOnRoutineUpdates' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testThumbnailTapCancelsRetryWithoutLeavingViewer' started at 2026-09-17 07:07:02.905
+Test Case 'ScreenshotPresentationTests.testThumbnailTapCancelsRetryWithoutLeavingViewer' passed (0.0 seconds)
+Test Case 'ScreenshotPresentationTests.testToolsCancelsPendingRecovery' started at 2026-09-17 07:07:02.905
+Test Case 'ScreenshotPresentationTests.testToolsCancelsPendingRecovery' passed (0.0 seconds)
+Test Suite 'ScreenshotPresentationTests' passed at 2026-09-17 07:07:02.905
+	 Executed 24 tests, with 0 failures (0 unexpected) in 0.002 (0.002) seconds
+Test Suite 'ScreenshotShelfTests' started at 2026-09-17 07:07:02.905
+Test Case 'ScreenshotShelfTests.testBytesMustMatchMetadata' started at 2026-09-17 07:07:02.905
+Test Case 'ScreenshotShelfTests.testBytesMustMatchMetadata' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testCacheDirectorySymlinkRefused' started at 2026-09-17 07:07:02.905
+Test Case 'ScreenshotShelfTests.testCacheDirectorySymlinkRefused' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testCachedImageSymlinkRefused' started at 2026-09-17 07:07:02.906
+Test Case 'ScreenshotShelfTests.testCachedImageSymlinkRefused' passed (0.002 seconds)
+Test Case 'ScreenshotShelfTests.testClearAndEvictionNeverTouchSourceOrUnrelatedFile' started at 2026-09-17 07:07:02.907
+Test Case 'ScreenshotShelfTests.testClearAndEvictionNeverTouchSourceOrUnrelatedFile' passed (0.003 seconds)
+Test Case 'ScreenshotShelfTests.testClearIsDurableAndOldFilesDoNotReturn' started at 2026-09-17 07:07:02.910
+Test Case 'ScreenshotShelfTests.testClearIsDurableAndOldFilesDoNotReturn' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testCorruptIndexPreserved' started at 2026-09-17 07:07:02.912
+Test Case 'ScreenshotShelfTests.testCorruptIndexPreserved' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testCustomPrefixRegexEscaped' started at 2026-09-17 07:07:02.912
+Test Case 'ScreenshotShelfTests.testCustomPrefixRegexEscaped' passed (0.003 seconds)
+Test Case 'ScreenshotShelfTests.testCustomScreenshotPrefix' started at 2026-09-17 07:07:02.915
+Test Case 'ScreenshotShelfTests.testCustomScreenshotPrefix' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testEditedScreenshotReplacesOneSlot' started at 2026-09-17 07:07:02.916
+Test Case 'ScreenshotShelfTests.testEditedScreenshotReplacesOneSlot' passed (0.101 seconds)
+Test Case 'ScreenshotShelfTests.testEnglishScreenshotFilename' started at 2026-09-17 07:07:03.017
+Test Case 'ScreenshotShelfTests.testEnglishScreenshotFilename' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testExactlyFiveNewestAndOldestCacheEvicted' started at 2026-09-17 07:07:03.018
+Test Case 'ScreenshotShelfTests.testExactlyFiveNewestAndOldestCacheEvicted' passed (0.003 seconds)
+Test Case 'ScreenshotShelfTests.testFailedIndexCommitLeavesPreviousEntriesIntact' started at 2026-09-17 07:07:03.021
+Test Case 'ScreenshotShelfTests.testFailedIndexCommitLeavesPreviousEntriesIntact' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testHiddenAndUnsupportedFilesIgnoredEvenIfMarked' started at 2026-09-17 07:07:03.022
+Test Case 'ScreenshotShelfTests.testHiddenAndUnsupportedFilesIgnoredEvenIfMarked' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testIndexSymlinkRefused' started at 2026-09-17 07:07:03.022
+Test Case 'ScreenshotShelfTests.testIndexSymlinkRefused' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testManifestRejectsMoreThanFiveAndDuplicateIDs' started at 2026-09-17 07:07:03.023
+Test Case 'ScreenshotShelfTests.testManifestRejectsMoreThanFiveAndDuplicateIDs' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testMarkedRenamedImage' started at 2026-09-17 07:07:03.023
+Test Case 'ScreenshotShelfTests.testMarkedRenamedImage' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testMissingCachedFileReportsErrorNotWrongImage' started at 2026-09-17 07:07:03.023
+Test Case 'ScreenshotShelfTests.testMissingCachedFileReportsErrorNotWrongImage' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testOlderScreenshotCannotDisplaceFiveNewerOnes' started at 2026-09-17 07:07:03.023
+Test Case 'ScreenshotShelfTests.testOlderScreenshotCannotDisplaceFiveNewerOnes' passed (0.002 seconds)
+Test Case 'ScreenshotShelfTests.testOrphanCleanupDeletesOnlyOwnedUUIDPNGs' started at 2026-09-17 07:07:03.026
+Test Case 'ScreenshotShelfTests.testOrphanCleanupDeletesOnlyOwnedUUIDPNGs' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testOutOfOrderArrivalsAreSortedByCaptureDate' started at 2026-09-17 07:07:03.026
+Test Case 'ScreenshotShelfTests.testOutOfOrderArrivalsAreSortedByCaptureDate' passed (0.003 seconds)
+Test Case 'ScreenshotShelfTests.testPermissionsArePrivate' started at 2026-09-17 07:07:03.029
+Test Case 'ScreenshotShelfTests.testPermissionsArePrivate' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testPixelAndByteLimits' started at 2026-09-17 07:07:03.030
+Test Case 'ScreenshotShelfTests.testPixelAndByteLimits' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testReadingDoesNotReorderHistory' started at 2026-09-17 07:07:03.030
+Test Case 'ScreenshotShelfTests.testReadingDoesNotReorderHistory' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testRepeatedEventDoesNotDuplicateOrReorder' started at 2026-09-17 07:07:03.031
+Test Case 'ScreenshotShelfTests.testRepeatedEventDoesNotDuplicateOrReorder' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testRetentionAndBytesSurviveRelaunch' started at 2026-09-17 07:07:03.032
+Test Case 'ScreenshotShelfTests.testRetentionAndBytesSurviveRelaunch' passed (0.001 seconds)
+Test Case 'ScreenshotShelfTests.testStableGateNeedsTwoObservationsAndQuietTime' started at 2026-09-17 07:07:03.033
+Test Case 'ScreenshotShelfTests.testStableGateNeedsTwoObservationsAndQuietTime' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testStableGateRejectsEmptyAndOversize' started at 2026-09-17 07:07:03.033
+Test Case 'ScreenshotShelfTests.testStableGateRejectsEmptyAndOversize' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testStableGateResetsWhenWriterChangesFile' started at 2026-09-17 07:07:03.033
+Test Case 'ScreenshotShelfTests.testStableGateResetsWhenWriterChangesFile' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testUnicodeSpacesAndFrenchNames' started at 2026-09-17 07:07:03.033
+Test Case 'ScreenshotShelfTests.testUnicodeSpacesAndFrenchNames' passed (0.0 seconds)
+Test Case 'ScreenshotShelfTests.testUnrelatedImagesNotCollected' started at 2026-09-17 07:07:03.034
+Test Case 'ScreenshotShelfTests.testUnrelatedImagesNotCollected' passed (0.002 seconds)
+Test Case 'ScreenshotShelfTests.testUppercaseAndHEIFExtension' started at 2026-09-17 07:07:03.036
+Test Case 'ScreenshotShelfTests.testUppercaseAndHEIFExtension' passed (0.0 seconds)
+Test Suite 'ScreenshotShelfTests' passed at 2026-09-17 07:07:03.036
+	 Executed 31 tests, with 0 failures (0 unexpected) in 0.131 (0.131) seconds
+Test Suite 'debug.xctest' passed at 2026-09-17 07:07:03.036
+	 Executed 101 tests, with 0 failures (0 unexpected) in 0.352 (0.352) seconds
+Test Suite 'All tests' passed at 2026-09-17 07:07:03.036
+	 Executed 101 tests, with 0 failures (0 unexpected) in 0.352 (0.352) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.

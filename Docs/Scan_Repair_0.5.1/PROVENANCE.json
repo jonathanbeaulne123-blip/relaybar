@@ -1,0 +1,47 @@
+{
+  "version": "0.5.1",
+  "build": "10",
+  "baseline_archive": {
+    "name": "RelayBar_v0.5_Native_Sheets.zip",
+    "bytes": 300480,
+    "sha256": "874077179fee63697d580a2313a2e36075a69fb75f08be7b2810add3df40b6ba"
+  },
+  "unchanged_foundation": {
+    "Sources/Bridge/NativeBridge.h": "4808436e6e1133e0dcd541ddbdd257852eaba5e0ffcc30f084202aa933c6c00f",
+    "Sources/Bridge/NativeBridge.m": "f6247ceffd0f846928dad7458b3876581796b3a71d04cc83f6fa8fa5cc776ca8",
+    "Scripts/build.sh": "72955d51ed710d453be17a533d107488f6ec6a9836a52ffedb736f7397ae293a",
+    "Scripts/toolchain.sh": "b91541971c6a04d84133ab8b9778ace9e8a085809246e42b6b792bc252686dda",
+    "Sources/Mac/Components.swift": "23f6b636f1b4f98d33653a3443abb29eb841120ce190e858828a214ae14d471d",
+    "Sources/Core/ScreenshotPresentation.swift": "0c7506e20273d2f2f8ea99685dc66722ac33e76eddd5a32905305caf0786500b",
+    "Sources/Core/ScreenshotShelf.swift": "a4d01354268eeb9d85938c22f22ab687a81b0c4b43005a78afdf50a374666095",
+    "Sources/Mac/ScreenshotShelfMac.swift": "54333f51dbe8da0104110f32c8532b77d85277dbc45e9051ae0d0f7c3d4d1702"
+  },
+  "changed_existing_files": [
+    "Install.command",
+    "Resources/Info.plist",
+    "START_HERE.md",
+    "Sources/Core/NativeMenus.swift",
+    "Sources/Mac/AppMain.swift",
+    "Sources/Mac/NativeAXSource.swift",
+    "Sources/Mac/NativeMenuController.swift",
+    "Tests/AutoOpen/test_integration_contract.py",
+    "Tests/NativeSheets/test_contracts.py",
+    "Tests/RelayCoreTests/NativeMenuTests.swift"
+  ],
+  "tests": {
+    "swift": 223,
+    "adapter_service_doubles": 30,
+    "controller_service_doubles": 20,
+    "native_source_contracts": 18,
+    "screenshot_source_contracts": 14,
+    "repair_contracts": 12,
+    "compiler_repair": 16
+  },
+  "not_verified": [
+    "macOS SDK build/link/sign/install",
+    "native IPC",
+    "live Google Sheets",
+    "physical Touch Bar"
+  ],
+  "installed_mac_changed": false
+}

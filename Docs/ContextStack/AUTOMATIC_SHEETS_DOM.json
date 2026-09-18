@@ -1,0 +1,221 @@
+{
+  "boundary": "Real Chromium DOM via offline set_content; explicit Chrome runtime and Google control-handler doubles. Test-only substitutions supply location.href and crypto.randomUUID because enterprise browser policy blocks all navigations. Not live Sheets, installed extension or physical Touch Bar.",
+  "assertions": 53,
+  "passed": 53,
+  "results": [
+    {
+      "name": "automatic root discovery needs no registration",
+      "passed": true
+    },
+    {
+      "name": "legacy RelayBar setup menu not promoted",
+      "passed": true
+    },
+    {
+      "name": "custom menu prioritized over standard menus",
+      "passed": true
+    },
+    {
+      "name": "accessible object button found",
+      "passed": true
+    },
+    {
+      "name": "no decorative images guessed as actions",
+      "passed": true
+    },
+    {
+      "name": "discovery causes zero control events",
+      "passed": true
+    },
+    {
+      "name": "cell text absent from serialized manifest",
+      "passed": true
+    },
+    {
+      "name": "no server function names transmitted",
+      "passed": true
+    },
+    {
+      "name": "confirmation applies to actions not menu navigation",
+      "passed": true
+    },
+    {
+      "name": "stable page identity across polls",
+      "passed": true
+    },
+    {
+      "name": "root tap opens lazy menu",
+      "passed": true
+    },
+    {
+      "name": "lazy menu items appear automatically",
+      "passed": true
+    },
+    {
+      "name": "menu opening runs no leaf function",
+      "passed": true
+    },
+    {
+      "name": "disabled actions excluded",
+      "passed": true
+    },
+    {
+      "name": "nested menu button advertised",
+      "passed": true
+    },
+    {
+      "name": "submenu opening accepted",
+      "passed": true
+    },
+    {
+      "name": "deepest submenu mirrored",
+      "passed": true
+    },
+    {
+      "name": "submenu does not run action",
+      "passed": true
+    },
+    {
+      "name": "back returns one level",
+      "passed": true
+    },
+    {
+      "name": "one tap invokes one fixture handler",
+      "passed": true
+    },
+    {
+      "name": "replayed tap refused",
+      "passed": true
+    },
+    {
+      "name": "menu closing restores contextual root",
+      "passed": true
+    },
+    {
+      "name": "all-menus navigation works",
+      "passed": true
+    },
+    {
+      "name": "Extensions menu is available without registration",
+      "passed": true
+    },
+    {
+      "name": "return from all menus restores custom priority",
+      "passed": true
+    },
+    {
+      "name": "reject command sheetID",
+      "passed": true
+    },
+    {
+      "name": "reject command pageToken",
+      "passed": true
+    },
+    {
+      "name": "reject command actionID",
+      "passed": true
+    },
+    {
+      "name": "reject command expiresAt",
+      "passed": true
+    },
+    {
+      "name": "reject command expiresAt",
+      "passed": true
+    },
+    {
+      "name": "reject command version",
+      "passed": true
+    },
+    {
+      "name": "invalid commands caused no click",
+      "passed": true
+    },
+    {
+      "name": "renamed target cannot receive stale tap",
+      "passed": true
+    },
+    {
+      "name": "replacement with identical caption is not the original target",
+      "passed": true
+    },
+    {
+      "name": "worksheet switch changes token",
+      "passed": true
+    },
+    {
+      "name": "old worksheet tap refused",
+      "passed": true
+    },
+    {
+      "name": "newly disabled target refused",
+      "passed": true
+    },
+    {
+      "name": "occluded target fails hit test",
+      "passed": true
+    },
+    {
+      "name": "cancel confirmation invokes nothing",
+      "passed": true
+    },
+    {
+      "name": "confirmed action clicks once",
+      "passed": true
+    },
+    {
+      "name": "native Sheet dialog replaces actionable controls",
+      "passed": true
+    },
+    {
+      "name": "cannot run behind native dialog",
+      "passed": true
+    },
+    {
+      "name": "native protocol limit respected",
+      "passed": true
+    },
+    {
+      "name": "large menu continuation advertised",
+      "passed": true
+    },
+    {
+      "name": "second group reachable",
+      "passed": true
+    },
+    {
+      "name": "last entry not lost",
+      "passed": true
+    },
+    {
+      "name": "nested DOM menu items not filtered out",
+      "passed": true
+    },
+    {
+      "name": "foreign extension cannot ask for data",
+      "passed": true
+    },
+    {
+      "name": "page/content sender cannot dispatch",
+      "passed": true
+    },
+    {
+      "name": "window messages not used as command bridge",
+      "passed": true
+    },
+    {
+      "name": "link still exposes real controls after safe message refusals",
+      "passed": true
+    },
+    {
+      "name": "denied fresh worker lease blocks navigation too",
+      "passed": true
+    },
+    {
+      "name": "post-confirmation lease denial invokes nothing",
+      "passed": true
+    }
+  ],
+  "network": "Offline set_content; no external requests delivered.",
+  "actual_navigation_attempt": "Initial routed docs.google.com fixture navigation was blocked by ERR_BLOCKED_BY_ADMINISTRATOR. Policy was not changed."
+}

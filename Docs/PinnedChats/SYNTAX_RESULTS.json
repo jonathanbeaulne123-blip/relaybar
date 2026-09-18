@@ -1,0 +1,217 @@
+[
+  {
+    "file": "Sources/Core/AppContext.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/BrowserMailbox.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/ContextStack.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/LocalStore.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/Models.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/NativeMenus.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/PinnedChats.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/PromptEngine.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/ScreenshotPresentation.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Core/ScreenshotShelf.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/AppMain.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/Components.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/ContextStackMac.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/ContextStackNativeChecks.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/NativeAXSource.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/NativeMenuController.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/PinnedChatsAX.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/PinnedChatsMac.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/PinnedChatsNativeChecks.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/ScreenshotNativeChecks.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Sources/Mac/ScreenshotShelfMac.swift",
+    "check": "Swift parser only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Context_Stack_Test.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Diagnostics/Doctor.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Diagnostics/Screenshot_Test.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Diagnostics/Test.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Diagnostics/Toolchain_Check.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Doctor.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Install.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Pinned_Chats_Test.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Screenshot_Test.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Scripts/build.sh",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Scripts/toolchain.sh",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Test.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Toolchain_Check.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Uninstall.command",
+    "check": "bash syntax only",
+    "passed": true,
+    "stderr": ""
+  },
+  {
+    "file": "Resources/Info.plist",
+    "check": "metadata",
+    "passed": true
+  }
+]

@@ -1,0 +1,22 @@
+User-reported live connection report from RelayBar 0.8.0 on September 17, 2026:
+RelayBar 0.8.0 · Native Sheets engine 0.5.2 · Menu Cascade + Lean Scan
+Accessibility: granted
+Browser bundle: com.google.Chrome
+Page kind: sheets
+Top-level controls: 0
+Open-menu controls: 0
+Visited UI nodes: 983
+AX queries: 2236 / 3500
+Scan duration ms: 127 / 850
+Metadata batches / fallbacks: 981 / 0
+Child pages / widest branch: 343 / 67
+Deepest UI level: 14 / 24
+Skipped content / formatting branches: 126 / 7
+Menu containers / candidates seen: 1 / 11
+Last menu expansion: scan failed: node bound reached
+Scan phase: Sheet menu discovery
+Stop reason: node bound reached
+Status: Sheet menu discovery: node bound reached; actions disabled.
+No page URL, document title, cells, script source or screenshots were included.
+
+This is user-supplied live evidence, not a measurement reproduced in this Linux environment.

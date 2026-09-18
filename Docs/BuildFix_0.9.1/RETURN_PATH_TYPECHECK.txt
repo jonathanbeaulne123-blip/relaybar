@@ -1,0 +1,1 @@
+PASS: exact returnToRelayBar method typechecks with showPanel external label and shouldShowPanel local binding

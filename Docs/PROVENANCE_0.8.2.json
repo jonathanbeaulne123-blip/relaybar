@@ -1,0 +1,16 @@
+{
+  "base_archive": "RelayBar_v0.8.1_Adaptive_Menu_Bounds.zip",
+  "base_sha256": "3e0ca3a1fd45725a82d7358dac5d949b9f714b9818e53c7358a8fe780e4720f3",
+  "bundle_id": "local.relaybar",
+  "change_summary": "Retains 0.8.1 scanner/menu cascade and replaces Chromium-family Google Sheets AX activation with one verified primary-button click after exact route/frame/hit-test revalidation. Safari retains AX action dispatch.",
+  "changed_runtime_sha256": {
+    "Fix_Access.command": "a55826d2a9e593fbd04b875b256330e278a761faf1929ddcdd8c5150c7886417",
+    "Install.command": "a4a6e1f029d40bec870bb5bb594a6f1a51b01cbed120a378b7c57cfda55cf602",
+    "Resources/Info.plist": "64ab1655df232f535e3f53681ef6f3a5dc203868cab45b20fb7e7ff2d24da6d5",
+    "Sources/Core/NativeMenus.swift": "ed2cf355dca020a77d07d906fcb6c2a05da280db9fb2690c8b53f642f7c22093",
+    "Sources/Mac/NativeAXSource.swift": "de586b97970b0c8da9c0be954698981e1f858466326385b46586a2f26a251393",
+    "Sources/Mac/NativeMenuController.swift": "7b12e90d90b16fe401463eec337dfc60ab8dd2331d8e8848b88a1252e7041b55"
+  },
+  "live_acceptance": "Not performed in this environment; requires user Mac, Chrome/Sheets, Accessibility and physical Touch Bar.",
+  "release": "RelayBar 0.8.2 build 15 \u2014 Unified \u00b7 Verified Click"
+}

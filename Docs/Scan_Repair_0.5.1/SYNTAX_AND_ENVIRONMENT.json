@@ -1,0 +1,41 @@
+{
+  "swift_parser": {
+    "files": 14,
+    "exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "boundary": "Parsing only, not macOS SDK typechecking or linkage"
+  },
+  "shell_syntax": [
+    "Diagnostics/Doctor.command",
+    "Diagnostics/Screenshot_Test.command",
+    "Diagnostics/Test.command",
+    "Diagnostics/Toolchain_Check.command",
+    "Install.command",
+    "Scripts/build.sh",
+    "Scripts/toolchain.sh",
+    "Uninstall.command"
+  ],
+  "plist": {
+    "CFBundleDevelopmentRegion": "en",
+    "CFBundleExecutable": "RelayBar",
+    "CFBundleIdentifier": "local.relaybar",
+    "CFBundleName": "RelayBar",
+    "CFBundleDisplayName": "RelayBar",
+    "CFBundlePackageType": "APPL",
+    "CFBundleShortVersionString": "0.5.1",
+    "CFBundleVersion": "10",
+    "CFBundleIconFile": "AppIcon",
+    "LSMinimumSystemVersion": "12.0",
+    "LSUIElement": true,
+    "NSHighResolutionCapable": true,
+    "NSDesktopFolderUsageDescription": "Read screenshots from the save folder you choose to show the latest five on the Touch Bar. Original files are not changed.",
+    "NSDocumentsFolderUsageDescription": "Read screenshots only from the save folder you choose for the five-image Touch Bar shelf.",
+    "NSDownloadsFolderUsageDescription": "Read screenshots only from the save folder you choose for the five-image Touch Bar shelf.",
+    "NSPrincipalClass": "NSApplication",
+    "NSHumanReadableCopyright": "RelayBar \u2014 free local prototype. MIT licensed."
+  },
+  "platform": "Linux-6.18.44-x86_64-with-glibc2.41",
+  "swift_version": "Swift version 6.2.1 (swift-6.2.1-RELEASE)\nTarget: x86_64-unknown-linux-gnu\n",
+  "python": "3.13.5 (main, Jul 15 2026, 20:25:40) [GCC 14.2.0]"
+}

@@ -1,0 +1,18 @@
+test_all_feature_engines_present (__main__.UnifiedProduct.test_all_feature_engines_present) ... ok
+test_app_aware_sheet_transition_is_real (__main__.UnifiedProduct.test_app_aware_sheet_transition_is_real) ... ok
+test_button_families_are_root_layout (__main__.UnifiedProduct.test_button_families_are_root_layout) ... ok
+test_chromium_sheet_dispatch_is_verified_pointer_click (__main__.UnifiedProduct.test_chromium_sheet_dispatch_is_verified_pointer_click) ... ok
+test_context_stack_wired (__main__.UnifiedProduct.test_context_stack_wired) ... ok
+test_current_runtime_source_has_no_extension_entrypoint (__main__.UnifiedProduct.test_current_runtime_source_has_no_extension_entrypoint) ... ok
+test_installer_accepts_current_working_lineages (__main__.UnifiedProduct.test_installer_accepts_current_working_lineages) ... ok
+test_no_extension_or_apps_script_runtime (__main__.UnifiedProduct.test_no_extension_or_apps_script_runtime) ... ok
+test_permission_recovery_shipped (__main__.UnifiedProduct.test_permission_recovery_shipped) ... ok
+test_pins_wired (__main__.UnifiedProduct.test_pins_wired) ... ok
+test_release (__main__.UnifiedProduct.test_release) ... ok
+test_screenshot_auto_open_preserved (__main__.UnifiedProduct.test_screenshot_auto_open_preserved) ... ok
+test_sheets_has_lean_scan_and_menu_cascade (__main__.UnifiedProduct.test_sheets_has_lean_scan_and_menu_cascade) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK

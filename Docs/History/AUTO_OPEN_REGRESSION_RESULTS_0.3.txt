@@ -1,0 +1,19 @@
+test_build_and_compiler_workaround_are_byte_identical (__main__.IntegrationContractTests.test_build_and_compiler_workaround_are_byte_identical) ... ok
+test_capture_callback_does_not_steal_focus_or_touch_clipboard (__main__.IntegrationContractTests.test_capture_callback_does_not_steal_focus_or_touch_clipboard) ... ok
+test_cross_app_enable_is_still_explicit_only (__main__.IntegrationContractTests.test_cross_app_enable_is_still_explicit_only) ... ok
+test_fresh_bar_is_rebound_to_native_responders (__main__.IntegrationContractTests.test_fresh_bar_is_rebound_to_native_responders) ... ok
+test_manual_choices_cancel_or_replace_pending_reveal (__main__.IntegrationContractTests.test_manual_choices_cancel_or_replace_pending_reveal) ... ok
+test_only_successful_image_addition_triggers_auto_open (__main__.IntegrationContractTests.test_only_successful_image_addition_triggers_auto_open) ... ok
+test_overlay_allowlist_adds_only_explicit_chromium_support (__main__.IntegrationContractTests.test_overlay_allowlist_adds_only_explicit_chromium_support) ... ok
+test_queued_activation_uses_current_app (__main__.IntegrationContractTests.test_queued_activation_uses_current_app) ... ok
+test_reopen_dismisses_before_present (__main__.IntegrationContractTests.test_reopen_dismisses_before_present) ... ok
+test_retries_are_bounded_by_tested_policy (__main__.IntegrationContractTests.test_retries_are_bounded_by_tested_policy) ... ok
+test_retries_recheck_live_app_and_enabled_ticket (__main__.IntegrationContractTests.test_retries_recheck_live_app_and_enabled_ticket) ... ok
+test_version_and_auto_open_default (__main__.IntegrationContractTests.test_version_and_auto_open_default) ... ok
+test_watcher_cache_and_copy_engine_are_byte_identical (__main__.IntegrationContractTests.test_watcher_cache_and_copy_engine_are_byte_identical) ... ok
+test_working_bridge_is_byte_identical (__main__.IntegrationContractTests.test_working_bridge_is_byte_identical) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.001s
+
+OK

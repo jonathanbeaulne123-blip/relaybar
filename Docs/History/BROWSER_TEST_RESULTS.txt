@@ -1,0 +1,23 @@
+PASS: default project Hearth
+PASS: default action Next slice
+PASS: error suggests Diagnose
+PASS: diagnostic packet rendered
+PASS: handoff changes target
+PASS: handoff carries evidence boundary
+PASS: task edits invalidate previous draft
+PASS: mode overrides error heuristics
+PASS: code suggests Explain
+PASS: project change clears reference
+PASS: project change clears task
+PASS: prose suggests Tighten
+PASS: checkpoint contains correct schema
+PASS: checkpoint contains reviewed draft
+PASS: checkpoint contains provenance
+PASS: checkpoint restores draft
+PASS: oversize reference blocked
+PASS: reference rendered as inert text
+PASS: no script-injected image created
+PASS: no JavaScript exceptions
+PASS: narrow preview has no horizontal overflow
+
+Browser tests only; not native macOS or Touch Bar tests.
