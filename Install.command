@@ -53,7 +53,7 @@ if [[ -e "$APP" ]]; then
       if [[ ! "$CURRENT_BUILD" =~ ^[0-9]+$ ]] || [[ ! "$TARGET_BUILD" =~ ^[0-9]+$ ]] || (( 10#$CURRENT_BUILD > 10#$TARGET_BUILD )); then
         echo "Refusing to replace a newer or unrecognized build ($CURRENT build $CURRENT_BUILD)."; exit 2
       fi ;;
-    0.9.1:*)
+    0.9.1:*|1.0.0:*|1.1.0:*)
       if [[ ! "$CURRENT_BUILD" =~ ^[0-9]+$ ]] || [[ ! "$TARGET_BUILD" =~ ^[0-9]+$ ]] || (( 10#$CURRENT_BUILD > 10#$TARGET_BUILD )); then
         echo "Refusing to replace a newer or unrecognized build ($CURRENT build $CURRENT_BUILD)."; exit 2
       fi ;;

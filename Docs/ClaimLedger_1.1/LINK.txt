@@ -1,0 +1,9 @@
+=== RELAYBAR 1.1.0 — NATIVE LINK OF THE APP TARGET ===
+command: bash build/claims-check/build-selftest.sh
+
+copy-only patch applied to RealityDiff.swift: header.split(separator: " ", maxSplits: 1).map(String.init)
+copy-only patch applied to RealityDiff.swift: payload.split(separator: " ", maxSplits: 1).map(String.init)
+copy in sync: 40 core, 42 mac files
+Compiling the Objective-C bridge…
+Linking RelayBar (unoptimized, local)…
+Linked: build/claims-check/selftest/RelayBar

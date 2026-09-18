@@ -193,15 +193,28 @@ public enum ClaimMatcher {
         return best?.claim
     }
 
-    /// Jaccard similarity over content words. Numbers are treated separately,
-    /// because "3 callers" and "5 callers" are different claims, not similar ones.
+    /// Similarity over content words. Numbers are treated separately, because
+    /// "3 callers" and "5 callers" are different claims, not similar ones.
+    ///
+    /// Prose restates a claim inside a longer sentence — "the test suite passes,
+    /// so I merged it" — so the score is the better of plain overlap (Jaccard)
+    /// and containment, where the claim's own words are what must be present.
+    /// One shared word is never enough: a single common term is a coincidence,
+    /// not a repetition, and a false accusation costs more than a missed one.
     public static func similarity(_ lhs: String, _ rhs: String) -> Double {
         let a = contentWords(lhs), b = contentWords(rhs)
         guard !a.isEmpty, !b.isEmpty else { return 0 }
+        let shared = a.intersection(b).count
+        guard shared >= minimumSharedWords else { return 0 }
         let union = a.union(b)
         guard !union.isEmpty else { return 0 }
-        return Double(a.intersection(b).count) / Double(union.count)
+        let jaccard = Double(shared) / Double(union.count)
+        let containment = Double(shared) / Double(min(a.count, b.count))
+        return max(jaccard, containment)
     }
+
+    /// The floor that stops a single shared term from reading as a repetition.
+    public static let minimumSharedWords = 2
 
     static func contentWords(_ text: String) -> Set<String> {
         Set(text.lowercased()
@@ -210,9 +223,37 @@ public enum ClaimMatcher {
             .filter { $0.count > 1 && !stopwords.contains($0) })
     }
 
+    /// Every quantity a sentence states, in digits. Word numbers are converted
+    /// too, so "two callers" can never be matched against "three callers" just
+    /// because neither spells a digit.
     static func numbers(in text: String) -> Set<String> {
-        Set(text.split(whereSeparator: { !$0.isNumber }).map(String.init))
+        var found = Set<String>()
+        var digits = ""
+        var letters = ""
+        func flushDigits() {
+            guard !digits.isEmpty else { return }
+            found.insert(digits)
+            digits = ""
+        }
+        func flushLetters() {
+            if let value = wordNumbers[letters] { found.insert(value) }
+            letters = ""
+        }
+        for character in text {
+            if character.isNumber { flushLetters(); digits.append(character) }
+            else if character.isLetter { flushDigits(); letters.append(character) }
+            else { flushDigits(); flushLetters() }
+        }
+        flushDigits(); flushLetters()
+        return found
     }
+
+    /// Only whole words count, so "someone" is not read as "one".
+    static let wordNumbers: [String: String] = [
+        "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4", "five": "5",
+        "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10",
+        "eleven": "11", "twelve": "12", "twenty": "20", "thirty": "30", "fifty": "50", "hundred": "100"
+    ]
 
     private static func make(_ replyClaim: Claim, _ candidate: Claim, _ relationship: ReplyAuditFinding.Relationship) -> ReplyAuditFinding {
         ReplyAuditFinding(claimID: candidate.id, claimText: candidate.text, claimKind: candidate.kind,

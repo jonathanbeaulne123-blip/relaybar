@@ -10,7 +10,7 @@ if [[ "${1:-}" == "--force" || "${1:-}" == "-f" ]]; then FORCE=1; fi
 APP="$HOME/Applications/RelayBar.app"
 if [[ -e "$APP" ]]; then
   ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist" 2>/dev/null || true)
-  [[ "$ID" == "local.relaybar" ]] || { echo 'Refusing to remove an unrelated application.'; exit 2; fi
+  [[ "$ID" == "local.relaybar" ]] || { echo 'Refusing to remove an unrelated application.'; exit 2; }
   if [[ $FORCE -eq 1 ]]; then
     rm -rf "$APP"; echo 'Application removed (--force).'
   else

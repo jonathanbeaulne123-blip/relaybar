@@ -1,10 +1,23 @@
-# RelayBar 0.9.1 — Persistent Shell Build Fix
+# RelayBar 1.1.0 — Prove It (Claim Ledger)
 
-**One RelayBar product, always available after login. No browser extension and no per-spreadsheet setup.**
+**One RelayBar product, always available after login. No browser extension, no per-spreadsheet setup, and no unverified claim leaving your hands.**
 
-Native version **0.9.1, build 17**. This release keeps the working 0.8.2 unified product—including Verified Click for Google Sheets/Hearth Tools, adaptive menu scanning, Menu Cascade, Screenshot Shelf, Button Families, Context Stack and Pinned Chats—and adds a persistent Touch Bar shell around it.
+Native version **1.1.0, build 21**. Everything the 0.9.1 release shipped—the working 0.8.2 unified product (Verified Click for Google Sheets/Hearth Tools, adaptive menu scanning, Menu Cascade, Screenshot Shelf, Button Families, Context Stack, Pinned Chats) plus the persistent Touch Bar shell—is unchanged. 1.1.0 adds evidence receipts for the text you send.
 
-## 0.9.1 build fix
+## Evidence receipts
+
+RelayBar has always stamped its packets *UNVERIFIED unless evidence is attached*. 1.1.0 makes that a receipt:
+
+- **Review the draft as claims.** RelayBar pulls every falsifiable sentence out of the text you are about to send — test/build/lint results, file existence, line contents, symbol definitions and references, Git cleanliness, counts — and shows each one, still unsettled. A proposal, an opinion or a hedge ("we should probably revisit this") is marked *not checkable* rather than counted as a claim.
+- **Verify.** Each claim is settled by a bounded local read, or by a command **you declared once** (`RB → Verify → Declare verify command…`). RelayBar never invents a command from prose. Only declared commands run, one at a time, and a dirty tree is rehearsed in a throwaway Git worktree so your uncommitted work is never touched.
+- **Copy the receipt.** Every verdict travels with its evidence — method, SHA-256 fingerprint, exit code, duration, observation time, and the base commit it describes. The receipt also states what it did **not** cover: statements it did not recognize, code fences it skipped, limits it reached, claims that went stale because the repository moved, and, when nothing verified, that nothing verified.
+- **Audit the reply.** Paste the assistant's reply and RelayBar compares it against that receipt, flagging any statement the receipt does not support. It re-runs nothing, and it only compares against your own receipt — it is not a verdict about the reply's author.
+
+Nothing is sent anywhere: extraction is local pattern matching, every verdict is a local observation or a command you declared, and RelayBar never pastes, sends or auto-copies. The `Verify` page sits under `Context` on the Touch Bar (`Verify`, `Audit reply`, `Receipt`, `Ledger ›`), and a one-slot chip (`🔎 3✓ 1⚠`) keeps the current ledger visible from any page.
+
+Run `./Run_Self_Test.command claim-ledger` to check the feature's refusals, receipt and clipboard discipline on your Mac. See `CHANGELOG_1.1.md` and `Docs/VALIDATION_1.1.md` for the full list of what was executed and what is still unverified.
+
+## Historical: the 0.9.1 build fix
 
 The first 0.9.0 package stopped during Mac compilation because a Boolean parameter named `showPanel` shadowed the `showPanel()` method in `AppMain.swift`. 0.9.1 renames only the local parameter binding (`showPanel shouldShowPanel`) and preserves the external call label and Persistent Shell behavior. The failed 0.9.0 installer stopped before replacing the installed app.
 
@@ -27,7 +40,7 @@ If an app cannot be found, its shell button is disabled instead of silently fail
 
 1. Quit the running RelayBar from the **RB** menu.
 2. Extract this ZIP into its own `RelayBar_0.9_Persistent_Shell` folder. Do not merge source folders in Finder.
-3. Run **`Install.command`**. It compiles locally, verifies the staged app, backs up the previous `~/Applications/RelayBar.app`, installs 0.9 there, and enables a user-only login item unless you had previously disabled RelayBar login launch.
+3. Run **`Install.command`**. It compiles locally, verifies the staged app, backs up the previous `~/Applications/RelayBar.app`, installs 1.1 there (upgrading an installed 1.0.0/1.1.0 or older build), and enables a user-only login item unless you had previously disabled RelayBar login launch.
 4. Open RelayBar. Persistent RelayBar mode is on by default. Your screenshot settings, project data and existing native-control preferences remain local and are not deleted.
 5. For Google Sheets/Pinned Chats, keep **RB → Settings → Native controls** enabled. If macOS loses RelayBar’s Accessibility approval after the locally rebuilt app is installed, use the included **`Fix_Access.command`** and re-approve the exact `~/Applications/RelayBar.app` copy.
 
@@ -94,7 +107,9 @@ The persistent shell itself does not add browser JavaScript, network calls, scre
 
 ## Validation boundary
 
-The complete portable/unified regression suite was run after this merge. Notable results include:
+For 1.1.0, the whole tree typechecks (82 files, 0 errors), the full Core + Mac + Objective-C bridge target **links natively** on this machine, the Claim Ledger portable suites pass **81/81**, and the native `--claim-ledger-self-test` passes **35/35** against the linked binary. The complete portable suite runs 649 passed / 5 failed, where the five failures are pre-existing mismatches in other in-flight areas (sheet-URL classification and file-change ordering) that 1.1.0 does not touch. See `Docs/VALIDATION_1.1.md` for the exact commands, the harness's own limitations, and the residual hardware checks.
+
+The complete portable/unified regression suite was run for the 0.9.1 release. Notable results include:
 
 - **427 Swift tests** passed, zero failures.
 - **176** production Button Families adapter checks passed with explicit AppKit/feature doubles, including fixed shell placement, Mac handoff/return and Chrome-pin activation path.

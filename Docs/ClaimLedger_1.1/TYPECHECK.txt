@@ -1,0 +1,8 @@
+=== RELAYBAR 1.1.0 — WHOLE-TREE TYPECHECK (Core + Mac + Objective-C bridge) ===
+command: bash build/claims-check/typecheck.sh
+
+copy-only patch applied to RealityDiff.swift: header.split(separator: " ", maxSplits: 1).map(String.init)
+copy-only patch applied to RealityDiff.swift: payload.split(separator: " ", maxSplits: 1).map(String.init)
+copy in sync: 40 core, 42 mac files
+Typechecking 82 files…
+typecheck: 0 error(s)

@@ -25,6 +25,9 @@ public struct GitSnapshot: Equatable {
     }
     
     public var statusIndicator: String {
+        // No repository is not a clean repository, and the indicator must not
+        // imply that RelayBar looked at a tree it never found.
+        guard !branch.isEmpty else { return "○" }
         if isDirty {
             return "🟡"
         }
