@@ -23,7 +23,9 @@ final class ButtonHierarchyTests: XCTestCase {
     func testEveryPageHasUniqueAcyclicPath() { for p in RelayPage.allCases { XCTAssertEqual(p.path.first,.home);XCTAssertEqual(p.path.last,p);XCTAssertEqual(Set(p.path).count,p.path.count);XCTAssertLessThanOrEqual(p.path.count,4) } }
     func testBreadcrumbsAreUnambiguous() { XCTAssertEqual(RelayPage.stackOptions.breadcrumb,"Home › Context › Context Stack › Stack options") }
     func testNoEmptyDisplayLabels() { for p in RelayPage.allCases { XCTAssertFalse(p.title.isEmpty); for i in RelayHierarchy.items(on:p) { XCTAssertFalse(i.title.isEmpty);XCTAssertFalse(i.id.isEmpty) } } }
-    func testContextOwnsCaptureStackAndScreenshots() { XCTAssertEqual(RelayHierarchy.items(on:.context),[.page(.capture),.page(.stack),.page(.screenshots)]) }
+    func testContextOwnsCaptureStackVerifyAndScreenshots() { XCTAssertEqual(RelayHierarchy.items(on:.context),[.page(.capture),.page(.stack),.page(.verify),.page(.screenshots)]) }
+    func testVerifyOwnsTheClaimLedgerCommands() { XCTAssertEqual(RelayHierarchy.items(on:.verify),[.command(.verifyLedger),.command(.auditReply),.command(.showClaimLedger),.command(.declareVerifyCommand)]) }
+    func testVerifyPageIsReachableFromContext() { XCTAssertEqual(RelayPage.verify.parent,.context);XCTAssertTrue(RelayPage.verify.path.contains(.context)) }
     func testChatsOwnsPinsAndDestinations() { XCTAssertEqual(RelayPage.pins.parent,.chats);XCTAssertEqual(RelayPage.destinations.parent,.chats) }
     func testWorkspaceOwnsProjectAndApps() { XCTAssertEqual(RelayPage.projects.parent,.workspace);XCTAssertEqual(RelayPage.appControls.parent,.workspace);XCTAssertEqual(RelayPage.checkpoints.parent,.workspace) }
     func testCaptureCommandsDoNotContainPromptGeneration() { for item in RelayHierarchy.items(on:.capture) { if case .command(.prompt) = item { XCTFail("Prompt under capture") } } }

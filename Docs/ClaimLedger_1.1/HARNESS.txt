@@ -1,0 +1,41 @@
+=== RELAYBAR 1.1.0 CLAIM LEDGER — HOW THESE RECEIPTS WERE PRODUCED ===
+
+Environment: macOS 15.0 (24A335), arm64, Apple Swift 6.0.3 from
+/Library/Developer/CommandLineTools, macOS SDK 15.2.
+Executed September 18, 2026.
+
+Why the project's own test entry points were not used:
+  `swift build` / `swift test` cannot run in this environment. The installed
+  Command Line Tools reject the SwiftPM manifest's imports before reaching any
+  source file (duplicate module map in the CLT SDK — the same fault
+  Scripts/toolchain.sh documents and works around). Scripts/build.sh was also not
+  run, because it installs an app; the checks below deliberately stop short of
+  that.
+
+Commands actually executed (all build-time only, everything under build/):
+
+  bash build/claims-check/run-tests.sh            # the four Claim Ledger suites
+  bash build/claims-check/run-all-suites.sh       # the whole portable suite
+  bash build/claims-check/typecheck.sh            # Core + Mac + bridge header
+  bash build/claims-check/build-selftest.sh       # native link of the app target
+  build/claims-check/selftest/RelayBar --claim-ledger-self-test
+
+What the harness does: copies Sources/ into build/claims-check/src, compiles the
+real Tests/RelayCoreTests sources against that copy with a portable stand-in for
+the subset of the XCTest API they use (build/claims-check/shim/XCTest.swift),
+and runs them. Sources/ and Tests/ are never written by the harness.
+
+Copy-only patches: build/claims-check/patches.txt lists four substitutions
+applied ONLY to the build-time copy, to work around compile errors in machinery
+owned by other in-flight work (SiteControls.swift x2, RealityPatchTransfer.swift,
+RealityDiff.swift x2). No patched file is part of 1.1.0's code paths, and the
+patch list is expected to become unnecessary once that work lands.
+
+Exclusions: three test files do not compile against the current portable target
+and were excluded rather than patched or deleted — AppSwitcherTests.swift,
+SiteControlsTests.swift, TabContextRouterTests.swift. Every exclusion is printed
+by run-all-suites.sh.
+
+Boundary: the shim is not XCTest; the copy is compiled without -O, without
+codesigning and without a universal-binary pass. See Docs/VALIDATION_1.1.md for
+what these receipts prove and what they do not.

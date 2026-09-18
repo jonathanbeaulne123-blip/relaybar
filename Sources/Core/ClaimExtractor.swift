@@ -118,36 +118,51 @@ public enum ClaimExtractor {
     // MARK: Classification
 
     /// All claims a statement supports. A mixed sentence ("the tests pass but
-    /// the build fails") yields two claims rather than one silent omission.
+    /// the build fails") yields two claims — each answering for its own clause —
+    /// rather than one silent omission, and "the tests pass but the build
+    /// fails" is never read as a failing test run.
+    ///
+    /// Classification reads a display-safe projection of the statement: control
+    /// and bidirectional-override characters are removed first, so a trailing
+    /// U+202E cannot hide a claim from the pattern bank. The text stored on
+    /// every claim is the sentence as written, verbatim.
     public static func match(_ sentence: String, source: ClaimSource = .draft) -> [Claim] {
-        if sentence.count > LedgerPolicy.maxClaimCharacters { return [] }
-        let wordCount = sentence.split(whereSeparator: { $0.isWhitespace }).count
-        guard wordCount >= 3, sentence.count >= LedgerPolicy.minSentenceCharacters else { return [] }
+        guard sentence.count <= LedgerPolicy.maxClaimCharacters else { return [] }
+        let statement = LedgerPolicy.displayText(sentence, limit: LedgerPolicy.maxClaimCharacters)
+        let wordCount = statement.split(whereSeparator: { $0.isWhitespace }).count
+        guard wordCount >= 3, statement.count >= LedgerPolicy.minSentenceCharacters else { return [] }
 
         var results: [Claim] = []
-        func add(_ kind: ClaimKind, _ polarity: ClaimPolarity, _ strategy: ClaimCheckStrategy) {
-            results.append(Claim(text: sentence, kind: kind, polarity: polarity, source: source, strategy: strategy))
+        var seen = Set<String>()
+        func add(_ claim: Claim) {
+            guard seen.insert(claim.kind.rawValue + "#" + claim.polarity.rawValue).inserted else { return }
+            results.append(claim)
         }
 
         // A question asserts nothing that can be settled.
-        if sentence.contains("?") {
-            add(.notFalsifiable, .affirmative, .impossible("This is a question, not a claim about the project."))
+        if statement.contains("?") {
+            add(Claim(text: sentence, kind: .notFalsifiable, source: source,
+                      strategy: .impossible("This is a question, not a claim about the project.")))
             return results
         }
         // Hedged, proposed, or opinionated text is recorded but never "settled".
-        if contains(Pattern.hedging, sentence) {
-            add(.notFalsifiable, .affirmative, .impossible("This is a proposal, hedge, or opinion. Nothing local can confirm or refute it."))
+        if contains(Pattern.hedging, statement) {
+            add(Claim(text: sentence, kind: .notFalsifiable, source: source,
+                      strategy: .impossible("This is a proposal, hedge, or opinion. Nothing local can confirm or refute it.")))
             return results
         }
 
-        if let match = commandClaim(sentence, source: source) { results.append(match) }
-        if results.isEmpty, let match = gitClaim(sentence, source: source) { results.append(match) }
-        if results.isEmpty, let match = referenceClaim(sentence, source: source) { results.append(match) }
-        if results.isEmpty, let match = locationClaim(sentence, source: source) { results.append(match) }
-        if results.isEmpty, let match = fileClaim(sentence, source: source) { results.append(match) }
-        if results.isEmpty, let match = definitionClaim(sentence, source: source) { results.append(match) }
-        if results.isEmpty, contains(Pattern.assertionVerb, sentence), contains(Pattern.concrete, sentence) {
-            add(.assertion, .affirmative, .impossible("RelayBar has no local probe for this statement. It is reported as uncheckable, not as true."))
+        // Command rules are collected rather than short-circuited: one sentence
+        // can assert that the tests pass *and* that the build fails.
+        commandClaims(statement, verbatim: sentence, source: source).forEach(add)
+        if results.isEmpty, let claim = gitClaim(statement, verbatim: sentence, source: source) { add(claim) }
+        if results.isEmpty, let claim = referenceClaim(statement, verbatim: sentence, source: source) { add(claim) }
+        if results.isEmpty, let claim = locationClaim(statement, verbatim: sentence, source: source) { add(claim) }
+        if results.isEmpty, let claim = fileClaim(statement, verbatim: sentence, source: source) { add(claim) }
+        if results.isEmpty, let claim = definitionClaim(statement, verbatim: sentence, source: source) { add(claim) }
+        if results.isEmpty, contains(Pattern.assertionVerb, statement), contains(Pattern.concrete, statement) {
+            add(Claim(text: sentence, kind: .assertion, source: source,
+                      strategy: .impossible("RelayBar has no local probe for this statement. It is reported as uncheckable, not as true.")))
         }
         // Otherwise the statement is unrecognized and counted as unmatched upstream.
         return results
@@ -155,40 +170,61 @@ public enum ClaimExtractor {
 
     /// Tests, build, and lint claims map onto a declared command. Polarity is
     /// preserved so "the tests do not pass" is never silently inverted.
-    private static func commandClaim(_ sentence: String, source: ClaimSource) -> Claim? {
-        for rule in Rules.commands {
-            guard contains(rule.subject, sentence) else { continue }
-            let positive = contains(rule.positive, sentence)
-            let negative = contains(rule.negativeOutcome, sentence)
-            guard positive || negative else { continue }
-            // A failure phrase decides polarity, except where the sentence is
-            // itself a benign negation: "no lint warnings" and "not broken"
-            // assert health, while "the tests do not pass" asserts its absence.
-            let benign = contains(Pattern.benignNegation, sentence)
-            let polarity: ClaimPolarity = (negative && !benign) ? .negative : .affirmative
-            return Claim(text: sentence, kind: rule.kind, polarity: polarity, source: source,
+    private static func commandClaims(_ statement: String, verbatim: String, source: ClaimSource) -> [Claim] {
+        Rules.commands.compactMap { rule in
+            guard contains(rule.subject, statement) else { return nil }
+            guard let polarity = outcomePolarity(rule, in: statement) else { return nil }
+            return Claim(text: verbatim, kind: rule.kind, polarity: polarity, source: source,
                          strategy: .execute(rule.kind.verifyCommandKind!))
         }
-        return nil
     }
 
-    private static func gitClaim(_ sentence: String, source: ClaimSource) -> Claim? {
-        guard contains(Pattern.gitSubject, sentence) else { return nil }
-        let clean = contains(Pattern.gitClean, sentence)
-        let dirty = contains(Pattern.gitDirty, sentence)
+    /// The outcome phrase that decides polarity is the one nearest the subject.
+    /// A whole-sentence search would let "fails" in the second half of "the
+    /// tests pass but the build fails" refute the first half.
+    private static func outcomePolarity(_ rule: CommandRule, in statement: String) -> ClaimPolarity? {
+        let subjects = ranges(rule.subject, in: statement)
+        guard !subjects.isEmpty else { return nil }
+        var best: (range: NSRange, polarity: ClaimPolarity, distance: Int)?
+        for (pattern, polarity) in [(rule.positive, ClaimPolarity.affirmative), (rule.negativeOutcome, ClaimPolarity.negative)] {
+            for range in ranges(pattern, in: statement) {
+                let distance = subjects.map { gap($0, range) }.min() ?? Int.max
+                let isCloser = best == nil || distance < best!.distance
+                    || (distance == best!.distance && range.location < best!.range.location)
+                if isCloser { best = (range, polarity, distance) }
+            }
+        }
+        guard let chosen = best else { return nil }
+        // "no lint warnings" and "not broken" assert health, while "the tests do
+        // not pass" asserts its absence. Only a negation wrapping the phrase that
+        // decided the polarity can flip it.
+        if chosen.polarity == .negative, isBenignlyNegated(chosen.range, in: statement) { return .affirmative }
+        return chosen.polarity
+    }
+
+    /// True when a "no warnings" / "not broken" phrase contains the outcome
+    /// phrase that would otherwise be read as a failure.
+    private static func isBenignlyNegated(_ range: NSRange, in statement: String) -> Bool {
+        ranges(Pattern.benignNegation, in: statement).contains { $0.intersection(range) != nil }
+    }
+
+    private static func gitClaim(_ statement: String, verbatim: String, source: ClaimSource) -> Claim? {
+        guard contains(Pattern.gitSubject, statement) else { return nil }
+        let clean = contains(Pattern.gitClean, statement)
+        let dirty = contains(Pattern.gitDirty, statement)
         // Ambiguous statements produce no claim rather than a coin flip.
         guard clean != dirty else { return nil }
         let expectation: GitFactExpectation = clean ? .clean : .dirty
-        return Claim(text: sentence, kind: .gitFact, source: source, strategy: .observe(.gitFact(expectation)))
+        return Claim(text: verbatim, kind: .gitFact, source: source, strategy: .observe(.gitFact(expectation)))
     }
 
-    private static func referenceClaim(_ sentence: String, source: ClaimSource) -> Claim? {
-        guard let expectation = referenceExpectation(sentence) else { return nil }
-        guard let name = symbolName(in: sentence) else {
-            return Claim(text: sentence, kind: .referenceCount, source: source,
+    private static func referenceClaim(_ statement: String, verbatim: String, source: ClaimSource) -> Claim? {
+        guard let expectation = referenceExpectation(statement) else { return nil }
+        guard let name = symbolName(in: statement) else {
+            return Claim(text: verbatim, kind: .referenceCount, source: source,
                          strategy: .impossible("The statement is about references but names no symbol RelayBar can scan for."))
         }
-        return Claim(text: sentence, kind: .referenceCount, source: source,
+        return Claim(text: verbatim, kind: .referenceCount, source: source,
                      strategy: .observe(.referenceCount(name: name, expected: expectation)))
     }
 
@@ -199,30 +235,31 @@ public enum ClaimExtractor {
         return nil
     }
 
-    private static func locationClaim(_ sentence: String, source: ClaimSource) -> Claim? {
-        guard let line = capturedInt(Pattern.lineNumber, sentence) else { return nil }
-        guard let path = fileToken(in: sentence) else { return nil }
-        let needle = quotedNeedle(in: sentence) ?? capturedIdentifier(Pattern.definesNeedle, sentence) ?? ""
-        return Claim(text: sentence, kind: .lineContains, source: source,
+    private static func locationClaim(_ statement: String, verbatim: String, source: ClaimSource) -> Claim? {
+        guard let line = capturedInt(Pattern.lineNumber, statement) else { return nil }
+        guard let path = fileToken(in: statement) else { return nil }
+        let needle = quotedNeedle(in: statement) ?? capturedIdentifier(Pattern.definesNeedle, statement) ?? ""
+        return Claim(text: verbatim, kind: .lineContains, source: source,
                      strategy: .observe(.lineContains(path: path, line: max(1, line), needle: needle)))
     }
 
-    private static func fileClaim(_ sentence: String, source: ClaimSource) -> Claim? {
-        let positive = contains(Pattern.existencePositive, sentence)
-        let negative = contains(Pattern.existenceNegative, sentence)
+    private static func fileClaim(_ statement: String, verbatim: String, source: ClaimSource) -> Claim? {
+        let positive = contains(Pattern.existencePositive, statement)
+        let negative = contains(Pattern.existenceNegative, statement)
         // Neither phrase, or both: no claim. "there is no doubt the file exists"
-        // must not become a checkable assertion of absence.
+        // must not become a checkable assertion of absence, and "does not exist"
+        // must not read as presence.
         guard positive != negative else { return nil }
-        guard let path = fileToken(in: sentence) else { return nil }
-        return Claim(text: sentence, kind: .fileExists, polarity: positive ? .affirmative : .negative,
+        guard let path = fileToken(in: statement) else { return nil }
+        return Claim(text: verbatim, kind: .fileExists, polarity: positive ? .affirmative : .negative,
                      source: source, strategy: .observe(.fileExists(path: path)))
     }
 
-    private static func definitionClaim(_ sentence: String, source: ClaimSource) -> Claim? {
-        let negativeName = capturedIdentifier(Pattern.definedNegative, sentence)
-        let name = negativeName ?? capturedIdentifier(Pattern.declarationKeyword, sentence) ?? capturedIdentifier(Pattern.definedPositive, sentence)
+    private static func definitionClaim(_ statement: String, verbatim: String, source: ClaimSource) -> Claim? {
+        let negativeName = capturedIdentifier(Pattern.definedNegative, statement)
+        let name = negativeName ?? capturedIdentifier(Pattern.declarationKeyword, statement) ?? capturedIdentifier(Pattern.definedPositive, statement)
         guard let symbol = name else { return nil }
-        return Claim(text: sentence, kind: .symbolDefined, polarity: negativeName == nil ? .affirmative : .negative,
+        return Claim(text: verbatim, kind: .symbolDefined, polarity: negativeName == nil ? .affirmative : .negative,
                      source: source, strategy: .observe(.symbolDefined(name: symbol)))
     }
 
@@ -327,6 +364,19 @@ public enum ClaimExtractor {
         pattern.firstMatch(in: text, options: [], range: NSRange(text.startIndex..., in: text))
     }
 
+    /// Every match range, for the cases where position matters rather than
+    /// presence (deciding which outcome phrase belongs to which subject).
+    static func ranges(_ pattern: NSRegularExpression, in text: String) -> [NSRange] {
+        pattern.matches(in: text, options: [], range: NSRange(text.startIndex..., in: text)).map(\.range)
+    }
+
+    /// Distance between two matches in characters; 0 when they touch.
+    private static func gap(_ first: NSRange, _ second: NSRange) -> Int {
+        if first.upperBound <= second.location { return second.location - first.upperBound }
+        if second.upperBound <= first.location { return first.location - second.upperBound }
+        return 0
+    }
+
     private static func group(_ index: Int, in match: NSTextCheckingResult, of text: String) -> String? {
         guard index < match.numberOfRanges, let range = Range(match.range(at: index), in: text) else { return nil }
         return String(text[range])
@@ -371,7 +421,10 @@ public enum ClaimExtractor {
 
         /// Presence and absence are separate patterns on purpose: deriving
         /// polarity from a bare "not" would flip "the file is not missing".
-        static let existencePositive = compiled(#"\b(?:exists?|there\s+is\s+(?:a\s+)?(?:new\s+)?(?:file|path|module|directory|folder)\b|is\s+(?:in|at|present|created|added)|can\s+be\s+found|lives\s+(?:in|at)|was\s+(?:added|created)|has\s+been\s+(?:added|created))\b"#)
+        /// The negator lookbehinds keep "does not exist" out of the presence
+        /// list, which would otherwise trip the ambiguity guard and drop the
+        /// claim entirely.
+        static let existencePositive = compiled(#"\b(?:(?<!not\s)(?<!n['’]t\s)(?<!longer\s)(?<!never\s)exists?\b|there\s+is\s+(?:a\s+)?(?:new\s+)?(?:file|path|module|directory|folder)\b|is\s+(?:in|at|present|created|added)|can\s+be\s+found|lives\s+(?:in|at)|was\s+(?:added|created)|has\s+been\s+(?:added|created))\b"#)
         static let existenceNegative = compiled(#"\b(?:no\s+longer\s+exists|does\s+not\s+exist|doesn['’]t\s+exist|was\s+(?:removed|deleted|renamed)|has\s+been\s+(?:removed|deleted|renamed)|is\s+missing|there\s+is\s+no|there\s+are\s+no)\b"#)
 
         static let extensions = "swift|ts|tsx|js|jsx|mjs|cjs|py|rb|go|rs|java|kt|kts|c|h|cc|cpp|hpp|m|mm|cs|php|sh|bash|zsh|pl|lua|sql|html|css|scss|md|txt|json|yml|yaml|toml|xml|plist|lock|cfg|ini|env|gradle|strings|xcconfig"

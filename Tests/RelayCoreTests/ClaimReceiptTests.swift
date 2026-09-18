@@ -106,6 +106,24 @@ final class ClaimReceiptTests: XCTestCase {
         XCTAssertEqual(findings.first?.claimVerdict, .unverified)
     }
 
+    /// Prose wraps a claim in extra clauses, so a restatement has to be found
+    /// inside a longer sentence rather than only in a sentence of equal size.
+    func testReplyRestatingAClaimInsideALongerSentenceIsFlagged() {
+        let ledger = ledger(claims: [claim("The test suite passes on this machine.", .testsPass, .unverified)])
+        let findings = ClaimMatcher.audit(ledger: ledger, reply: "All good — the test suite passes, so I merged it.")
+        XCTAssertEqual(findings.first?.relationship, .repeatedUnverified)
+        XCTAssertEqual(findings.first?.claimVerdict, .unverified)
+    }
+
+    /// The counterweight: one word in common is a coincidence, and this feature
+    /// must not accuse a reply of repeating something it never said.
+    func testOneSharedWordIsNotARepetition() {
+        let ledger = ledger(claims: [claim("The build succeeds", .buildSucceeds, .unverified,
+                                          strategy: .execute(.build))])
+        XCTAssertTrue(ClaimMatcher.audit(ledger: ledger, reply: "The build system is a separate project.").isEmpty)
+        XCTAssertEqual(ClaimMatcher.similarity("The tests pass", "Tests are a habit."), 0)
+    }
+
     func testReplyRestatingARefutedClaimIsFlagged() {
         let ledger = ledger(claims: [claim("The tests pass", .testsPass, .refuted)])
         XCTAssertEqual(ClaimMatcher.audit(ledger: ledger, reply: "The tests pass.").first?.relationship, .repeatedUnverified)
@@ -157,12 +175,15 @@ final class ClaimReceiptTests: XCTestCase {
             claim("a", .testsPass, .verified, withEvidence: true),
             claim("b", .buildSucceeds, .verified, withEvidence: true),
             claim("c", .lintClean, .refuted),
-            claim("d", .gitFact, .unverified, strategy: .observe(.gitFact(.clean)))
+            claim("The working tree is clean", .gitFact, .unverified, strategy: .observe(.gitFact(.clean)))
         ])
         XCTAssertEqual(LedgerChip.title(for: source), "🔎 2✓ 1✗ 1⚠")
         XCTAssertTrue(LedgerChip.help(for: source).contains("2 verified"))
         XCTAssertEqual(LedgerChip.auditTitle([]), "✓ Reply audited")
-        XCTAssertEqual(LedgerChip.auditTitle(ClaimMatcher.audit(ledger: source, reply: "The tests pass.")), "❗ 1 repeated")
+        // A reply that agrees with *verified* evidence is not a finding; the
+        // count below can only come from the claim the receipt left unverified.
+        XCTAssertEqual(LedgerChip.auditTitle(ClaimMatcher.audit(ledger: source, reply: "The tests pass.")), "✓ Reply audited")
+        XCTAssertEqual(LedgerChip.auditTitle(ClaimMatcher.audit(ledger: source, reply: "The working tree is clean.")), "❗ 1 repeated")
     }
 
     func testEmptyLedgerChipIsExplicit() {

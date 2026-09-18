@@ -12,7 +12,7 @@ struct RelayBarMain {
         let app = NSApplication.shared
         if CommandLine.arguments.contains("--diagnostics") {
             let result: [String: Any] = [
-                "version": "1.0.0",
+                "version": "1.1.0",
                 "macOS": ProcessInfo.processInfo.operatingSystemVersionString,
                 "overlaySelectorsAvailable": RBBridge.overlayAvailable(),
                 "accessibilityGranted": RBBridge.accessibilityTrusted(),

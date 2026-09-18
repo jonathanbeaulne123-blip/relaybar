@@ -1,0 +1,22 @@
+=== RELAYBAR 1.1.0 — SHELL SCRIPT SYNTAX AND MANIFEST ===
+
+bash -n ok: Doctor.command
+bash -n ok: Fix_Access.command
+bash -n ok: Fix_Permissions.command
+bash -n ok: Install.command
+bash -n ok: Run_Self_Test.command
+bash -n ok: Test.command
+bash -n ok: Toolchain_Check.command
+bash -n ok: Uninstall.command
+bash -n ok: Scripts/build.sh
+bash -n ok: Scripts/toolchain.sh
+bash -n ok: build/claims-check/build-selftest.sh
+bash -n ok: build/claims-check/run-all-suites.sh
+bash -n ok: build/claims-check/run-tests.sh
+bash -n ok: build/claims-check/sync.sh
+bash -n ok: build/claims-check/typecheck.sh
+
+plutil -lint Resources/Info.plist: Resources/Info.plist: OK
+
+	<string>1.1.0</string>
+	<string>21</string>

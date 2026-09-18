@@ -120,6 +120,16 @@ public enum GitFactExpectation: String, Codable, Equatable {
     case dirty
 
     public var title: String { self == .clean ? "working tree clean" : "uncommitted changes present" }
+
+    /// Reads inside a sentence: "Working tree is dirty (uncommitted changes
+    /// present)". The title alone would produce "Working tree is uncommitted
+    /// changes present".
+    public var notePhrase: String {
+        switch self {
+        case .clean: return "clean (no uncommitted changes)"
+        case .dirty: return "dirty (uncommitted changes present)"
+        }
+    }
 }
 
 public enum ReferenceExpectation: Codable, Equatable {
@@ -205,7 +215,9 @@ public struct ClaimEvidence: Codable, Equatable {
         self.durationSeconds = durationSeconds
         self.worktreePath = worktreePath
         self.baseCommit = baseCommit
-        self.observedAt = observedAt
+        // Evidence is persisted as ISO-8601 to the second. Aligning the stamp at
+        // creation keeps an in-memory receipt equal to the one read back.
+        self.observedAt = LedgerPolicy.persistedPrecision(observedAt)
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -358,7 +370,9 @@ public struct ClaimLedger: Codable, Identifiable, Equatable {
     ) {
         self.id = id
         self.schemaVersion = Self.currentSchemaVersion
-        self.createdAt = createdAt
+        // Same reason as `ClaimEvidence`: the persisted format is ISO-8601 to
+        // the second, so a round trip through storage must be lossless.
+        self.createdAt = LedgerPolicy.persistedPrecision(createdAt)
         self.projectID = projectID
         self.projectName = projectName
         self.gitRoot = gitRoot
@@ -443,6 +457,15 @@ public enum LedgerPolicy {
         "png", "jpg", "jpeg", "gif", "pdf", "icns", "ico", "zip", "gz", "tgz", "o", "a",
         "dylib", "so", "dSYM", "class", "jar", "woff", "woff2", "ttf", "otf", "mp4", "mov", "heic"
     ]
+
+    /// Timestamps are stored as ISO-8601 to the second, so any stamp a receipt
+    /// carries is truncated to that precision when it is created rather than
+    /// when it is written. A ledger therefore compares equal to its own
+    /// round-tripped copy, and no reader can be handed a timestamp that will
+    /// not survive a save.
+    public static func persistedPrecision(_ date: Date) -> Date {
+        Date(timeIntervalSince1970: date.timeIntervalSince1970.rounded(.down))
+    }
 
     /// Display-only normalization. Mirrors the Context Stack rule: control
     /// characters and bidirectional overrides are stripped for display, and the

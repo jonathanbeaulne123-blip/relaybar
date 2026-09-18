@@ -1,0 +1,74 @@
+=== RELAYBAR 1.1.0 — WHOLE PORTABLE SUITE ===
+command: bash build/claims-check/run-all-suites.sh
+
+--- exclusions (do not compile against the current portable target) ---
+excluded (does not compile against Core): AppSwitcherTests.swift 
+excluded (does not compile against Core): SiteControlsTests.swift 
+excluded (does not compile against Core): TabContextRouterTests.swift 
+excluded 3 file(s): AppSwitcherTests.swift SiteControlsTests.swift TabContextRouterTests.swift 
+
+--- per-suite results ---
+AppContextTests: 40 passed, 0 failed
+BrowserMailboxTests: 12 passed, 0 failed
+BrowserTabTests: 6 passed, 0 failed
+ButtonHierarchyTests: 60 passed, 0 failed
+ClaimCheckerTests: 26 passed, 0 failed
+ClaimExtractorTests: 30 passed, 0 failed
+ClaimReceiptTests: 17 passed, 0 failed
+ContextStackTests: 50 passed, 0 failed
+NativeMenuTests: 59 passed, 4 failed
+NativeScanBudgetTests: 12 passed, 0 failed
+PageContextTests: 17 passed, 0 failed
+PersistentShellTests: 6 passed, 0 failed
+PinnedChatsTests: 90 passed, 0 failed
+PluginTests: 1 passed, 0 failed
+QuickActionTests: 3 passed, 0 failed
+RealityTests: 10 passed, 1 failed
+RehearsalWorktreeTests: 8 passed, 0 failed
+RelayCoreTests: 46 passed, 0 failed
+ScreenshotPresentationTests: 24 passed, 0 failed
+ScreenshotShelfTests: 31 passed, 0 failed
+SessionJournalTests: 15 passed, 0 failed
+ToolboxTests: 22 passed, 0 failed
+WorkspaceAwarenessTests: 3 passed, 0 failed
+YouTubeTests: 61 passed, 0 failed
+═══ 649 test methods passed, 5 failed ═══
+
+═══ 649 test methods passed, 5 failed ═══
+
+--- failures (pre-existing at the working-tree baseline, in areas 1.1.0 does not touch) ---
+FAIL: testUntrustedURLFormsFail
+      Tests/RelayCoreTests/NativeMenuTests.swift:88: XCTAssertEqual failed: sheets != other https://docs.google.com/spreadsheets/d/e/a/pubhtml
+      Tests/RelayCoreTests/NativeMenuTests.swift:88: XCTAssertEqual failed: sheets != other https://docs.google.com/spreadsheets/d/a/preview
+      Tests/RelayCoreTests/NativeMenuTests.swift:88: XCTAssertEqual failed: sheets != other https://docs.google.com/spreadsheets/d/a/edit/extra
+PASS: testAssistantSitesWithoutReadingTheirContent
+--
+FAIL: testTwoWebAreasFailClosed
+      Tests/RelayCoreTests/NativeMenuTests.swift:136: XCTAssertNil failed 
+PASS: testIframeNeverContributesActions
+PASS: testHiddenMenuNotListed
+PASS: testZeroSizedMenuNotListed
+--
+FAIL: testChangedTabEvenSameURLRefused
+      Tests/RelayCoreTests/NativeMenuTests.swift:272: Expected refusal, got requested
+      Tests/RelayCoreTests/NativeMenuTests.swift:272: XCTAssertTrue failed 
+FAIL: testChangedSelectionFocusRefused
+      Tests/RelayCoreTests/NativeMenuTests.swift:276: Expected refusal, got requested
+      Tests/RelayCoreTests/NativeMenuTests.swift:276: XCTAssertTrue failed 
+PASS: testStaleAndFutureSnapshotRefused
+PASS: testChangedTargetRefused
+--
+FAIL: testFileChangesExtractTrackedAndUntrackedFiles
+      Tests/RelayCoreTests/RealityTests.swift:116: XCTAssertEqual failed: ["notes.txt", "README.md", "Sources/New.swift"] != ["README.md", "Sources/New.swift", "notes.txt"] 
+PASS: testSelectedPatchContainsOnlyRequestedFiles
+PASS: testHunksCanBeSelectedIndividually
+PASS: testGitSnapshotRecordValidation
+
+--- baseline evidence ---
+These failures reproduce against HEAD (commit 63487e7) unchanged files:
+  RealityDiff.files(in:) sorts with localizedStandardCompare at HEAD, while
+  RealityTests still expects plain ordering; the SiteControls fragment policy and
+  the Reality persistence listing are other uncommitted work in the same tree.
+  Unrelated uncommitted work is being edited in the same working tree, so
+  non-ledger suite counts can shift between runs.
+  The Claim Ledger suites (CORE_SUITES.txt) are stable.

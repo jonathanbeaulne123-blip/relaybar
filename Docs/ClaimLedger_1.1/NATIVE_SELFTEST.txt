@@ -1,0 +1,42 @@
+=== RELAYBAR 1.1.0 — NATIVE CLAIM LEDGER SELF-TEST ===
+command: build/claims-check/selftest/RelayBar --claim-ledger-self-test
+binary: linked from Sources/Core + Sources/Mac + Sources/Bridge/NativeBridge.m
+        (arm64-apple-macosx12.0, same frameworks as Scripts/build.sh, no -O, not signed)
+
+PASS: review without a project root is refused
+PASS: a refused review creates no ledger
+PASS: review builds a ledger from reviewed text
+PASS: three claims were recognized (3)
+PASS: nothing is settled before Verify
+PASS: self-test declares no command
+PASS: an execution claim stays UNVERIFIED with no declared command
+PASS: the refusal explains the missing declaration
+PASS: an existing file claim is verified from a local read
+PASS: observed evidence carries a SHA-256 fingerprint
+PASS: a proposal is never checkable
+PASS: planning selects the declared command verbatim
+PASS: a clean tree is planned in place
+PASS: auditing a reply succeeds
+PASS: a repeated unverified claim is flagged
+PASS: only unsettled claims can be flagged as repeated
+PASS: the receipt is exactly one pasteboard item
+PASS: the receipt is marked as RelayBar output
+PASS: the receipt includes its coverage disclosure
+PASS: the receipt renders verdicts
+PASS: the audit summary is copyable
+PASS: one evidence chip is offered
+PASS: the chip summarises verdicts
+PASS: the Verify page offers controls
+PASS: declared widths plus estimated gaps fit the 685pt budget (not hardware measurement)
+PASS: construct actual Touch Bar item: ledger-chip
+PASS: construct actual Touch Bar item: ledger-verify
+PASS: construct actual Touch Bar item: ledger-audit
+PASS: construct actual Touch Bar item: ledger-receipt
+PASS: construct actual Touch Bar item: ledger-open
+PASS: construct actual Touch Bar item: ledger-hide
+PASS: the ledger panel is constructed without being shown
+PASS: construction did not trigger navigation or hide actions
+PASS: the controller always reports a status
+PASS: NSPasteboard.general was never read or written
+
+35 native checks passed; 0 failed. Named pasteboard and synthetic observation source only. No declared command was executed, and no physical Touch Bar or real repository was verified by this self-test.

@@ -233,7 +233,7 @@ public final class ClaimChecker {
         case (.observe(.gitFact(let expectation)), .git(let snapshot)):
             let actual: GitFactExpectation = snapshot.isDirty ? .dirty : .clean
             claim.verdict = actual == expectation ? .verified : .refuted
-            claim.note = "Working tree is \(actual.title) (branch \(snapshot.branch.isEmpty ? "unknown" : snapshot.branch), \(snapshot.modifiedCount) modified, \(snapshot.stagedCount) staged, \(snapshot.untrackedCount) untracked)."
+            claim.note = "Working tree is \(actual.notePhrase); branch \(snapshot.branch.isEmpty ? "unknown" : snapshot.branch), \(snapshot.modifiedCount) modified, \(snapshot.stagedCount) staged, \(snapshot.untrackedCount) untracked."
             claim.evidence = ClaimEvidence(method: "Read Git state",
                                            summary: claim.note,
                                            excerpt: "branch \(snapshot.branch)\nmodified \(snapshot.modifiedCount)\nstaged \(snapshot.stagedCount)\nuntracked \(snapshot.untrackedCount)",
