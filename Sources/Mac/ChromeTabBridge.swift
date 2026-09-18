@@ -150,20 +150,28 @@ public final class ChromeTabBridge {
 
     /// Injected into the tab script only when a probe is due. It is appended by
     /// string replacement so the surrounding AppleScript stays untouched, and it
-    /// carries the payload as a fourth field on the probed tab's own line — no
-    /// new line handling and no extra AppleScript round trip.
+    /// carries the payload as a fourth field on the *front window's active* tab
+    /// line — the one line the parser is already reading, so no extra line
+    /// handling and no extra AppleScript round trip.
+    ///
+    /// The probed tab is not necessarily in the front window: the mini-player
+    /// has to survive a switch to any other tab, window or app, so this looks at
+    /// the active tab first, then the front window, then every other window.
     nonisolated private static let probeSection = """
         set probeIndex to 0
         set probeText to "rby-no-video"
+        set targetWindow to missing value
         try
             set selectedURL to item activeIdx of tURLs
             if selectedURL contains "youtube.com/watch" or selectedURL contains "youtu.be/" then
                 set probeIndex to activeIdx
+                set targetWindow to front window
             else
                 repeat with probeCandidate from 1 to (count of tURLs)
                     set candidateURL to item probeCandidate of tURLs
                     if candidateURL contains "youtube.com/watch" or candidateURL contains "youtu.be/" then
                         set probeIndex to probeCandidate
+                        set targetWindow to front window
                         exit repeat
                     end if
                 end repeat
@@ -171,18 +179,34 @@ public final class ChromeTabBridge {
         on error
             set probeIndex to 0
         end try
+        if probeIndex is 0 then
+            try
+                repeat with candidateWindow in windows
+                    set candidateURLs to URL of tabs of candidateWindow
+                    repeat with probeCandidate from 1 to (count of candidateURLs)
+                        set candidateURL to item probeCandidate of candidateURLs
+                        if candidateURL contains "youtube.com/watch" or candidateURL contains "youtu.be/" then
+                            set probeIndex to probeCandidate
+                            set targetWindow to candidateWindow
+                            exit repeat
+                        end if
+                    end repeat
+                    if probeIndex is not 0 then exit repeat
+                end repeat
+            on error
+                set probeIndex to 0
+            end try
+        end if
         if probeIndex is not 0 then
             try
-                set probeText to (execute (tab probeIndex of front window) javascript "(function(){var v=document.querySelector('video');if(!v)return 'rby-no-video';var st;if(document.querySelector('.ad-showing')){st='ad';}else if(v.ended){st='ended';}else if(Number.isFinite(v.duration)&&v.duration===Infinity){st=v.paused?'paused':'live';}else{st=v.paused?'paused':'playing';}var t=Number.isFinite(v.currentTime)?Math.floor(v.currentTime):'';var d=(Number.isFinite(v.duration)&&v.duration!==Infinity)?Math.floor(v.duration):'';var vol=Math.round(v.volume*100);var chEl=document.querySelector('.ytp-chapter-title-content');var ch=chEl?chEl.textContent:'';var m=location.search.match(/[?&]v=([A-Za-z0-9_-]+)/);var id=m?m[1]:'';var c=function(x){return String(x).split('|').join(' ').split(String.fromCharCode(10)).join(' ').split(String.fromCharCode(13)).join(' ');};return ['rby1',st,t,d,vol,String(v.muted),c(id),c(document.title||''),c(ch)].join('|');})()")
+                set probeText to (execute (tab probeIndex of targetWindow) javascript "(function(){var v=document.querySelector('video');if(!v)return 'rby-no-video';var st;if(document.querySelector('.ad-showing')){st='ad';}else if(v.ended){st='ended';}else if(Number.isFinite(v.duration)&&v.duration===Infinity){st=v.paused?'paused':'live';}else{st=v.paused?'paused':'playing';}var t=Number.isFinite(v.currentTime)?Math.floor(v.currentTime):'';var d=(Number.isFinite(v.duration)&&v.duration!==Infinity)?Math.floor(v.duration):'';var vol=Math.round(v.volume*100);var chEl=document.querySelector('.ytp-chapter-title-content');var ch=chEl?chEl.textContent:'';var m=location.search.match(/[?&]v=([A-Za-z0-9_-]+)/);var id=m?m[1]:'';var c=function(x){return String(x).split('|').join(' ').split(String.fromCharCode(10)).join(' ').split(String.fromCharCode(13)).join(' ');};return ['rby1',st,t,d,vol,String(v.muted),c(id),c(document.title||''),c(ch)].join('|');})()")
             on error
+                -- Chrome refused `execute javascript`. This is not "no video":
+                -- the user must enable it in Chrome's own View menu.
                 set probeText to "rby-unavailable"
             end try
-            set item probeIndex of tTitles to ((item probeIndex of tTitles) & "<tab_sep>" & probeText)
-        else
-            -- Report the absence of a watch page explicitly, so "no probe was
-            -- requested" and "no video is open" can never be confused.
-            set item activeIdx of tTitles to ((item activeIdx of tTitles) & "<tab_sep>" & "rby-no-video")
         end if
+        set item activeIdx of tTitles to ((item activeIdx of tTitles) & "<tab_sep>" & probeText)
     """
 
     nonisolated private static func scriptForBundle(_ bundle: String, probe: Bool) -> String {

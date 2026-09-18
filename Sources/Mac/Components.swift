@@ -77,6 +77,32 @@ final class TouchBarDriver: NSObject, NSTouchBarDelegate {
             }
         }
     }
+    /// Changes only the text of slots that are already on screen, leaving the
+    /// bar's identifiers untouched. This is what the YouTube clock uses: a tick
+    /// that rebuilt the bar would recreate every item, which discards the tab
+    /// strip's scroll position several times a second.
+    /// Titles currently drawn, keyed by slot. The native self-test uses this to
+    /// prove an in-place retitle changed only the labels that moved.
+    var currentTitles: [String: String] {
+        slots.reduce(into: [String: String]()) { $0[$1.key] = $1.title }
+    }
+
+    func retitle(_ titles: [String: String]) {
+        guard !titles.isEmpty else { return }
+        var applied = false
+        for (key, title) in titles {
+            guard let button = buttons[key], button.title != title else { continue }
+            button.title = title
+            applied = true
+        }
+        guard applied else { return }
+        // Keep the cached slots in step so the next structural rebuild does not
+        // briefly restore an older timecode.
+        for index in slots.indices where titles[slots[index].key] != nil {
+            slots[index].title = titles[slots[index].key] ?? slots[index].title
+        }
+    }
+
     private func configure(_ button: NSButton, slot: Slot) {
         button.title = slot.title; button.toolTip = slot.help; button.isEnabled = slot.isEnabled
         button.image = slot.image; button.imagePosition = slot.image == nil ? .noImage : .imageLeft

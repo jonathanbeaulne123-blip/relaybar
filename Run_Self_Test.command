@@ -24,6 +24,7 @@ Suites:
   claim-ledger       Run the Claim Ledger review/refusal/receipt test (no command is executed)
   pinned-chats       Run the Pinned Chats sidebar-parsing test
   screenshot         Run the Screenshot Shelf filesystem test
+  youtube            Run the YouTube bar, honest-state and local-transcript checks
   smoke              Run the quick native-component smoke test
   all                Run every suite above sequentially
   help               Show this message
@@ -62,6 +63,7 @@ case "$SUITE" in
     claim-ledger)    run_suite "Claim Ledger"    "--claim-ledger-self-test" ;;
     pinned-chats)    run_suite "Pinned Chats"    "--pinned-chats-self-test" ;;
     screenshot)      run_suite "Screenshot Shelf" "--screenshot-self-test" ;;
+    youtube)         run_suite "YouTube"         "--youtube-self-test" ;;
     smoke)           run_suite "Smoke Test"      "--smoke-test" ;;
     all)
         PASSED=0 FAILED=0
@@ -71,6 +73,7 @@ case "$SUITE" in
             "Claim Ledger:--claim-ledger-self-test" \
             "Pinned Chats:--pinned-chats-self-test" \
             "Screenshot Shelf:--screenshot-self-test" \
+            "YouTube:--youtube-self-test" \
             "Smoke Test:--smoke-test"; do
             name="${suite_args%%:*}"
             flag="${suite_args#*:}"

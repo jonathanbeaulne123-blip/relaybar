@@ -44,6 +44,10 @@ struct RelayBarMain {
             app.setActivationPolicy(.prohibited)
             exit(ScreenshotNativeChecks.run())
         }
+        if CommandLine.arguments.contains("--youtube-self-test") {
+            app.setActivationPolicy(.prohibited)
+            exit(YouTubeNativeChecks.run())
+        }
         if CommandLine.arguments.contains("--smoke-test") {
             app.setActivationPolicy(.prohibited)
             let driver = TouchBarDriver()
@@ -137,6 +141,8 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
     private let chromeBridge = ChromeTabBridge.shared
     private let sheetsTools = SheetsToolsController.shared
     private let youTube = YouTubeController.shared
+    private var youTubeStore: YouTubeTranscriptStore?
+    private var youTubeSettings: YouTubeSettingsPanel?
     private var tabPageIndex = 0
     private var contextStack: ContextStackController?
     private var claimLedger: ClaimLedgerController?
@@ -169,6 +175,17 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
             configurationWritable = false
             startupError = "Local configuration could not be loaded: \(error.localizedDescription)\n\nThe original data is untouched. This session uses temporary starter settings. Fix or rename the configuration file before saving new settings."
         }
+        // Transcripts and Moments live in their own private folder beside the
+        // existing realities and checkpoints. Storage being unavailable must not
+        // stop the bar working, so a failure here only disables persistence.
+        if let store = store {
+            do { youTubeStore = try YouTubeTranscriptStore(directory: store.transcriptsURL) }
+            catch {
+                youTubeStore = nil
+                setStatus("YouTube transcripts cannot be stored locally: \(error.localizedDescription) Control still works; transcripts will not be kept.")
+            }
+        }
+        youTube.attach(store: youTubeStore)
         screenshotPresentation.setAutoOpenEnabled(UserDefaults.standard.object(forKey: autoOpenKey) as? Bool ?? true)
         screenshotPresentation.showTools() // First launch opens the five families, not an empty screenshot shelf.
         shellState.enabled = UserDefaults.standard.object(forKey: "persistentShell.enabled") as? Bool ?? true
@@ -264,6 +281,28 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
             self.rebuildBars()
             self.updateOverlay(for: NSWorkspace.shared.frontmostApplication)
         }
+        // The clock and the volume label change several times a second. They are
+        // updated on the existing buttons instead of rebuilding the bar, which is
+        // what keeps a finger-slide through the tab strip from being interrupted.
+        youTube.onProgressChange = { [weak self] in
+            guard let self = self else { return }
+            let titles = self.youTube.progressTitles
+            self.panelBar.retitle(titles)
+            self.overlayBar.retitle(titles)
+        }
+        youTube.onStatus = { [weak self] message in self?.setStatus(message) }
+        youTube.onMoment = { [weak self] _, text in
+            guard let self = self else { return }
+            self.sessionJournal.record(.note(text: "YouTube Moment"), app: self.liveAppName)
+            self.setStatus("Moment copied. It is ready to paste: \(text.split(separator: "\n").first.map(String.init) ?? "").") }
+        // The probe rides along with the tab fetch that is already happening, so a
+        // playback tick costs one AppleScript round trip rather than two.
+        chromeBridge.onFetched = { [weak self] in
+            guard let self = self else { return }
+            self.youTube.consume(tabs: self.chromeBridge.tabs,
+                                 bundle: self.chromeBridge.currentBundle,
+                                 probe: self.chromeBridge.lastProbe)
+        }
         wireSiteControls()
         nativeMenus.onStatus = { [weak self] message in self?.setStatus(message) }
         contextTimer = Timer.scheduledTimer(withTimeInterval: 0.45, repeats: true) { [weak self] _ in
@@ -316,6 +355,7 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
         _ = add("Local Toolbox", #selector(showToolboxFromMenu))
         _ = add("Fork Current Reality…", #selector(forkCurrentReality))
         _ = add("Show Reality Timeline", #selector(showRealityTimeline))
+        _ = add("YouTube Control & Storage…", #selector(showYouTubeSettingsFromMenu))
         returnRelayMenuItem = add("Return RelayBar Touch Bar", #selector(returnRelayBarFromMenu))
         macTouchBarMenuItem = add("Use macOS Touch Bar", #selector(useMacTouchBarFromMenu))
         persistentPauseMenuItem = add("Pause Persistent Touch Bar", #selector(togglePersistentShellPause))
@@ -760,13 +800,34 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
 
     private func askAIAboutYouTube() {
         guard let s = youTube.session else { return }
-        let quote = youTube.transcriptEntries.last(where: { $0.timestamp <= s.currentTime })?.text ?? ""
-        let quotePart = quote.isEmpty ? "" : "\nExcerpt at \(s.formattedTime): “\(quote)”"
-        let prompt = """
-        I am watching: "\(s.cleanTitle)" at \(s.formattedTime) (\(s.url)&t=\(Int(s.currentTime))s).\(quotePart)
-
-        Can you explain what is being discussed here and key takeaways?
-        """
+        // Everything here is real: the title the page reported, the extrapolated
+        // playhead, the chapter the video itself exposes, and — when a transcript
+        // exists — the caption lines either side of the playhead. When no real
+        // playhead has been read the query says so instead of inventing a time.
+        var lines: [String] = []
+        let time = youTube.liveTime
+        let timecode = youTube.liveTimecode
+        var header = "I am watching: \"\(s.cleanTitle)\""
+        if time != nil { header += " at \(timecode)" }
+        if let link = YouTubeVideoID(raw: s.videoID)?.shareURL(at: time ?? 0) ?? URL(string: s.url) {
+            header += " (\(link.absoluteString))"
+        }
+        lines.append(header + ".")
+        if let chapter = youTube.currentChapterTitle, let at = time,
+           let entry = youTube.chapters.chapter(at: at) {
+            lines.append("Chapter: \(chapter) (starts \(entry.timecode)).")
+        }
+        if let duration = youTube.liveDuration { lines.append("Length: \(YouTubeTimecode.format(duration)).") }
+        if let excerpt = youTube.momentExcerpt(around: time) {
+            lines.append("\nCaption lines around this moment (transcript, \(youTube.transcriptProvenance)):")
+            lines.append(excerpt)
+        } else if youTube.availability.setupRequired {
+            lines.append("\nRelayBar has no transcript or playhead for this video because Chrome is blocking scripted control.")
+        } else {
+            lines.append("\nNo transcript has been built for this video yet, so no caption lines are quoted.")
+        }
+        lines.append("\nCan you explain what is being discussed here and give me the key takeaways?")
+        let prompt = lines.joined(separator: "\n")
         currentAction = .explain
         draft = PromptDraft(text: prompt, action: .explain, projectID: configuration.selectedProjectID, target: configuration.target, createdAt: Date())
         suppressEdits = true
@@ -857,6 +918,19 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
             panel.orderOut(nil)
             setStatus("Claude prefill requested. Review the new chat; no send action was issued.")
         } catch { showError(error.localizedDescription) }
+    }
+
+    /// YouTube control and local transcript storage. Kept as a real window
+    /// rather than hidden state because the Chrome prerequisite and the stored
+    /// transcript files are both facts the user can act on.
+    @objc private func showYouTubeSettingsFromMenu() {
+        if youTubeStore == nil, let store = store {
+            do { youTubeStore = try YouTubeTranscriptStore(directory: store.transcriptsURL) }
+            catch { showError("YouTube transcripts cannot be stored locally: \(error.localizedDescription)") }
+        }
+        youTube.attach(store: youTubeStore)
+        if youTubeSettings == nil { youTubeSettings = YouTubeSettingsPanel(store: youTubeStore) }
+        youTubeSettings?.orderFrontRegardless()
     }
 
     @objc private func showRealityTimeline() {
@@ -1258,10 +1332,18 @@ final class RelayAppDelegate: NSObject, NSApplicationDelegate, NSTextViewDelegat
         nativeMenus.observe(pid: front.processIdentifier, bundle: bundle,
                             enabled: appAwareEnabled && nativeMenusEnabled && overlayEnabled)
         if chromeBridge.isSupported(bundle: bundle) {
+            // One round trip carries both the tab list and, when the controller
+            // says a probe is due, the playback payload. A paused video is not
+            // re-read on every tick.
+            chromeBridge.probeYouTube = youTube.takeProbeSlot()
             chromeBridge.refreshTabs(for: bundle)
-            youTube.poll(currentTabs: chromeBridge.tabs, activeTab: chromeBridge.activeTab, bundle: bundle)
         } else {
             chromeBridge.clear()
+            // The browser is not in front, so nothing is being polled. Confirm
+            // that it is at least still running rather than showing a session
+            // for an app the user has quit. This is deliberately not an
+            // `endSession`: switching tabs or apps must keep the mini-player.
+            youTube.validateSessionLiveness()
         }
         let snapshot = nativeMenus.snapshot
         let route = snapshot?.route
@@ -1778,9 +1860,11 @@ extension RelayAppDelegate {
             } else if siteControls.pending == nil {
                 switch contextKind {
             case .youtube:
-                toolSlots = youTube.contextSlots { [weak self] in
+                toolSlots = youTube.contextSlots(onSetup: { [weak self] in
+                    self?.showYouTubeSettingsFromMenu()
+                }, onAsk: { [weak self] in
                     self?.askAIAboutYouTube()
-                }
+                })
             case .sheets:
                 toolSlots.append(TouchBarDriver.Slot(
                     key: "tab-tool-sheets",
@@ -2036,7 +2120,10 @@ extension RelayAppDelegate {
         guard process.terminationStatus == 0 else { return nil }
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
         guard let output = String(data: data, encoding: .utf8) else { return nil }
-        guard let line = output.split(separator: "\\n").first(where: { $0.hasPrefix("n") }) else { return nil }
+        // A single newline separator: the two-character sequence this used to
+        // contain both missed every line and required macOS 13, while the app
+        // targets macOS 12.
+        guard let line = output.split(separator: "\n").first(where: { $0.hasPrefix("n") }) else { return nil }
         let project = ProjectDetector.detect(from: String(line.dropFirst()))
         return project.root.isEmpty ? nil : project.root
     }
@@ -2048,7 +2135,7 @@ extension RelayAppDelegate {
         // The mini-player is always pinned. Only when the active browser tab is
         // the YouTube watch page does the small volume slider also appear.
         let activeURL = chromeBridge.activeTab?.url ?? ""
-        let ytForeground = activeURL.contains("youtube.com/watch") || activeURL.contains("youtu.be/")
+        let ytForeground = YouTubeVideoID.isWatchPage(activeURL)
         if let ytMini = youTube.persistentSlots(expanded: ytForeground) {
             result.append(contentsOf: ytMini)
         }

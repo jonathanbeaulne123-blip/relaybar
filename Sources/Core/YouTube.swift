@@ -56,11 +56,17 @@ public struct YouTubeVideoID: Equatable, Hashable, Codable, CustomStringConverti
             return id
         }
         let parts = components.path.split(separator: "/").map(String.init)
-        guard parts.count >= 2 else { return nil }
-        switch parts[0] {
+        switch parts.first {
         case "shorts", "embed", "live", "v":
+            guard parts.count >= 2 else { return nil }
             return YouTubeVideoID(raw: parts[1])
-        default:
+        case .some:
+            // A short link carries the identifier as its whole path: youtu.be/<id>.
+            if host == "youtu.be" || host.hasSuffix(".youtu.be") {
+                return YouTubeVideoID(raw: parts[0])
+            }
+            return nil
+        case .none:
             return nil
         }
     }
