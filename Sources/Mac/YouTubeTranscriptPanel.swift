@@ -32,6 +32,10 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
     private var rangeAnchor: Double?
     private var rangeEnd: Double?
 
+    /// The stored record's own "where you left off", shown as a labelled fact.
+    /// It is never used as the live playhead.
+    private var lastPosition: Double?
+
     private var currentTime: (() -> Double?)?
     private var onSeek: ((Double) -> Void)?
     private var onOpenTranscript: (() -> Void)?
@@ -56,6 +60,38 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
         self.level = .floating
         self.center()
         buildContent()
+    }
+
+    /// Reuses one window. A second transcript opening replaces the first rather
+    /// than stacking, so the panel always describes the video you are on now.
+    public static func show(videoTitle: String,
+                            videoID: String,
+                            provenance: String,
+                            chapters: YouTubeChapterIndex,
+                            entries: [TranscriptEntry],
+                            moments: [YouTubeMoment],
+                            lastPosition: Double? = nil,
+                            currentTime: @escaping () -> Double?,
+                            onSeek: @escaping (Double) -> Void,
+                            onOpenTranscript: (() -> Void)? = nil,
+                            onForget: (() -> Void)? = nil,
+                            onStar: (() -> Void)? = nil,
+                            onSearch: @escaping (String) -> [TranscriptMatch]) {
+        let panel = shared ?? YouTubeTranscriptPanel()
+        shared = panel
+        panel.show(videoTitle: videoTitle,
+                   videoID: videoID,
+                   provenance: provenance,
+                   chapters: chapters,
+                   entries: entries,
+                   moments: moments,
+                   lastPosition: lastPosition,
+                   currentTime: currentTime,
+                   onSeek: onSeek,
+                   onOpenTranscript: onOpenTranscript,
+                   onForget: onForget,
+                   onStar: onStar,
+                   onSearch: onSearch)
     }
 
     private func buildContent() {
@@ -152,6 +188,18 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
             self.onForget?()
         }
 
+        // Moments are the part of a transcript that is worth keeping, so they get
+        // their own copy action rather than being reachable only one at a time.
+        let copyMoments = ActionButton("Copy Moments", help: "Copy every Moment saved for this video, newest first") { [weak self] in
+            guard let self = self else { return }
+            guard !self.moments.isEmpty else { self.note("No Moments have been saved for this video yet."); return }
+            let blocks = self.moments
+                .sorted { $0.timestamp < $1.timestamp }
+                .map { $0.pastedText(title: self.videoTitle) }
+            copyToPasteboard(blocks.joined(separator: "\n\n"))
+            self.note("Copied \(blocks.count) Moment\(blocks.count == 1 ? "" : "s").")
+        }
+
         let close = ActionButton("Close") { [weak self] in self?.orderOut(nil) }
 
         func copyPrompt(_ prompt: String, note: String) {
@@ -171,11 +219,11 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
                        note: "Copied a steps prompt. Paste it into your assistant; nothing was sent.")
         }
 
-        let actions = NSStackView(views: [copyAll, copyExcerpt, copyRange, open, star, forget, close])
+        let actions = NSStackView(views: [copyAll, copyExcerpt, copyRange, copyMoments, open, star, forget, close])
         actions.orientation = .horizontal
         actions.spacing = 6
         actions.alignment = .centerY
-        actions.setViews([copyAll, copyExcerpt, copyRange, open, star, forget, close], in: .leading)
+        actions.setViews([copyAll, copyExcerpt, copyRange, copyMoments, open, star, forget, close], in: .leading)
 
         let prompts = NSStackView(views: [searchField, followButton, summarize, steps])
         prompts.orientation = .horizontal
@@ -207,6 +255,7 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
                      chapters: YouTubeChapterIndex,
                      entries: [TranscriptEntry],
                      moments: [YouTubeMoment],
+                     lastPosition: Double? = nil,
                      currentTime: @escaping () -> Double?,
                      onSeek: @escaping (Double) -> Void,
                      onOpenTranscript: (() -> Void)? = nil,
@@ -218,6 +267,7 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
         self.chapters = chapters
         self.entries = TranscriptIndex.sorted(entries)
         self.moments = moments
+        self.lastPosition = lastPosition
         self.currentTime = currentTime
         self.onSeek = onSeek
         self.onOpenTranscript = onOpenTranscript
@@ -228,6 +278,8 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
         self.rangeEnd = nil
         self.searchField.stringValue = ""
         self.searchMatches = []
+        // The follow-along highlight belongs to the previous video's lines.
+        self.highlightedEntry = nil
 
         titleLabel.stringValue = videoTitle.isEmpty ? "YouTube Transcript" : videoTitle
         provenanceLabel.stringValue = transcriptSummary(provenance: provenance)
@@ -244,7 +296,10 @@ public final class YouTubeTranscriptPanel: NSPanel, NSTableViewDataSource, NSTab
         let chapterText = chapters.isEmpty ? "no chapters" : "\(chapters.count) chapters"
         let momentText = moments.isEmpty ? "no Moments" : "\(moments.count) Moment\(moments.count == 1 ? "" : "s")"
         let source = provenance.isEmpty ? "caption source unknown" : provenance
-        return "\(lines) lines · \(chapterText) · \(momentText) · \(source)"
+        var parts = ["\(lines) lines", chapterText, momentText, source]
+        // Stated as a property of the stored transcript, not as the playhead.
+        if let position = lastPosition { parts.append("last watched \(YouTubeTimecode.format(position))") }
+        return parts.joined(separator: " · ")
     }
 
     public override func orderOut(_ sender: Any?) {

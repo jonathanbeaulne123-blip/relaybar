@@ -25,7 +25,7 @@ public final class YouTubeTranscriptStore {
     /// `YouTubeVideoID`. A short digest is appended because APFS is
     /// case-insensitive by default and identifiers are case-sensitive.
     public func recordURL(for videoID: String) -> URL {
-        let digest = SHA256.hexDigest(Array(videoID.utf8)).prefix(8)
+        let digest = SHA256Digest.hexDigest(Array(videoID.utf8)).prefix(8)
         return directory.appendingPathComponent("\(videoID)-\(digest).json")
     }
 
@@ -97,7 +97,7 @@ public final class YouTubeTranscriptStore {
 
     private func jsonFiles() throws -> [URL] {
         let urls = try fm.contentsOfDirectory(at: directory,
-                                              includingPropertiesForKeys: [.contentModificationDateKey, .typeOfFile])
+                                              includingPropertiesForKeys: [.contentModificationDateKey])
         return urls.filter { $0.pathExtension.lowercased() == "json" && !$0.lastPathComponent.hasPrefix(".") }
     }
 

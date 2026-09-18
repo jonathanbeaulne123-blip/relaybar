@@ -170,6 +170,13 @@ public final class YouTubeController {
 
     public var hasTranscript: Bool { !transcriptEntries.isEmpty }
 
+    /// Where the *stored* record says this video was left. Reported as a fact
+    /// about the file ("last watched"), never written into the live clock: a
+    /// stored position from an earlier session is not a reading of the page, and
+    /// showing it as the current playhead would be exactly the kind of
+    /// confident-but-stale value this layer refuses to display.
+    public private(set) var storedPosition: Double?
+
     public var transcriptProvenance: String {
         trackProvenance.isEmpty ? (storedRecord?.provenance ?? "") : trackProvenance
     }
@@ -179,6 +186,24 @@ public final class YouTubeController {
     }
 
     public var setupStatus: String { availability.status }
+
+    /// Titles that change on every tick, keyed by slot. The app applies these in
+    /// place instead of rebuilding the bar, so a playing video costs no new
+    /// Touch Bar items and the tab strip keeps its scroll position.
+    public var progressTitles: [String: String] {
+        guard let session = session else { return [:] }
+        return [
+            "yt-mini-clock": liveTimecode,
+            "yt-mini-jump": "YouTube • \(liveTimecode) ↗",
+            "yt-mini-vol": volumeLabel(for: session)
+        ]
+    }
+
+    private func volumeLabel(for session: YouTubeSession) -> String {
+        if session.isMuted == true { return "🔇" }
+        if let volume = session.volume { return "🔊 \(volume)%" }
+        return "🔊 —"
+    }
 
     // MARK: - Probing
 
@@ -223,12 +248,32 @@ public final class YouTubeController {
         case .metrics(let metrics):
             // The probe names the video it read, so prefer that tab when several
             // YouTube tabs are open.
-            guard let tab = YouTubeTabSelector.pick(tabs: tabs, lastVideoID: metrics.videoID ?? lastVideoID) else {
+            let picked = YouTubeTabSelector.pick(tabs: tabs, lastVideoID: metrics.videoID ?? lastVideoID)
+            if picked == nil && session == nil {
+                // A playback payload arrived but nothing in the tab list is a
+                // watch page. With no session to preserve there is nothing to
+                // show, so say so instead of displaying a bar for no video.
                 clearSession(reason: nil)
                 return
             }
-            adopt(metrics: metrics, tab: tab, bundle: bundle, at: date, settling: settling)
+            // `picked` may legitimately be nil while a session is live: the
+            // probe reads across every window, while the tab list only covers
+            // the front one. Command routing is by tab identifier and searches
+            // every window, so the existing session is kept, not dropped.
+            adopt(metrics: metrics, tab: picked, bundle: bundle, at: date, settling: settling)
         }
+    }
+
+    /// Cheap liveness check for while the browser is not frontmost and therefore
+    /// is not being polled at all. No AppleScript is involved: if the browser
+    /// that owns the session has quit, the session is over and the pinned
+    /// mini-player must not keep showing a frozen clock.
+    public func validateSessionLiveness() {
+        guard let session = session else { return }
+        let running = NSWorkspace.shared.runningApplications.contains {
+            ($0.bundleIdentifier ?? "") == session.bundle && !$0.isTerminated
+        }
+        if !running { clearSession(reason: nil) }
     }
 
     private func adoptBlocked(tabs: [BrowserTab], bundle: String) {
@@ -270,9 +315,12 @@ public final class YouTubeController {
         onStateChange?()
     }
 
-    private func adopt(metrics: YouTubePlaybackMetrics, tab: BrowserTab, bundle: String, at date: Date, settling: Bool) {
+    private func adopt(metrics: YouTubePlaybackMetrics, tab: BrowserTab?, bundle: String, at date: Date, settling: Bool) {
         availability = .ready
-        let videoID = metrics.videoID ?? YouTubeVideoID.parse(url: tab.url)
+        let existing = session
+        let videoID = metrics.videoID
+            ?? tab.flatMap { YouTubeVideoID.parse(url: $0.url) }
+            ?? existing.flatMap { YouTubeVideoID(raw: $0.videoID) }
         let videoChanged = videoID?.raw != lastVideoID?.raw
         if videoChanged {
             persistLastPosition()
@@ -292,10 +340,10 @@ public final class YouTubeController {
         let muted = settling ? (session?.isMuted ?? metrics.isMuted) : metrics.isMuted
 
         let next = YouTubeSession(
-            tabID: tab.id,
-            bundle: bundle,
-            title: tab.title,
-            url: tab.url,
+            tabID: tab?.id ?? existing?.tabID ?? 0,
+            bundle: tab == nil ? (existing?.bundle ?? bundle) : bundle,
+            title: tab?.title ?? existing?.title ?? "",
+            url: tab?.url ?? existing?.url ?? "",
             videoID: videoID?.raw ?? "",
             state: state,
             currentTime: time,
@@ -307,13 +355,17 @@ public final class YouTubeController {
             availability: .ready
         )
 
-        let structureChanged = session?.state != next.state
-            || session?.tabID != next.tabID
-            || session?.videoID != next.videoID
-            || session?.title != next.title
-            || session?.availability != next.availability
-            || session?.chapterTitle != next.chapterTitle
-            || session?.duration != next.duration
+        // Only genuine structural change may rebuild the bar. The clock and the
+        // volume label change several times a second and are updated in place,
+        // which is what keeps the tab strip's scroll position stable.
+        let structureChanged = existing?.state != next.state
+            || existing?.tabID != next.tabID
+            || existing?.videoID != next.videoID
+            || existing?.title != next.title
+            || existing?.availability != next.availability
+            || existing?.chapterTitle != next.chapterTitle
+            || existing?.duration != next.duration
+            || existing?.url != next.url
 
         session = next
         if settling {
@@ -353,6 +405,7 @@ public final class YouTubeController {
         tracks = TranscriptTrackList()
         trackProvenance = ""
         storedRecord = nil
+        storedPosition = nil
         moments = []
     }
 
@@ -650,10 +703,9 @@ public final class YouTubeController {
         moments = record.recentMoments
         trackProvenance = record.provenance
         storedRecord = record
-        if let position = record.lastPosition, session?.currentTime == nil {
-            session?.currentTime = position
-            clock = YouTubeSessionClock(time: position, state: session?.state ?? .paused, duration: session?.duration)
-        }
+        // Kept as a labelled fact for the transcript panel. The live clock is
+        // untouched: it only ever follows a real sample from this session.
+        storedPosition = record.lastPosition
         transcriptionState = .completed(entryCount: record.entries.count, fromCache: fromCache)
         onStateChange?()
         onStatus?(fromCache
@@ -679,6 +731,7 @@ public final class YouTubeController {
             return
         }
         storedRecord = record
+        storedPosition = record.lastPosition
         moments = record.recentMoments
         trackProvenance = record.provenance
         if !record.entries.isEmpty {
@@ -698,6 +751,7 @@ public final class YouTubeController {
             chapters: chapters,
             entries: transcriptEntries,
             moments: recentMoments,
+            lastPosition: storedPosition,
             currentTime: { [weak self] in self?.liveTime },
             onSeek: { [weak self] time in self?.seek(to: time) },
             onOpenTranscript: { [weak self] in self?.openNativeTranscript() },
@@ -710,6 +764,21 @@ public final class YouTubeController {
     /// Real, local, offline search over the transcript lines.
     public func searchTranscript(_ query: String) -> [TranscriptMatch] {
         TranscriptIndex.search(query, in: transcriptEntries)
+    }
+
+    /// A bounded block of real caption lines around `time`, or nil when there is
+    /// no transcript. Used for both the Moment quote and the Ask prompt, so a
+    /// saved Moment and a question about the same instant quote the same lines.
+    public func momentExcerpt(around time: Double?, window: Double = YouTubePolicy.excerptWindow) -> String? {
+        guard let time = time else { return nil }
+        let excerpt = TranscriptIndex.excerpt(around: time, window: window, in: transcriptEntries)
+        return excerpt.isEmpty ? nil : excerpt
+    }
+
+    /// A single saved Moment, nearest the playhead, for the panel's "recent" row.
+    public func moment(nearest time: Double?) -> YouTubeMoment? {
+        guard let time = time else { return recentMoments.first }
+        return moments.min { abs($0.timestamp - time) < abs($1.timestamp - time) }
     }
 
     public func openNativeTranscript() {
@@ -836,10 +905,7 @@ public final class YouTubeController {
         }
 
         let playTitle = session.state == .playing || session.state == .live ? "❚❚" : "▶︎"
-        let volTitle: String
-        if let muted = session.isMuted, muted { volTitle = "🔇" }
-        else if let volume = session.volume { volTitle = "🔊 \(volume)%" }
-        else { volTitle = "🔊 —" }
+        let volTitle = volumeLabel(for: session)
 
         var slots: [TouchBarDriver.Slot] = [
             TouchBarDriver.Slot(
@@ -868,6 +934,14 @@ public final class YouTubeController {
                 },
                 action: {}
             ))
+            // Still the pinned layer, so the elapsed time stays in the same
+            // place whether or not the YouTube page is in front.
+            slots.append(TouchBarDriver.Slot(
+                key: "yt-mini-clock",
+                title: liveTimecode,
+                help: "\(session.cleanTitle)\n\(session.state.shortLabel)\(liveDuration.map { " of \(YouTubeTimecode.format($0))" } ?? "")",
+                width: 58
+            ) { [weak self] in self?.jumpToTab() })
         } else {
             slots.append(jumpSlot(for: session))
         }
